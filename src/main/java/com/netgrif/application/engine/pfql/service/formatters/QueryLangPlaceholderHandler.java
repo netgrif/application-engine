@@ -18,6 +18,8 @@ public class QueryLangPlaceholderHandler {
                 new NumberListPlaceholderFormatter(),
                 new ObjectIdPlaceholderFormatter(),
                 new ObjectIdListPlaceholderFormatter(),
+                new VersionPlaceholderFormatter(),
+                new VersionListPlaceholderFormatter(),
                 new DateTimePlaceholderFormatter(),
                 new DateTimeListPlaceholderFormatter(),
                 new DatePlaceholderFormatter(),

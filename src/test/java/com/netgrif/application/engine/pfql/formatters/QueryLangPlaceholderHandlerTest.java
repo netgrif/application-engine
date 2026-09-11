@@ -3,6 +3,7 @@ package com.netgrif.application.engine.pfql.formatters;
 
 import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
 import com.netgrif.application.engine.petrinet.domain.dataset.TaskField;
+import com.netgrif.application.engine.petrinet.domain.version.Version;
 import com.netgrif.application.engine.pfql.service.formatters.QueryLangPlaceholderHandler;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
@@ -358,7 +359,20 @@ public class QueryLangPlaceholderHandlerTest {
         assertDoesNotThrow(() -> evaluateQuery(query));
     }
 
-    // todo 2483 version object
+    @Test
+    public void testProcess_Version() {
+        String query = formatPlaceholders("process: version eq {}", placeholderHandler, new Version(1, 2, 3));
+        assertEquals("process: version eq 1.2.3", query);
+        assertDoesNotThrow(() -> evaluateQuery(query));
+    }
+
+    @Test
+    public void testProcess_VersionList() {
+        String query = formatPlaceholders("process: version in {}", placeholderHandler,
+                List.of(new Version(1, 0, 0), new Version(2, 0, 0)));
+        assertEquals("process: version in (1.0.0, 2.0.0)", query);
+        assertDoesNotThrow(() -> evaluateQuery(query));
+    }
 
     @Test
     public void testProcess_ObjectId() {
