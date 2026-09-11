@@ -3,7 +3,19 @@ package com.netgrif.application.engine.pfql.service.formatters;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-// todo 2483 doc
+/**
+ * Formatter for collections of date values in PFQL placeholders.
+ * <p>
+ * This formatter extends {@link DatePlaceholderFormatter} to handle collections of date objects.
+ * It validates that all items in the collection are supported date types and formats them as a
+ * comma-separated list wrapped in brackets suitable for MongoDB query syntax.
+ * </p>
+ * <p>
+ * Example output: {@code [2023-01-15T10:30:00Z, 2023-02-20T14:45:00Z, 2023-03-25T08:15:00Z]}
+ * </p>
+ *
+ * @see DatePlaceholderFormatter
+ */
 public class DateListPlaceholderFormatter extends DatePlaceholderFormatter {
 
     @Override

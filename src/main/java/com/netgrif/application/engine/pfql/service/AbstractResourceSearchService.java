@@ -27,7 +27,7 @@ public abstract class AbstractResourceSearchService<Resource> implements IResour
      * Pre-processes the raw query string: fills {@code {}} placeholders and ensures a correct PFQL prefix.
      *
      * @param rawQuery the raw query string, possibly with {@code {}} placeholders
-     * @param isMulti todo 2483
+     * @param isMulti if the prefix should address multiple resources
      * @param args     arguments to substitute into {@code {}} placeholders (in order)
      * @return the fully pre-processed query string ready for evaluation
      */
@@ -41,7 +41,7 @@ public abstract class AbstractResourceSearchService<Resource> implements IResour
      * Each implementation defines which prefix is expected and how to inject it if missing.
      *
      * @param query the query string after placeholder substitution
-     * @param isMulti todo 2483
+     * @param isMulti if the prefix should address multiple resources
      * @return the query string with the correct prefix guaranteed
      */
     protected abstract String ensurePrefix(String query, boolean isMulti);
@@ -54,7 +54,6 @@ public abstract class AbstractResourceSearchService<Resource> implements IResour
 
     protected abstract boolean doExists(QueryLangEvaluator evaluator);
 
-    // todo 2483 doc
     @Override
     public Resource searchOne(String queryString, Object... args) {
         final String processedQuery = preProcess(queryString, false, args);

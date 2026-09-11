@@ -4,7 +4,25 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.regex.Pattern;
 
-// todo 2483 doc
+/**
+ * Formatter for date placeholders in PFQL queries.
+ * <p>
+ * This formatter handles date values that can be either {@link LocalDate} instances or
+ * string representations matching the ISO date format (yyyy-MM-dd). It validates and
+ * formats date values according to the {@code DATE} token specification defined in the
+ * QueryLang.g4 grammar.
+ * </p>
+ * <p>
+ * Supported date formats:
+ * <ul>
+ *   <li>{@link LocalDate} objects - formatted to yyyy-MM-dd string</li>
+ *   <li>String values matching pattern: yyyy-MM-dd (e.g., "2020-03-03")</li>
+ * </ul>
+ * </p>
+ *
+ * @see QueryLangPlaceholderFormatter
+ * @see LocalDate
+ */
 public class DatePlaceholderFormatter implements QueryLangPlaceholderFormatter {
 
     /**

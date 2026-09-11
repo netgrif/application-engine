@@ -486,7 +486,17 @@ public class SearchUtils {
         return result.toString();
     }
 
-    // todo 2483
+    /**
+     * Checks if a PFQL query string begins with a resource token that matches one of the expected token types.
+     * The method tokenizes the trimmed query and compares the first token's type against the provided list.
+     *
+     * @param query              the PFQL query string to check (will be trimmed before tokenization)
+     * @param expectedTokenTypes a list of token type constants (e.g., {@link QueryLangParser#CASE},
+     *                           {@link QueryLangParser#TASK}) that are considered valid resource prefixes
+     * @return {@code true} if the first token of the query matches one of the expected types; {@code false} otherwise
+     * @see #buildResourcePrefix(int)
+     * @see #validQueryResourcePrefixes
+     */
     public static boolean hasResourcePrefix(String query, List<Integer> expectedTokenTypes) {
         CharStream input = CharStreams.fromString(query.trim());
         QueryLangLexer lexer = new QueryLangLexer(input);

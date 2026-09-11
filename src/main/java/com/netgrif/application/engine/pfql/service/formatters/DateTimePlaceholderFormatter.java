@@ -8,7 +8,30 @@ import java.time.temporal.ChronoField;
 import java.util.Date;
 import java.util.regex.Pattern;
 
-// todo 2483 doc
+/**
+ * Formatter for datetime placeholders in PFQL queries.
+ * <p>
+ * This formatter handles datetime values in queries by converting them to a standardized string format
+ * that matches the {@code DATETIME} token defined in the QueryLang grammar. It supports conversion from
+ * multiple Java time types including {@link LocalDateTime}, {@link Date}, and pre-formatted datetime strings.
+ * </p>
+ * <p>
+ * The formatter produces datetime strings in ISO 8601-like format: {@code yyyy-MM-dd'T'HH:mm:ss[.nnnnnnnnn]},
+ * where the fractional seconds part is optional and can have 1 to 9 digits.
+ * </p>
+ * <p>
+ * Examples of supported formats:
+ * <ul>
+ *   <li>{@code 2020-03-03T20:00:00}</li>
+ *   <li>{@code 2020-03-03T20:00:00.055}</li>
+ *   <li>{@code 2026-09-11T14:30:45.123456789}</li>
+ * </ul>
+ * </p>
+ *
+ * @see QueryLangPlaceholderFormatter
+ * @see LocalDateTime
+ * @see Date
+ */
 public class DateTimePlaceholderFormatter implements QueryLangPlaceholderFormatter {
 
     /**

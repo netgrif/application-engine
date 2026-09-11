@@ -58,11 +58,6 @@ public class TaskSearchService extends AbstractResourceSearchService<Task> {
         return QueryType.TASK;
     }
 
-    /**
-     // todo 2483
-     * @param query the query string after placeholder substitution
-     * @return
-     */
     @Override
     protected String ensurePrefix(String query, boolean isMulti) {
         if (query == null || hasResourcePrefix(query, allowedResourcePrefixes)) {

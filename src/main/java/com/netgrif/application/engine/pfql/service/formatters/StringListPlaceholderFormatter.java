@@ -3,7 +3,18 @@ package com.netgrif.application.engine.pfql.service.formatters;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-// todo 2483 doc
+/**
+ * Formatter for collections of strings in PFQL placeholder substitution.
+ * <p>
+ * This formatter handles collections of string values by formatting each individual string
+ * using the parent {@link StringPlaceholderFormatter} logic and then combining them into
+ * a comma-separated list wrapped in brackets.
+ * </p>
+ * <p>
+ * The formatter only supports non-empty collections where all items are supported by the
+ * parent string formatter.
+ * </p>
+ */
 public class StringListPlaceholderFormatter extends StringPlaceholderFormatter {
 
     @Override

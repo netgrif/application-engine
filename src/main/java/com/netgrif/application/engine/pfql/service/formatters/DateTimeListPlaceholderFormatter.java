@@ -3,7 +3,19 @@ package com.netgrif.application.engine.pfql.service.formatters;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-// todo 2483 doc
+/**
+ * Formatter for handling collections of date-time values in PFQL placeholders.
+ * <p>
+ * This formatter extends {@link DateTimePlaceholderFormatter} to support formatting of collections
+ * containing date-time objects. It validates that all items in the collection are supported date-time
+ * types and formats them into a bracketed, comma-separated string representation suitable for
+ * MongoDB queries.
+ * </p>
+ * <p>
+ * The formatter only supports non-empty collections where every element passes the parent class's
+ * {@link DateTimePlaceholderFormatter#supports(Object)} validation.
+ * </p>
+ */
 public class DateTimeListPlaceholderFormatter extends DateTimePlaceholderFormatter {
 
     @Override

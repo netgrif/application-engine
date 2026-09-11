@@ -17,7 +17,15 @@ import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.buil
 import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.hasResourcePrefix;
 
 
-// todo 2483 doc
+/**
+ * Service for searching and querying process resources using PFQL.
+ * <p>
+ * This service provides methods to search for processes, count processes, and check process existence
+ * based on PFQL query strings or evaluated query objects. It delegates the actual MongoDB
+ * queries to the {@link IPetriNetService}. Future implementations will support Elasticsearch as an alternative
+ * search backend.
+ * </p>
+ */
 @Slf4j
 @Service
 public class ProcessSearchService extends AbstractResourceSearchService<PetriNet> {
@@ -40,11 +48,6 @@ public class ProcessSearchService extends AbstractResourceSearchService<PetriNet
         return QueryType.PROCESS;
     }
 
-    /**
-     // todo 2483
-     * @param query the query string after placeholder substitution
-     * @return
-     */
     @Override
     protected String ensurePrefix(String query, boolean isMulti) {
         if (query == null || hasResourcePrefix(query, allowedResourcePrefixes)) {

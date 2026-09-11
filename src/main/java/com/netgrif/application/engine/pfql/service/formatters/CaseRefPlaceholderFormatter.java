@@ -6,7 +6,26 @@ import com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField;
 
 import java.util.stream.Collectors;
 
-// todo 2483 doc
+/**
+ * Formatter implementation for CaseRef field placeholder values in PFQL queries.
+ * <p>
+ * This formatter handles the conversion of case reference fields into their string representation
+ * for use in query language placeholders. It supports two types of case reference values:
+ * </p>
+ * <ul>
+ *     <li>{@link CaseField} - Direct case reference fields containing a list of case IDs</li>
+ *     <li>{@link MapOptionsField} - Map-based option fields with a "caseref" component</li>
+ * </ul>
+ * <p>
+ * The formatter converts case reference values into a comma-separated list of single-quoted
+ * strings enclosed in brackets, e.g., {@code ('case-id-1', 'case-id-2')}.
+ * Empty or null values are formatted as empty brackets {@code ()}.
+ * </p>
+ *
+ * @see QueryLangPlaceholderFormatter
+ * @see CaseField
+ * @see MapOptionsField
+ */
 public class CaseRefPlaceholderFormatter implements QueryLangPlaceholderFormatter {
 
     @Override

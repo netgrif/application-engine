@@ -3,7 +3,20 @@ package com.netgrif.application.engine.pfql.service.formatters;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-// todo 2483 doc
+/**
+ * Formatter for collections of version values in PFQL queries.
+ * <p>
+ * This formatter extends {@link VersionPlaceholderFormatter} to handle collections of version objects.
+ * It validates that all items in the collection are supported version values and formats them as a
+ * comma-separated list wrapped in brackets.
+ * </p>
+ * <p>
+ * The formatter only supports non-empty collections where every element is a valid version value
+ * as determined by the parent {@link VersionPlaceholderFormatter#supports(Object)} method.
+ * </p>
+ *
+ * @see VersionPlaceholderFormatter
+ */
 public class VersionListPlaceholderFormatter extends VersionPlaceholderFormatter {
 
     @Override

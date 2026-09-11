@@ -3,7 +3,17 @@ package com.netgrif.application.engine.pfql.service.formatters;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-// todo 2483 doc
+/**
+ * Formatter for collections of numeric values in PFQL placeholders.
+ * <p>
+ * This formatter extends {@link NumberPlaceholderFormatter} to handle collections of numbers.
+ * It formats a collection of numeric values by converting each number individually using the
+ * parent formatter and joining them with commas, wrapped in brackets.
+ * </p>
+ * <p>
+ * Example: A collection [1, 2.5, 3] would be formatted as "(1, 2.5, 3)"
+ * </p>
+ */
 public class NumberListPlaceholderFormatter extends NumberPlaceholderFormatter {
 
     @Override
