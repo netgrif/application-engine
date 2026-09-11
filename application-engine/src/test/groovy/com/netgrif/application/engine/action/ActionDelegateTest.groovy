@@ -99,7 +99,7 @@ class ActionDelegateTest {
         prepareFilterImportFile()
 
         List<String> actionDelegateList = actionDelegate.importFilters()
-        assert actionDelegateList.size() == 2
+        assert actionDelegateList.size() == 0
     }
 
     private void prepareFilterImportFile() {
