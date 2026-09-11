@@ -159,7 +159,8 @@ public class QueryLangPlaceholderHandlerTest {
         caseOptionField.setComponent(new Component("caseref"));
         caseOptionField.setOptions(Map.of("507f1f77bcf86cd799439011", new I18nString(), "507f1f77bcf86cd799439012", new I18nString()));
         String query2 = formatPlaceholders("case: id in {}", placeholderHandler, caseOptionField);
-        assertEquals("case: id in ('507f1f77bcf86cd799439011', '507f1f77bcf86cd799439012')", query2);
+        assertTrue(query2.equals("case: id in ('507f1f77bcf86cd799439011', '507f1f77bcf86cd799439012')")
+                || query2.equals("case: id in ('507f1f77bcf86cd799439012', '507f1f77bcf86cd799439011')"));
         assertDoesNotThrow(() -> evaluateQuery(query2));
     }
 
