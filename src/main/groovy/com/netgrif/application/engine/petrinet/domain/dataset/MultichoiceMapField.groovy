@@ -11,13 +11,13 @@ class MultichoiceMapField extends MapOptionsField<I18nString, LinkedHashSet<Stri
         this.defaultValue = new LinkedHashSet<>()
     }
 
-    MultichoiceMapField(Map<String, I18nString> choices) {
-        super(choices)
+    MultichoiceMapField(Map<String, I18nString> options) {
+        super(options)
         this.defaultValue = new LinkedHashSet<>()
     }
 
-    MultichoiceMapField(Map<String, I18nString> choices, LinkedHashSet<String> defaultValues) {
-        this(choices)
+    MultichoiceMapField(Map<String, I18nString> options, LinkedHashSet<String> defaultValues) {
+        this(options)
         this.defaultValue = defaultValues
     }
 
@@ -44,6 +44,24 @@ class MultichoiceMapField extends MapOptionsField<I18nString, LinkedHashSet<Stri
     @Override
     void setDefaultValue(LinkedHashSet<String> defaultValue) {
         super.setDefaultValue(defaultValue)
+    }
+
+    /**
+     * Returns a set of internationalized string values corresponding to the currently selected option keys.
+     * <p>
+     * This method maps each selected value (key) in the field's current value to its corresponding
+     * {@link I18nString} from the options map.
+     * </p>
+     *
+     * @return a {@link LinkedHashSet} of {@link I18nString} objects representing the internationalized
+     *         values of the selected options. Returns an empty set if options are null, empty, or if
+     *         the field's value is null.
+     */
+    Set<I18nString> getI18nValue() {
+        if (this.options == null || this.options.isEmpty() || this.getValue() == null) {
+            return new LinkedHashSet<>()
+        }
+        return this.getValue().collect { this.options[it] } as LinkedHashSet
     }
 
     @Override
