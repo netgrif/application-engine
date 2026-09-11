@@ -45,9 +45,17 @@ class EnumerationMapField extends MapOptionsField<I18nString, String> {
         super.setDefaultValue(defaultValue)
     }
 
-    // todo 2483 doc
+    /**
+     * Returns the internationalized string value corresponding to the currently selected option key.
+     * <p>
+     * This method retrieves the {@link I18nString} from the options map that corresponds to the
+     * current value of this field.
+     * </p>
+     *
+     * @return the {@link I18nString} object representing the internationalized value of the selected
+     *         option, or {@code null} if the field's value is null or if no matching option exists.
+     */
     I18nString getI18nValue() {
-        // todo 2483 test
         if (this.getValue() == null) {
             return null;
         }

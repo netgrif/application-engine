@@ -1,7 +1,10 @@
 
 package com.netgrif.application.engine.pfql.formatters;
 
+import com.netgrif.application.engine.petrinet.domain.Component;
+import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
+import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;
 import com.netgrif.application.engine.petrinet.domain.dataset.TaskField;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import com.netgrif.application.engine.pfql.service.formatters.QueryLangPlaceholderHandler;
@@ -151,6 +154,13 @@ public class QueryLangPlaceholderHandlerTest {
         String query = formatPlaceholders("case: id in {}", placeholderHandler, caseField);
         assertEquals("case: id in ('507f1f77bcf86cd799439011', '507f1f77bcf86cd799439012')", query);
         assertDoesNotThrow(() -> evaluateQuery(query));
+
+        EnumerationMapField caseOptionField = new EnumerationMapField();
+        caseOptionField.setComponent(new Component("caseref"));
+        caseOptionField.setOptions(Map.of("507f1f77bcf86cd799439011", new I18nString(), "507f1f77bcf86cd799439012", new I18nString()));
+        String query2 = formatPlaceholders("case: id in {}", placeholderHandler, caseOptionField);
+        assertEquals("case: id in ('507f1f77bcf86cd799439011', '507f1f77bcf86cd799439012')", query2);
+        assertDoesNotThrow(() -> evaluateQuery(query2));
     }
 
     @Test

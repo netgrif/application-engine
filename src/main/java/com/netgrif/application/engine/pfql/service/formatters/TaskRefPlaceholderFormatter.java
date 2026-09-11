@@ -16,7 +16,7 @@ public class TaskRefPlaceholderFormatter implements QueryLangPlaceholderFormatte
     public String format(Object value) {
         TaskField field = (TaskField) value;
         if (field.getValue() == null) {
-            return "";
+            return "()";
         }
         return wrapInBrackets(field.getValue().stream()
                 .map(this::wrapInSingleQuotes)

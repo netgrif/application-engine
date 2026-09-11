@@ -46,9 +46,18 @@ class MultichoiceMapField extends MapOptionsField<I18nString, LinkedHashSet<Stri
         super.setDefaultValue(defaultValue)
     }
 
-    // todo 2483 doc
+    /**
+     * Returns a set of internationalized string values corresponding to the currently selected option keys.
+     * <p>
+     * This method maps each selected value (key) in the field's current value to its corresponding
+     * {@link I18nString} from the options map.
+     * </p>
+     *
+     * @return a {@link LinkedHashSet} of {@link I18nString} objects representing the internationalized
+     *         values of the selected options. Returns an empty set if options are null, empty, or if
+     *         the field's value is null.
+     */
     Set<I18nString> getI18nValue() {
-        // todo 2483 test
         if (this.options == null || this.options.isEmpty() || this.getValue() == null) {
             return new LinkedHashSet<>()
         }

@@ -11,8 +11,6 @@ public class QueryLangPlaceholderHandler {
 
     public QueryLangPlaceholderHandler() {
         this.formatters = List.of(
-                new CaseRefPlaceholderFormatter(),
-                new TaskRefPlaceholderFormatter(),
                 new BooleanPlaceholderFormatter(),
                 new NumberPlaceholderFormatter(),
                 new NumberListPlaceholderFormatter(),
@@ -25,7 +23,9 @@ public class QueryLangPlaceholderHandler {
                 new DatePlaceholderFormatter(),
                 new DateListPlaceholderFormatter(),
                 new StringPlaceholderFormatter(),
-                new StringListPlaceholderFormatter()
+                new StringListPlaceholderFormatter(),
+                new CaseRefPlaceholderFormatter(),
+                new TaskRefPlaceholderFormatter()
         );
     }
 
