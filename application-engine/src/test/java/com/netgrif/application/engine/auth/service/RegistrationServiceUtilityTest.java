@@ -164,7 +164,7 @@ class RegistrationServiceUtilityTest {
         verify(userService).addDefaultAuthorities(any(AbstractUser.class));
         verify(userService).addRole(any(AbstractUser.class), eq("role-a"));
         verify(userService).addRole(any(AbstractUser.class), eq(defaultRole.getStringId()));
-        verify(groupService).addUser(saved, "group-a");
+        verify(groupService).addUser("group-a", saved);
     }
 
     @Test
