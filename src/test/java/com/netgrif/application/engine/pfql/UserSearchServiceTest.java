@@ -50,6 +50,10 @@ public class UserSearchServiceTest {
         assertNotNull(result);
         assertEquals(superCreator.getSuperUser().getStringId(), result.getStringId());
 
+        result = userSearchService.searchOne("email eq '" + superCreator.getSuperUser().getEmail() + "'");
+        assertNotNull(result);
+        assertEquals(superCreator.getSuperUser().getStringId(), result.getStringId());
+
         result = userSearchService.searchOne("user: email eq 'wrong'");
         assertNull(result);
     }
@@ -61,6 +65,11 @@ public class UserSearchServiceTest {
         assertThrows(IllegalArgumentException.class, () -> userSearchService.searchAll("processes: identifier eq 'query_lang_test'"));
 
         Page<IUser> result = userSearchService.searchAll("users: email eq '" + superCreator.getSuperUser().getEmail() + "'");
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+        assertEquals(superCreator.getSuperUser().getStringId(), result.getContent().get(0).getStringId());
+
+        result = userSearchService.searchAll("email eq '" + superCreator.getSuperUser().getEmail() + "'");
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
         assertEquals(superCreator.getSuperUser().getStringId(), result.getContent().get(0).getStringId());
@@ -78,6 +87,9 @@ public class UserSearchServiceTest {
         long result = userSearchService.count("users: email eq '" + superCreator.getSuperUser().getEmail() + "'");
         assertEquals(1, result);
 
+        result = userSearchService.count("email eq '" + superCreator.getSuperUser().getEmail() + "'");
+        assertEquals(1, result);
+
         result = userSearchService.count("users: email eq 'wrong'");
         assertEquals(0, result);
     }
@@ -88,6 +100,9 @@ public class UserSearchServiceTest {
         assertThrows(IllegalArgumentException.class, () -> userSearchService.exists("process: identifier eq 'query_lang_test'"));
 
         boolean result = userSearchService.exists("users: email eq '" + superCreator.getSuperUser().getEmail() + "'");
+        assertTrue(result);
+
+        result = userSearchService.exists("email eq '" + superCreator.getSuperUser().getEmail() + "'");
         assertTrue(result);
 
         result = userSearchService.exists("users: email eq 'wrong'");
