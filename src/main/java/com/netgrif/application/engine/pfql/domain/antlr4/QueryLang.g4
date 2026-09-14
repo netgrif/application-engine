@@ -339,7 +339,7 @@ doubleRange: leftEndpoint=('(' | '[') SPACE? DOUBLE SPACE? ':' SPACE? DOUBLE SPA
 dateRange: leftEndpoint=('(' | '[') SPACE? DATE SPACE? ':' SPACE? DATE SPACE? rightEndpoint=(')' | ']') ;
 dateTimeRange: leftEndpoint=('(' | '[') SPACE? DATETIME SPACE? ':' SPACE? DATETIME SPACE? rightEndpoint=(')' | ']') ;
 versionRange: leftEndpoint=('(' | '[') SPACE? VERSION_NUMBER SPACE? ':' SPACE? VERSION_NUMBER SPACE? rightEndpoint=(')' | ']') ;
-STRING: '\'' (~('\'' | '\r' | '\n'))* '\'' ; // todo NAE-1997: escape???
+STRING: '\'' ( '\\' . | ~('\'' | '\\' | '\r' | '\n') )* '\'' | '"'  ( '\\' . | ~('"'  | '\\'  | '\r' | '\n') )* '"';
 INT: DIGIT+ ;
 DOUBLE: DIGIT+ '.' DIGIT+ ;
 DATETIME: DATE 'T' ([01] DIGIT | '2' [0-3]) ':' [0-5] DIGIT ':' [0-5] DIGIT ('.' DIGIT+)? ; // 2020-03-03T20:00:00.055 // todo NAE-1997: format

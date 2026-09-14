@@ -183,7 +183,7 @@ public class SearchUtils {
     }
 
     public static String getStringValue(String queryLangString) {
-        return queryLangString.replace("'", "");
+        return queryLangString.replaceAll("^[\"']+|[\"']+$", "");
     }
 
     public static ObjectId getObjectIdValue(String queryLangString) {
