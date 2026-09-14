@@ -25,7 +25,12 @@
     <data type="text" immediate="true">
         <id>text_0</id>
         <title>Text</title>
-        <init dynamic="true">params["id"]</init>
+        <init dynamic="true">params["id"] + params["id"] + params["id"]</init>
+    </data>
+    <data type="text" immediate="true">
+        <id>text_1</id>
+        <title>Text</title>
+        <init dynamic="true">params["id"] == "0" ? null : params["id"]</init>
     </data>
     <transition>
         <id>t1</id>
