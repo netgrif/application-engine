@@ -157,6 +157,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Optional<AbstractUser> findUserByEmail(String email, String realmId) {
+        log.debug("Finding user by username [{}] in realm [{}]", email, realmId);
+        String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
+        Optional<AbstractUser> userOpt = userRepository.findByEmail(email, mongoTemplate, collectionName).map(user -> user);
+        if (userOpt.isPresent()) {
+            log.debug("User [{}] found in realm [{}]", email, realmId);
+        } else {
+            log.warn("User [{}] not found in realm [{}]", email, realmId);
+        }
+        return userOpt;
+    }
+
+    @Override
     public Page<AbstractUser> findAllUsersByQuery(Query query, String realmName, Pageable pageable) {
         log.trace("Retrieving all users in realm [{}]", realmName);
         String collectionName = collectionNameProvider.getCollectionNameForRealm(realmName);

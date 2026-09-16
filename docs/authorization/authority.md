@@ -1,4 +1,4 @@
-# Authority System
+Ple# Authority System
 
 The Netgrif Application Engine (NAE) uses **authorities** to protect resources and
 operations from unauthorized access. Authorities are application-wide permissions that
@@ -56,16 +56,9 @@ The application engine defines the following authorizing objects:
 **Process**
 
 - `PROCESS_UPLOAD` — import a new process
-- `PROCESS_VIEW_ALL` — retrieve all processes imported by any user
-- `PROCESS_VIEW_OWN` — retrieve only processes imported by the logged user
-- `PROCESS_DELETE_ALL` — delete processes imported by any user
-- `PROCESS_DELETE_OWN` — delete processes imported by the logged user
-
-**Filter**
-
-- `FILTER_UPLOAD` — upload a filter
-- `FILTER_DELETE_OWN` — delete a filter created by the logged user
-- `FILTER_DELETE_ALL` — delete a filter created by any user
+- `PROCESS_VIEW` — retrieve all processes imported by any user
+- `PROCESS_DELETE` — delete processes imported by any user
+- `PROCESS_DOWNLOAD` — download processes imported by any user
 
 **User**
 
@@ -98,31 +91,11 @@ The application engine defines the following authorizing objects:
 - `AUTHORITY_CREATE` — create an authority
 - `AUTHORITY_DELETE` — delete an authority
 - `AUTHORITY_VIEW` — retrieve an authority
-
-**Case**
-
-- `CASE_VIEW_ALL` — view all cases
-- `CASE_CREATE` — create a case
-- `CASE_DELETE` — delete a case
-- `CASE_DATA_GET_ALL` — get all data of a case
-
-**Task**
-
-- `TASK_RELOAD` — reload tasks
-- `TASK_ASSIGN` — assign a task
-- `TASK_FINISH` — finish a task
-- `TASK_CANCEL` — cancel a task
-- `TASK_DELEGATE` — delegate a task
-- `TASK_SAVE_DATA` — save data on a task
+- `AUTHORITY_ASSIGN_TO_USER` — assign an authority to a user
 
 **Elasticsearch**
 
 - `ELASTIC_REINDEX` — reindex the Elasticsearch database
-
-**LDAP**
-
-- `LDAP_GROUP_GET_ALL` — get all LDAP groups
-- `LDAP_GROUP_ASSIGN_ROLES` — assign roles to LDAP groups
 
 > The enum also declares the default values as `ADMIN` and `USER` values.
 
@@ -155,7 +128,7 @@ Newly created users receive a set of default authorities. These defaults are con
 per user type using scopes and concrete authority names:
 
 ```properties
-nae.authority.defaultUserAuthorities=FILTER_UPLOAD,FILTER_DELETE_OWN,USER_EDIT_OWN,GROUP_OWN_ADD_USER,...
+nae.authority.defaultUserAuthorities=USER,PROCESS_VIEW,USER_EDIT_SELF,USER_VIEW_SELF,GROUP_VIEW_OWN,GROUP_DELETE_OWN,GROUP_MEMBERSHIP_SELF
 nae.authority.defaultAnonymousAuthorities=...
 nae.authority.defaultAdminAuthorities=*
 ```

@@ -1156,43 +1156,51 @@ class ActionDelegate extends DelegateExpando {
         refs.find { it.transitionId == transitionId }.stringId
     }
 
+    @Authorize(authority = ["ROLE_ASSIGN_TO_USER", "ADMIN"])
     AbstractUser assignRole(String roleMongoId, AbstractUser user = userService.loggedUser) {
         AbstractUser actualUser = userService.addRole(user, roleMongoId)
         return actualUser
     }
 
+    @Authorize(authority = ["ROLE_ASSIGN_TO_USER", "ADMIN"])
     AbstractUser assignRole(String roleId, String netId, AbstractUser user = userService.loggedUser, Pageable pageable = Pageable.unpaged()) {
         List<PetriNet> nets = petriNetService.getByIdentifier(netId, pageable).content
         nets.forEach({ net -> user = assignRole(roleId, net, user) })
         return user
     }
 
+    @Authorize(authority = ["ROLE_ASSIGN_TO_USER", "ADMIN"])
     AbstractUser assignRole(String roleId, PetriNet net, AbstractUser user = userService.loggedUser) {
         AbstractUser actualUser = userService.addRole(user, net.roles.values().find { role -> role.importId == roleId }.stringId)
         return actualUser
     }
 
+    @Authorize(authority = ["ROLE_ASSIGN_TO_USER", "ADMIN"])
     AbstractUser assignRole(String roleId, String netId, Version version, AbstractUser user = userService.loggedUser) {
         PetriNet net = petriNetService.getPetriNet(netId, version)
         return assignRole(roleId, net, user)
     }
 
+    @Authorize(authority = ["ROLE_ASSIGN_TO_USER", "ADMIN"])
     AbstractUser removeRole(String roleMongoId, AbstractUser user = userService.loggedUser) {
         AbstractUser actualUser = userService.removeRole(user, roleMongoId)
         return actualUser
     }
 
+    @Authorize(authority = ["ROLE_ASSIGN_TO_USER", "ADMIN"])
     AbstractUser removeRole(String roleId, String netId, AbstractUser user = userService.loggedUser, Pageable pageable = Pageable.unpaged()) {
         List<PetriNet> nets = petriNetService.getByIdentifier(netId, pageable).content
         nets.forEach({ net -> user = removeRole(roleId, net, user) })
         return user
     }
 
+    @Authorize(authority = ["ROLE_ASSIGN_TO_USER", "ADMIN"])
     AbstractUser removeRole(String roleId, PetriNet net, AbstractUser user = userService.loggedUser) {
         AbstractUser actualUser = userService.removeRole(user, net.roles.values().find { role -> role.importId == roleId }.stringId)
         return actualUser
     }
 
+    @Authorize(authority = ["ROLE_ASSIGN_TO_USER", "ADMIN"])
     AbstractUser removeRole(String roleId, String netId, Version version, AbstractUser user = userService.loggedUser) {
         PetriNet net = petriNetService.getPetriNet(netId, version)
         return removeRole(roleId, net, user)
@@ -1410,17 +1418,23 @@ class ActionDelegate extends DelegateExpando {
         mailService.sendMail(mailDraft)
     }
 
-    @Authorize(authority = "USER_EDIT_ALL")
+    @Authorize(authority = ["USER_EDIT_ALL", "ADMIN"])
     @Authorize(authority = "USER_EDIT_SELF", expression = "@userService.getLoggedUser().email.equals(#arg0)")
     def changeUserByEmail(String email) {
         [email  : { cl ->
             changeUserByEmail(email, "email", cl)
         },
          name   : { cl ->
-             changeUserByEmail(email, "name", cl)
+             changeUserByEmail(email, "firstName", cl)
+         },
+         firstName   : { cl ->
+             changeUserByEmail(email, "firstName", cl)
          },
          surname: { cl ->
-             changeUserByEmail(email, "surname", cl)
+             changeUserByEmail(email, "lastName", cl)
+         },
+         lastName   : { cl ->
+             changeUserByEmail(email, "lastName", cl)
          },
          tel    : { cl ->
              changeUserByEmail(email, "tel", cl)
@@ -1428,15 +1442,23 @@ class ActionDelegate extends DelegateExpando {
         ]
     }
 
+    @Authorize(authority = ["USER_EDIT_ALL", "ADMIN"])
+    @Authorize(authority = "USER_EDIT_SELF", expression = "@userService.getLoggedUser().email.equals(#arg0)")
     def changeUser(String id) {
         [email  : { cl ->
             changeUser(id, "email", cl)
         },
          name   : { cl ->
-             changeUser(id, "name", cl)
+             changeUser(id, "firstName", cl)
+         },
+         firstName   : { cl ->
+             changeUser(id, "firstName", cl)
          },
          surname: { cl ->
-             changeUser(id, "surname", cl)
+             changeUser(id, "lastName", cl)
+         },
+         lastName   : { cl ->
+             changeUser(id, "lastName", cl)
          },
          tel    : { cl ->
              changeUser(id, "tel", cl)
@@ -1444,15 +1466,23 @@ class ActionDelegate extends DelegateExpando {
         ]
     }
 
+    @Authorize(authority = ["USER_EDIT_ALL", "ADMIN"])
+    @Authorize(authority = "USER_EDIT_SELF", expression = "@userService.getLoggedUser().email.equals(#arg0)")
     def changeUser(AbstractUser user) {
         [email  : { cl ->
             changeUser(user, "email", cl)
         },
          name   : { cl ->
-             changeUser(user, "name", cl)
+             changeUser(user, "firstName", cl)
+         },
+         firstName   : { cl ->
+             changeUser(user, "firstName", cl)
          },
          surname: { cl ->
-             changeUser(user, "surname", cl)
+             changeUser(user, "lastName", cl)
+         },
+         lastName   : { cl ->
+             changeUser(user, "lastName", cl)
          },
          tel    : { cl ->
              changeUser(user, "tel", cl)
@@ -1460,8 +1490,10 @@ class ActionDelegate extends DelegateExpando {
         ]
     }
 
+    @Authorize(authority = ["USER_EDIT_ALL", "ADMIN"])
+    @Authorize(authority = "USER_EDIT_SELF", expression = "@userService.getLoggedUser().email.equals(#arg0)")
     def changeUserByEmail(String email, String attribute, def cl) {
-        Optional<AbstractUser> userOptional = userService.findUserByUsername(email, null)
+        Optional<AbstractUser> userOptional = userService.findUserByEmail(email, null)
         if (!userOptional.isPresent()) {
             log.error("Cannot find user with email [" + email + "]")
             return
@@ -1470,11 +1502,15 @@ class ActionDelegate extends DelegateExpando {
         changeUser(user, attribute, cl)
     }
 
+    @Authorize(authority = ["USER_EDIT_ALL", "ADMIN"])
+    @Authorize(authority = "USER_EDIT_SELF", expression = "@userService.getLoggedUser().email.equals(#arg0)")
     def changeUser(String id, String attribute, def cl) {
         AbstractUser user = userService.findById(id, null)
         changeUser(user, attribute, cl)
     }
 
+    @Authorize(authority = ["USER_EDIT_ALL", "ADMIN"])
+    @Authorize(authority = "USER_EDIT_SELF", expression = "@userService.getLoggedUser().email.equals(#arg0)")
     def changeUser(AbstractUser user, String attribute, def cl) {
         if (user == null) {
             log.error("Cannot find user.")
@@ -1490,6 +1526,8 @@ class ActionDelegate extends DelegateExpando {
         userService.saveUser(user, null)
     }
 
+    @Authorize(authority = ["USER_EDIT_ALL", "ADMIN"])
+    @Authorize(authority = "USER_EDIT_SELF", expression = "@userService.getLoggedUser().email.equals(#arg0)")
     MessageResource inviteUser(String email) {
         NewUserRequest newUserRequest = new NewUserRequest()
         newUserRequest.email = email
@@ -1498,6 +1536,7 @@ class ActionDelegate extends DelegateExpando {
         return inviteUser(newUserRequest)
     }
 
+    @Authorize(authority = ["USER_CREATE", "ADMIN"])
     MessageResource inviteUser(NewUserRequest newUserRequest) {
         AbstractUser user = registrationService.createNewUser(newUserRequest)
         if (user == null)
@@ -1508,6 +1547,7 @@ class ActionDelegate extends DelegateExpando {
         return MessageResource.successMessage("Done")
     }
 
+    @Authorize(authority = ["USER_DELETE", "ADMIN"])
     void deleteUser(String email) {
         AbstractUser user = userService.findByEmail(email, null)
         if (user == null) {
@@ -1517,6 +1557,7 @@ class ActionDelegate extends DelegateExpando {
         deleteUser(user)
     }
 
+    @Authorize(authority = ["USER_DELETE", "ADMIN"])
     void deleteUser(AbstractUser user) {
         Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize())
         Page<Task> tasksAssignedToUserPage = taskService.findByUser(pageable, user)
@@ -1537,6 +1578,8 @@ class ActionDelegate extends DelegateExpando {
         userService.deleteUser(user)
     }
 
+    @Authorize(authority = ["USER_VIEW_ALL", "ADMIN"])
+    @Authorize(authority = "USER_VIEW_SELF", expression = "@userService.getLoggedUser().email.equals(#arg0)")
     AbstractUser findUserByEmail(String email) {
         Optional<AbstractUser> userOpt = userService.findUserByUsername(email, null)
         if (userOpt.isEmpty()) {
@@ -1547,6 +1590,8 @@ class ActionDelegate extends DelegateExpando {
         }
     }
 
+    @Authorize(authority = ["USER_VIEW_ALL", "ADMIN"])
+    @Authorize(authority = "USER_VIEW_SELF", expression = "@userService.getLoggedUser().email.equals(#arg0)")
     AbstractUser findUserById(String id) {
         AbstractUser user = userService.findById(id, null)
         if (user == null) {

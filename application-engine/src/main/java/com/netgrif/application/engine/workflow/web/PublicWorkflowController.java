@@ -44,7 +44,7 @@ public class PublicWorkflowController {
         this.workflowService = workflowService;
     }
 
-    @PreAuthorize("@workflowAuthorizationService.canCallCreate(@userService.getAnonymousLogged(), #body.netId)")
+    @Authorize(expression = "@workflowAuthorizationService.canCallCreate(@userService.getAnonymousLogged(), #body.netId)")
     @PostMapping(value = "/case", consumes = "application/json;charset=UTF-8", produces = MediaTypes.HAL_JSON_VALUE)
     @Operation(summary = "Create new case")
     public EntityModel<EventOutcomeWithMessage> createCase(@RequestBody CreateCaseBody body, Locale locale) {

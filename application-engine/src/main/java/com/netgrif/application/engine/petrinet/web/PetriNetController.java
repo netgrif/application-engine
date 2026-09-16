@@ -5,6 +5,7 @@ import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRol
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
 import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
 import com.netgrif.application.engine.importer.service.Importer;
+import com.netgrif.application.engine.objects.annotations.Authorize;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNetSearch;
@@ -95,7 +96,7 @@ public class PetriNetController {
         }
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @Authorize(authority = {"ADMIN", "PROCESS_UPLOAD"})
     @Operation(summary = "Import new process",
             description = "Caller must have the ADMIN role. Imports an entirely new process or a new version of an existing process.",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -126,6 +127,7 @@ public class PetriNetController {
         }
     }
 
+    @Authorize(authority = {"ADMIN", "PROCESS_VIEW_ALL"})
     @Operation(summary = "Get all processes", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<Page<PetriNetReference>> getAll(@RequestParam(value = "indentifier", required = false) String identifier, @RequestParam(value = "version", required = false) String version, Pageable pageable, Authentication auth, Locale locale) {
@@ -182,7 +184,7 @@ public class PetriNetController {
         return new TransactionsResource(net.getTransactions().values(), netId, locale);
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @Authorize(authority = {"ADMIN", "PROCESS_DOWNLOAD"})
     @Operation(summary = "Download process model", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{netId}/file", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public FileSystemResource getNetFile(@PathVariable("netId") String netId, @RequestParam(value = "title", required = false) String title, Authentication auth, HttpServletResponse response) {
@@ -220,7 +222,8 @@ public class PetriNetController {
         return resources;
     }
 
-    @PreAuthorize("@petriNetAuthorizationService.canCallProcessDelete(#auth.getPrincipal(), #processId)")
+    @Authorize(authority = {"ADMIN", "PROCESS_DELETE"})
+    @Authorize(expression = "@petriNetAuthorizationService.canCallProcessDelete(#auth.getPrincipal(), #processId)")
     @Operation(summary = "Delete process",
             description = "Caller must have the ADMIN role. Removes the specified process, along with it's cases, tasks and process roles.",
             security = {@SecurityRequirement(name = "BasicAuth")})

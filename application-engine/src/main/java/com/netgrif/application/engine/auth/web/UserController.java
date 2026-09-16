@@ -8,6 +8,7 @@ import com.netgrif.application.engine.auth.web.requestbodies.UserCreateRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.UserSearchRequestBody;
 import com.netgrif.application.engine.auth.web.responsebodies.PreferencesResource;
 import com.netgrif.application.engine.auth.web.responsebodies.User;
+import com.netgrif.application.engine.objects.annotations.Authorize;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
@@ -54,7 +55,7 @@ public class UserController {
     private final RealmService realmService;
     private final UserFactory userFactory;
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @Authorize(authority = {"ADMIN", "USER_CREATE"})
     @Operation(summary = "Create a new user", description = "Creates a new user in the realm specified by id.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "User successfully created"),
@@ -209,7 +210,7 @@ public class UserController {
 //        Page<IUser> page = userService.findAllActiveByProcessRoles(roleResourceIds, pageable);
 //        return ResponseEntity.ok();
 //    }
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @Authorize(authority = {"ADMIN", "ROLE_ASSIGN_TO_USER"})
     @Operation(summary = "Assign roles to the user", description = "Caller must have the ADMIN role", security = {@SecurityRequirement(name = "X-Auth-Token")})
     @PutMapping(value = "/{realmId}/{id}/roles", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponses(value = {
@@ -253,7 +254,7 @@ public class UserController {
 //        }
 //    }
 //
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @Authorize(authority = {"ADMIN", "AUTHORITY_VIEW"})
     @Operation(summary = "Get all authorities of the system",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "X-Auth-Token")})
@@ -267,7 +268,7 @@ public class UserController {
         return ResponseEntity.ok(authorityService.findAll(Pageable.unpaged()).stream().toList());
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @Authorize(authority = {"ADMIN", "AUTHORITY_ASSIGN_TO_USER"})
     @Operation(summary = "Assign authority to the user",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "X-Auth-Token")})
