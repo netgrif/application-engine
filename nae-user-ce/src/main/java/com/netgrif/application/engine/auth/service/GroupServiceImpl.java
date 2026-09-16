@@ -101,7 +101,7 @@ public class GroupServiceImpl implements GroupService {
             log.error("Group [{}] does not exist", group.getStringId());
             throw new IllegalArgumentException("Group " + group.getStringId() + " does not exist");
         }
-        if (group.getMemberIds() != null) {
+        if (group.getMemberIds() != null && !group.getMemberIds().isEmpty()) {
             Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
             Page<AbstractUser> members;
             do {
@@ -114,7 +114,7 @@ public class GroupServiceImpl implements GroupService {
                 pageable = pageable.next();
             } while (members.hasNext());
         }
-        if (group.getSubgroupIds() != null) {
+        if (group.getSubgroupIds() != null && !group.getSubgroupIds().isEmpty()) {
             log.debug("Removing group [{}] from child groups [{}]", group.getStringId(), group.getSubgroupIds());
             List<Group> subGroups = findAllByIds(group.getSubgroupIds(), Pageable.unpaged()).stream().toList();
             subGroups.forEach(subgroup -> {
@@ -122,7 +122,7 @@ public class GroupServiceImpl implements GroupService {
                 save(subgroup);
             });
         }
-        if (group.getGroupIds() != null) {
+        if (group.getGroupIds() != null && !group.getGroupIds().isEmpty()) {
             log.debug("Removing group [{}] from parent groups [{}]", group.getStringId(), group.getGroupIds());
             List<Group> groups = findAllByIds(group.getGroupIds(), Pageable.unpaged()).stream().toList();
             groups.forEach(grup -> {
@@ -365,7 +365,7 @@ public class GroupServiceImpl implements GroupService {
 
         removableAuthorityIds.forEach(toBeRemovedId -> removeAuthority(groupId, toBeRemovedId));
         newAuthorityIds.forEach(toBeAddedId -> addAuthority(groupId, toBeAddedId));
-        return group;
+        return findById(groupId);
     }
 
     @Override
