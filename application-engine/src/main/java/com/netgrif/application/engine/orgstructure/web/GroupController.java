@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.orgstructure.web;
 
 import com.netgrif.application.engine.auth.service.GroupService;
+import com.netgrif.application.engine.objects.annotations.Authorize;
 import com.netgrif.application.engine.orgstructure.web.responsebodies.Group;
 import com.netgrif.application.engine.orgstructure.web.responsebodies.GroupsResource;
 import io.swagger.v3.oas.annotations.Operation;
