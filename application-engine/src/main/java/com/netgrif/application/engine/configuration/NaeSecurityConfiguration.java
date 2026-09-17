@@ -200,6 +200,6 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
     }
 
     private ActuatorRequestFilter actuatorRequestFilter() {
-        return new ActuatorRequestFilter(webEndpointProperties);
+        return new ActuatorRequestFilter(webEndpointProperties, securityConfigurationProperties);
     }
 }

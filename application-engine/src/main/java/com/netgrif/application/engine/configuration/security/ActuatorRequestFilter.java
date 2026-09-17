@@ -4,11 +4,13 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -16,11 +18,13 @@ import java.io.IOException;
 public class ActuatorRequestFilter extends OncePerRequestFilter {
 
     private final String actuatorBasePath ;
-    private final String healthPath;
+    private final String[] publicPaths;
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
-    public ActuatorRequestFilter(WebEndpointProperties webEndpointProperties) {
+    public ActuatorRequestFilter(WebEndpointProperties webEndpointProperties,
+                                 SecurityConfigurationProperties securityConfigurationProperties) {
        actuatorBasePath = webEndpointProperties.getBasePath();
-       healthPath = actuatorBasePath + "/health";
+       publicPaths = securityConfigurationProperties.getServerPatterns();
     }
 
     @Override
@@ -31,7 +35,7 @@ public class ActuatorRequestFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        if (path.equals(healthPath)) {
+        if (isPublicPath(path)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -57,6 +61,18 @@ public class ActuatorRequestFilter extends OncePerRequestFilter {
 
     private boolean isAuthenticated(Authentication auth) {
         return auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken);
+    }
+
+    private boolean isPublicPath(String path) {
+        if (publicPaths == null) {
+            return false;
+        }
+        for (String publicPath : publicPaths) {
+            if (pathMatcher.match(publicPath, path)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean hasAdminRole(Authentication auth) {

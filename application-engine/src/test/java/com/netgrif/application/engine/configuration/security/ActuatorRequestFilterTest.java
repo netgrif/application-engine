@@ -1,7 +1,10 @@
 package com.netgrif.application.engine.configuration.security;
 
+import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -34,15 +37,29 @@ class ActuatorRequestFilterTest {
         assertEquals(200, response.getStatus());
     }
 
-    @Test
-    void allowsHealthEndpointWithoutAuthentication() throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "/manage/health",
+            "/manage/health/liveness",
+            "/manage/health/readiness"
+    })
+    void allowsHealthEndpointsWithoutAuthentication(String path) throws Exception {
         MockFilterChain chain = new MockFilterChain();
         MockHttpServletResponse response = new MockHttpServletResponse();
 
-        filter().doFilter(request("/manage/health"), response, chain);
+        filter().doFilter(request(path), response, chain);
 
         assertNotNull(chain.getRequest());
         assertEquals(200, response.getStatus());
+    }
+
+    @Test
+    void rejectsOtherHealthSubpathsWithoutAuthentication() throws Exception {
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        filter().doFilter(request("/manage/health/custom"), response, new MockFilterChain());
+
+        assertEquals(401, response.getStatus());
     }
 
     @Test
@@ -107,7 +124,13 @@ class ActuatorRequestFilterTest {
     private ActuatorRequestFilter filter() {
         WebEndpointProperties properties = new WebEndpointProperties();
         properties.setBasePath("/manage");
-        return new ActuatorRequestFilter(properties);
+        SecurityConfigurationProperties securityProperties = new SecurityConfigurationProperties();
+        securityProperties.setServerPatterns(new String[]{
+                "/manage/health",
+                "/manage/health/liveness",
+                "/manage/health/readiness"
+        });
+        return new ActuatorRequestFilter(properties, securityProperties);
     }
 
     private MockHttpServletRequest request(String uri) {
