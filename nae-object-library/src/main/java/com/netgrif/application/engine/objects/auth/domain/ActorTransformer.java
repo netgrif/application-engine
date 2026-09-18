@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.objects.auth.domain;
 
 import java.time.Duration;
+import java.util.Set;
 
 /**
  * Transformer class responsible for converting between different user/actor representations
@@ -27,6 +28,14 @@ public class ActorTransformer {
          * @return newly created LoggedUser instance
          */
         LoggedUser create();
+
+        default void resolveProcessRoles(AbstractActor user) {};
+
+        default void resolveProcessRolesRecursively(AbstractActor actor, Set<String> processRoleIds) {};
+
+        default void resolveAuthorities(AbstractActor user) {};
+
+        default void resolveAuthoritiesRecursively(AbstractActor actor, Set<String> authorityIds) {};
     }
 
     /**
@@ -62,6 +71,8 @@ public class ActorTransformer {
         loggedUser.setProcessRoles(user.getProcessRoles());
         loggedUser.setAttributes(user.getAttributes());
         loggedUser.setGroupIds(user.getGroupIds());
+        factory.resolveProcessRoles(loggedUser);
+        factory.resolveAuthorities(loggedUser);
         return loggedUser;
     }
 

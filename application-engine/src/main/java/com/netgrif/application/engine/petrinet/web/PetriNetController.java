@@ -95,7 +95,7 @@ public class PetriNetController {
         }
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @PreAuthorize("@authorizationServiceImpl.hasAuthority('ADMIN')")
     @Operation(summary = "Import new process",
             description = "Caller must have the ADMIN role. Imports an entirely new process or a new version of an existing process.",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -182,7 +182,7 @@ public class PetriNetController {
         return new TransactionsResource(net.getTransactions().values(), netId, locale);
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @PreAuthorize("@authorizationServiceImpl.hasAuthority('ADMIN')")
     @Operation(summary = "Download process model", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{netId}/file", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public FileSystemResource getNetFile(@PathVariable("netId") String netId, @RequestParam(value = "title", required = false) String title, Authentication auth, HttpServletResponse response) {
