@@ -116,16 +116,12 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
 
 
     @Override
-    @Authorize(authority = "ADMIN")
-    @Authorize(authority = "ROLE_ASSIGN_TO_USER")
     public void assignRolesToUser(AbstractUser user, Collection<ProcessResourceId> processResourceIds, LoggedUser loggedUser) {
         assignRolesToActor(user, processResourceIds);
         saveUserAndReloadContext(user, loggedUser);
     }
 
     @Override
-    @Authorize(authority = "ADMIN")
-    @Authorize(authority = "ROLE_ASSIGN_TO_GROUP")
     public void assignRolesToGroup(Group group, Collection<ProcessResourceId> requestedRolesIds) {
         assignRolesToActor(group, requestedRolesIds);
         groupService.save(group);

@@ -3,7 +3,6 @@ package com.netgrif.application.engine.auth.service;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
-import com.netgrif.application.engine.objects.annotations.Authorize;
 import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
@@ -121,8 +120,6 @@ public class RegistrationService implements IRegistrationService {
 
     @Override
     @Transactional
-    @Authorize(authority = "ADMIN")
-    @Authorize(authority = "USER_CREATE")
     public AbstractUser createNewUser(NewUserRequest newUser) {
         User user = (User) userService.findByEmail(newUser.email, null);
         if (user != null) {

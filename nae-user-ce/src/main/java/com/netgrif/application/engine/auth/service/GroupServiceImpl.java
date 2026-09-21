@@ -83,9 +83,6 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    @Authorize(authority = "ADMIN")
-    @Authorize(authority = "GROUP_DELETE")
-    @Authorize(authority = "GROUP_DELETE_OWN", expression = "@userService.getLoggedUser().getUsername().equals(#group.getOwnerUsername())")
     public void delete(Group group) {
         if (!groupRepository.existsById(group.getStringId())) {
             log.error("Group [{}] does not exist", group.getStringId());
@@ -194,9 +191,6 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    @Authorize(authority = "ADMIN")
-    @Authorize(authority = "GROUP_CREATE")
-    @Authorize(authority = "GROUP_CREATE_OWN", expression = "@userService.getLoggedUser().getUsername().equals(#groupOwner.getUsername())")
     public Group create(String identifier, String title, AbstractUser groupOwner) {
         log.info("Creating default group for user: [{}]", groupOwner.getStringId());
         Group group = new com.netgrif.application.engine.adapter.spring.auth.domain.Group(identifier, groupOwner.getRealmId());
@@ -252,9 +246,6 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    @Authorize(authority = "ADMIN")
-    @Authorize(authority = "GROUP_ADD_USER")
-    @Authorize(authority = "GROUP_ADD_USER_OWN", expression = "@userService.getLoggedUser().getUsername().equals(#group.getOwnerUsername())")
     public Group addUser(AbstractUser user, Group group) {
         log.info("Adding user [{}] to group [{}]", user.getStringId(), group.getStringId());
         user.addGroupId(group.getStringId());
@@ -270,9 +261,6 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    @Authorize(authority = "ADMIN")
-    @Authorize(authority = "GROUP_REMOVE_USER")
-    @Authorize(authority = "GROUP_REMOVE_USER_OWN", expression = "@userService.getLoggedUser().getUsername().equals(#group.getOwnerUsername())")
     public Group removeUser(AbstractUser user, Group group) {
         log.info("Removing user [{}] from group [{}]", user.getStringId(), group.getStringId());
         user.removeGroupId(group.getStringId());
@@ -346,9 +334,6 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    @Authorize(authority = "ADMIN")
-    @Authorize(authority = "GROUP_ADD_SUBGROUP")
-    @Authorize(authority = "GROUP_ADD_SUBGROUP_OWN", expression = "@userService.getLoggedUser().getUsername().equals(#parentGroup.getOwnerUsername())")
     public Pair<Group, Group> addSubgroup(Group parentGroup, Group childGroup) {
         // TODO: maybe handle groups cycles here?
         if (parentGroup.getStringId().equals(childGroup.getStringId())) {
