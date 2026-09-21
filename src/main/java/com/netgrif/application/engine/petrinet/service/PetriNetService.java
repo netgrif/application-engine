@@ -133,10 +133,9 @@ public class PetriNetService implements IPetriNetService {
     private IUriService uriService;
 
     private IElasticPetriNetService elasticPetriNetService;
+
     @Autowired
     private TaskService taskService;
-    @Autowired
-    private IDataService iDataService;
 
     @Autowired
     public void setElasticPetriNetService(IElasticPetriNetService elasticPetriNetService) {
@@ -458,7 +457,7 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public PetriNetReference getReference(String identifier, Version version, LoggedUser user, Locale locale) {
-        PetriNet net = version == null ? getNewestVersionByIdentifier(identifier) : getPetriNet(identifier, version);
+        PetriNet net = version == null ? self.getNewestVersionByIdentifier(identifier) : self.getPetriNet(identifier, version);
         return net != null ? transformToReference(net, locale) : new PetriNetReference();
     }
 
