@@ -139,71 +139,90 @@ userComparisons: idComparison
 // attribute comparisons
 idComparison: ID SPACE objectIdComparison # idBasic
             | ID SPACE inListStringComparison # idList
+            | ID SPACE nullComparison # idNull
             ;
 titleComparison: TITLE SPACE stringComparison # titleBasic
+               | TITLE SPACE stringLikeComparison # titleLike
                | TITLE SPACE inListStringComparison # titleList
                | TITLE SPACE inRangeStringComparison # titleRange
+               | TITLE SPACE nullComparison # titleNull
                ;
 identifierComparison: IDENTIFIER SPACE stringComparison # identifierBasic
                     | IDENTIFIER SPACE inListStringComparison # identifierList
                     | IDENTIFIER SPACE inRangeStringComparison # identifierRange
+                    | IDENTIFIER SPACE nullComparison # identifierNull
                     ;
 versionComparison: VERSION SPACE (NOT SPACE?)? op=(EQ | LT | GT | LTE | GTE) SPACE VERSION_NUMBER # versionBasic
                  | VERSION SPACE inListVersionComparison # versionListCmp
                  | VERSION SPACE inRangeVersionComparison # versionRangeCmp
+                 | VERSION SPACE nullComparison # versionNull
                  ;
 creationDateComparison: CREATION_DATE SPACE dateComparison # cdDateBasic
                       | CREATION_DATE SPACE dateTimeComparison # cdDateTimeBasic
                       | CREATION_DATE SPACE inListDateComparison # cdDateList
                       | CREATION_DATE SPACE inRangeDateComparison # cdDateRange
+                      | CREATION_DATE SPACE nullComparison # cdNull
                       ;
 processIdComparison: PROCESS_ID SPACE stringComparison # processIdBasic
                    | PROCESS_ID SPACE inListStringComparison # processIdList
+                   | PROCESS_ID SPACE nullComparison # processIdNull
                    ;
 processIdObjIdComparison: PROCESS_ID SPACE objectIdComparison # processIdObjIdBasic
                    | PROCESS_ID SPACE inListStringComparison # processIdObjIdList
+                   | PROCESS_ID SPACE nullComparison # processIdObjNull
                    ;
 processIdentifierComparison: PROCESS_IDENTIFIER SPACE stringComparison # processIdentifierBasic
                            | PROCESS_IDENTIFIER SPACE inListStringComparison # processIdentifierList
                            | PROCESS_IDENTIFIER SPACE inRangeStringComparison # processIdentifierRange
+                           | PROCESS_IDENTIFIER SPACE nullComparison # processIdentifierNull
                            ;
 authorComparison: AUTHOR SPACE stringComparison # authorBasic
                 | AUTHOR SPACE inListStringComparison # authorList
+                | AUTHOR SPACE nullComparison # authorNull
                 ;
 transitionIdComparison: TRANSITION_ID SPACE stringComparison # transitionIdBasic
                       | TRANSITION_ID SPACE inListStringComparison # transitionIdList
                       | TRANSITION_ID SPACE inRangeStringComparison # transitionIdRange
+                      | TRANSITION_ID SPACE nullComparison # transitionIdNull
                       ;
 stateComparison: STATE SPACE EQ SPACE state=(ENABLED | DISABLED) ;
 userIdComparison: USER_ID SPACE stringComparison # userIdBasic
                 | USER_ID SPACE inListStringComparison # userIdList
+                | USER_ID SPACE nullComparison # userIdNull
                 ;
 caseIdComparison: CASE_ID SPACE stringComparison # caseIdBasic
                 | CASE_ID SPACE inListStringComparison # caseIdList
+                | CASE_ID SPACE nullComparison # caseIdNull
                 ;
 lastAssignComparison: LAST_ASSIGN SPACE dateComparison # laDateBasic
                     | LAST_ASSIGN SPACE dateTimeComparison # laDateTimeBasic
                     | LAST_ASSIGN SPACE inListDateComparison # laDateList
                     | LAST_ASSIGN SPACE inRangeDateComparison # laDateRange
+                    | LAST_ASSIGN SPACE nullComparison # laNull
                     ;
 lastFinishComparison: LAST_FINISH SPACE dateComparison # lfDateBasic
                     | LAST_FINISH SPACE dateTimeComparison # lfDateTimeBasic
                     | LAST_FINISH SPACE inListDateComparison # lfDateList
                     | LAST_FINISH SPACE inRangeDateComparison # lfDateRange
+                    | LAST_FINISH SPACE nullComparison # lfNull
                     ;
 nameComparison: NAME SPACE stringComparison # nameBasic
               | NAME SPACE inListStringComparison # nameList
               | NAME SPACE inRangeStringComparison # nameRange
+              | NAME SPACE nullComparison # nameNull
               ;
 surnameComparison: SURNAME SPACE stringComparison # surnameBasic
                  | SURNAME SPACE inListStringComparison # surnameList
                  | SURNAME SPACE inRangeStringComparison # surnameRange
+                 | SURNAME SPACE nullComparison # surnameNull
                  ;
 emailComparison: EMAIL SPACE stringComparison # emailBasic
                | EMAIL SPACE inListStringComparison # emailList
                | EMAIL SPACE inRangeStringComparison # emailRange
+               | EMAIL SPACE nullComparison # emailNull
                ;
 dataValueComparison: dataValue SPACE stringComparison # dataString
+              | dataValue SPACE stringLikeComparison # dataStringLike
               | dataValue SPACE numberComparison # dataNumber
               | dataValue SPACE dateComparison # dataDate
               | dataValue SPACE dateTimeComparison # dataDatetime
@@ -214,27 +233,33 @@ dataValueComparison: dataValue SPACE stringComparison # dataString
               | dataValue SPACE inRangeStringComparison # dataStringRange
               | dataValue SPACE inRangeNumberComparison # dataNumberRange
               | dataValue SPACE inRangeDateComparison # dataDateRange
+              | dataValue SPACE nullComparison # dataNull
               ;
 dataOptionsComparison: dataOptions SPACE stringComparison # dataOptionsBasic
                      | dataOptions SPACE inListStringComparison # dataOptionsList
                      | dataOptions SPACE inRangeStringComparison # dataOptionsRange
+                     | dataOptions SPACE nullComparison # dataOptionsNull
                      ;
 placesComparison: places SPACE numberComparison # placesBasic
                 | places SPACE inListNumberComparison # placesList
                 | places SPACE inRangeNumberComparison # placesRange
+                | places SPACE nullComparison # placesNull
                 ;
 tasksStateComparison: tasksState SPACE (NOT SPACE?)? op=EQ SPACE state=(ENABLED | DISABLED) ;
 tasksUserIdComparison: tasksUserId SPACE stringComparison # tasksUserIdBasic
                      | tasksUserId SPACE inListStringComparison # tasksUserIdList
+                     | tasksUserId SPACE nullComparison # tasksUserIdNull
                      ;
 
 // basic comparisons
 objectIdComparison: (NOT SPACE?)? op=(EQ | NEQ) SPACE (STRING | LOGGED_USER_ID) ;
 stringComparison: (NOT SPACE?)? op=(EQ | NEQ | CONTAINS | LT | GT | LTE | GTE) SPACE (STRING | loggedUserStringAttribute) ;
+stringLikeComparison: stringComparison LIKE ;
 numberComparison: (NOT SPACE?)? op=(EQ | NEQ | LT | GT | LTE | GTE) SPACE number=(INT | DOUBLE) ;
 dateComparison: (NOT SPACE?)? op=(EQ | NEQ | LT | GT | LTE | GTE) SPACE DATE ;
 dateTimeComparison: (NOT SPACE?)? op=(EQ | NEQ | LT | GT | LTE | GTE) SPACE DATETIME ;
 booleanComparison: (NOT SPACE?)? op=(EQ | NEQ) SPACE (BOOLEAN | LOGGED_USER_ANONYMOUS) ;
+nullComparison: (NOT SPACE?)? op=(EQ | NEQ) SPACE NULL ;
 
 // in list/in range comparisons
 inListStringComparison: (NOT SPACE?)? op=IN SPACE? stringList ;
@@ -277,7 +302,7 @@ LT: L T | '<' ;
 GT: G T | '>' ;
 LTE: L T E | '<=' ;
 GTE: G T E | '>=' ;
-CONTAINS: C O N T A I N S | '~';
+CONTAINS: C O N T A I N S | '~' ;
 IN: I N ;
 
 // resurces
@@ -346,6 +371,8 @@ DATETIME: DATE 'T' ([01] DIGIT | '2' [0-3]) ':' [0-5] DIGIT ':' [0-5] DIGIT ('.'
 DATE: DIGIT DIGIT DIGIT DIGIT '-' ('0' [1-9] | '1' [0-2]) '-' ('0' [1-9] | [12] DIGIT | '3' [01]) ; // 2020-03-03 // todo NAE-1997: format
 BOOLEAN: T R U E | F A L S E ;
 VERSION_NUMBER: DIGIT+ '.' DIGIT+ '.' DIGIT+ ;
+NULL: N U L L ;
+LIKE: '*' ;
 JAVA_ID: [a-zA-Z$_] [a-zA-Z0-9$_]* ;
 
 SPACE: [ ]+ ;
