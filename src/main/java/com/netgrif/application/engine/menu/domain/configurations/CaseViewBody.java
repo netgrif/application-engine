@@ -21,6 +21,7 @@ public class CaseViewBody extends ViewBody {
     private boolean requireTitleInCreation = true;
     private boolean showCreateCaseButton = true;
     private String bannedNetsInCreation;
+    private boolean showMultipleVersionsOfProcess = false;
     private boolean showMoreMenu = false;
     private boolean allowHeaderTableMode = true;
     private List<String> headersMode = new ArrayList<>(List.of("sort", "edit", "search"));
@@ -76,6 +77,8 @@ public class CaseViewBody extends ViewBody {
                 this.showCreateCaseButton);
         outcome.putDataSetEntry(CaseViewConstants.FIELD_BANNED_NETS_IN_CREATION, FieldType.TEXT,
                 this.bannedNetsInCreation);
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_SHOW_MULTIPLE_VERSIONS_OF_PROCESS, FieldType.BOOLEAN,
+                this.showMultipleVersionsOfProcess);
         outcome.putDataSetEntry(CaseViewConstants.FIELD_SHOW_MORE_MENU, FieldType.BOOLEAN,
                 this.showMoreMenu);
         outcome.putDataSetEntry(CaseViewConstants.FIELD_ALLOW_HEADER_TABLE_MODE, FieldType.BOOLEAN,

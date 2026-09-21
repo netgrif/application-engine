@@ -228,6 +228,7 @@ public class MenuItemServiceTest {
         assertEquals("processIdentifier:menu_item", filterDataField.getValue());
         assertEquals(true, caseView.getFieldValue(CaseViewConstants.FIELD_ALL_ALLOWED_NETS));
         assertEquals(true, caseView.getFieldValue(CaseViewConstants.FIELD_INHERIT_ALLOWED_NETS));
+        assertEquals(false, caseView.getFieldValue(CaseViewConstants.FIELD_SHOW_MULTIPLE_VERSIONS_OF_PROCESS));
 
         List<String> caseDefaultHeaders = (List<String>) caseView.getFieldValue(CaseViewConstants.FIELD_DEFAULT_HEADERS);
         assertEquals(2, caseDefaultHeaders.size());

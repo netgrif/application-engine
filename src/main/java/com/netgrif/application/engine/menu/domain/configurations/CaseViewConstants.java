@@ -10,6 +10,7 @@ public class CaseViewConstants extends ViewConstants {
     public static final String FIELD_CREATE_CASE_BUTTON_TITLE = "create_case_button_title";
     public static final String FIELD_CREATE_CASE_BUTTON_ICON = "create_case_button_icon";
     public static final String FIELD_BANNED_NETS_IN_CREATION = "banned_nets_in_creation";
+    public static final String FIELD_SHOW_MULTIPLE_VERSIONS_OF_PROCESS = "show_multiple_versions_of_process";
     public static final String FIELD_SHOW_CREATE_CASE_BUTTON = "show_create_case_button";
     public static final String FIELD_SHOW_MORE_MENU = "case_show_more_menu";
     public static final String FIELD_ALLOW_HEADER_TABLE_MODE = "case_allow_header_table_mode";

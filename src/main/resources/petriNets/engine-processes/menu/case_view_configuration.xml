@@ -192,6 +192,11 @@
             }
         </action>
     </data>
+    <data type="boolean" immediate="true">
+        <id>show_multiple_versions_of_process</id>
+        <title name="show_multiple_versions_of_process">Show multiple versions of a process?</title>
+        <init>false</init>
+    </data>
     <data type="i18n">
         <id>view_header</id>
         <title/>
@@ -404,6 +409,7 @@
         <i18nString name="require_title_in_creation">Vyžadovať názov inštancii pri vytváraní?</i18nString>
         <i18nString name="banned_nets_in_creation">Zakázané siete pri vytváraní</i18nString>
         <i18nString name="banned_nets_in_creation_desc">Uveďte identifikátory procesov oddelené čiarkou. Napríklad: mynet1,mynet2</i18nString>
+        <i18nString name="show_multiple_versions_of_process">todo 2461</i18nString>
         <i18nString name="show_create_case_button">Zobraziť tlačidlo na vytvorenie prípadu?</i18nString>
         <i18nString name="case_show_more_menu">Zobrazovať menu pre prípadovú položku?</i18nString>
         <i18nString name="sort">Zoraďovanie</i18nString>
@@ -463,6 +469,7 @@
         <i18nString name="require_title_in_creation">Erforde den Titel beim erzeugen von Fällen?</i18nString>
         <i18nString name="banned_nets_in_creation">Ausgeschlossene Prozesse</i18nString>
         <i18nString name="banned_nets_in_creation_desc">Trenne die Prozessidentifikatoren mit einer Komma. z.B.: netz1,netz2</i18nString>
+        <i18nString name="show_multiple_versions_of_process">todo 2461</i18nString>
         <i18nString name="show_create_case_button">Schaltfläche „Fall erstellen“ anzeigen?</i18nString>
         <i18nString name="case_show_more_menu">"Erweiterte Optionen" Taste bei einzelnen Fällen anzeigen</i18nString>
         <i18nString name="item_settings">Menüeintrageinstellungen</i18nString>
@@ -873,7 +880,22 @@
                     <cols>1</cols>
                     <offset>0</offset>
                     <template>material</template>
-                    <appearance>standard</appearance>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>show_multiple_versions_of_process</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
                 </layout>
             </dataRef>
             <dataRef>
@@ -1513,6 +1535,20 @@
                 <layout>
                     <x>0</x>
                     <y>25</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>show_multiple_versions_of_process</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>26</y>
                     <rows>1</rows>
                     <cols>1</cols>
                     <template>material</template>
