@@ -189,7 +189,7 @@ public class WorkflowController {
         return resources;
     }
 
-    @Authorize(authority = {"ADMIN"})
+    @Authorize(authority = "ADMIN")
     @Operation(summary = "Reload tasks of case",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "BasicAuth")})

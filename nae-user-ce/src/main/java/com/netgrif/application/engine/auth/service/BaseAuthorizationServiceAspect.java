@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.auth.service;
 
 
+import com.netgrif.application.engine.adapter.spring.utils.NaeReflectionUtils;
 import com.netgrif.application.engine.objects.annotations.Authorizations;
 import com.netgrif.application.engine.objects.annotations.Authorize;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
@@ -9,6 +10,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.expression.BeanFactoryResolver;
 import org.springframework.core.DefaultParameterNameDiscoverer;
@@ -115,8 +117,13 @@ public class BaseAuthorizationServiceAspect {
 
         List<Object> args = Arrays.asList(joinPoint.getArgs());
 
-        for (int i = 0; i < args.size(); i++) {
-            evaluationContext.setVariable("arg" + i, args.get(i));
+        if (NaeReflectionUtils.isGroovyClass(joinPoint.getTarget().getClass())) {
+            for (int i = 0; i < args.size(); i++) {
+                evaluationContext.setVariable("arg" + i, args.get(i));
+            }
+        } else {
+            List<String> argNames = Arrays.asList(((MethodSignature) joinPoint.getSignature()).getParameterNames());
+            argNames.forEach(name -> evaluationContext.setVariable(name, args.get(argNames.indexOf(name))));
         }
 
         boolean allowed;
@@ -128,4 +135,5 @@ public class BaseAuthorizationServiceAspect {
             return false;
         }
     }
+
 }

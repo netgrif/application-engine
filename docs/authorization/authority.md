@@ -1,4 +1,4 @@
-Ple# Authority System
+# Authority System
 
 The Netgrif Application Engine (NAE) uses **authorities** to protect resources and
 operations from unauthorized access. Authorities are application-wide permissions that
@@ -66,38 +66,39 @@ The application engine defines the following authorizing objects:
 - `USER_DELETE` — remove a user
 - `USER_EDIT_ALL` — edit any user
 - `USER_EDIT_SELF` — edit only the logged user
-- `USER_VIEW_ALL` — retrieve all users
-- `USER_VIEW_SELF` — retrieve only the logged user
 
 **Group**
 
 - `GROUP_CREATE` — create a group
+- `GROUP_CREATE_OWN` — create a group owned by the logged user
+- `GROUP_DELETE` — delete a group created by any user
 - `GROUP_DELETE_OWN` — delete a group created by the logged user
-- `GROUP_DELETE_ALL` — delete a group created by any user
-- `GROUP_ALL_ADD_USER` — add any user to any group
-- `GROUP_OWN_ADD_USER` — add a user to a group owned by the logged user
-- `GROUP_ALL_REMOVE_USER` — remove any user from any group
-- `GROUP_OWN_REMOVE_USER` — remove a user from a group owned by the logged user
-- `GROUP_VIEW_ALL` — retrieve any group
-- `GROUP_VIEW_OWN` — retrieve a group of the logged user
-- `GROUP_MEMBERSHIP_SELF` — manage the logged user's own group membership
+- `GROUP_ADD_USER` — add any user to any group
+- `GROUP_ADD_USER_OWN` — add a user to a group owned by the logged user
+- `GROUP_REMOVE_USER` — remove any user from any group
+- `GROUP_REMOVE_USER_OWN` — remove a user from a group owned by the logged user
+- `GROUP_ADD_SUBGROUP` — add a subgroup to any group
+- `GROUP_ADD_SUBGROUP_OWN` — add a subgroup to a group owned by the logged user
+- `GROUP_REMOVE_SUBGROUP` — remove a subgroup from any group
+- `GROUP_REMOVE_SUBGROUP_OWN` — remove a subgroup from a group owned by the logged user
 
 **Role**
 
 - `ROLE_ASSIGN_TO_USER` — assign a process role to a user
+- `ROLE_ASSIGN_TO_GROUP` — assign a process role to a group
 
 **Authority**
 
 - `AUTHORITY_CREATE` — create an authority
 - `AUTHORITY_DELETE` — delete an authority
-- `AUTHORITY_VIEW` — retrieve an authority
 - `AUTHORITY_ASSIGN_TO_USER` — assign an authority to a user
+- `AUTHORITY_ASSIGN_TO_GROUP` — assign an authority to a group
 
 **Elasticsearch**
 
 - `ELASTIC_REINDEX` — reindex the Elasticsearch database
 
-> The enum also declares the default values as `ADMIN` and `USER` values.
+> The enum also declares the default values as `ADMIN`, `USER`, `SYSTEMADMIN`, and `ANONYMOUS` values.
 
 ### Custom authorizing objects
 
@@ -128,7 +129,7 @@ Newly created users receive a set of default authorities. These defaults are con
 per user type using scopes and concrete authority names:
 
 ```properties
-nae.authority.defaultUserAuthorities=USER,PROCESS_VIEW,USER_EDIT_SELF,USER_VIEW_SELF,GROUP_VIEW_OWN,GROUP_DELETE_OWN,GROUP_MEMBERSHIP_SELF
+nae.authority.defaultUserAuthorities=USER,PROCESS_VIEW,USER_EDIT_SELF,GROUP_DELETE_OWN
 nae.authority.defaultAnonymousAuthorities=...
 nae.authority.defaultAdminAuthorities=*
 ```
@@ -153,7 +154,7 @@ The annotation targets both **methods** and **types**, so it can be applied to:
 
 - **REST controllers** — to guard HTTP endpoints. For example, the endpoints of the
   authority management controller are protected with authorities such as
-  `AUTHORITY_CREATE`, `AUTHORITY_DELETE`, and `AUTHORITY_VIEW`:
+  `AUTHORITY_CREATE` and `AUTHORITY_DELETE`:
 
   ```java
   @Authorize(authority = "AUTHORITY_DELETE")
@@ -199,7 +200,7 @@ The annotation targets both **methods** and **types**, so it can be applied to:
     - Spring beans (e.g. `@userService`).
 
 ```groovy
-@Authorize(authority = "USER_EDIT_OWN", expression = "@userService.getLoggedUser().email.equals(#email)")
+@Authorize(authority = "USER_EDIT_SELF", expression = "@userService.getLoggedUser().email.equals(#email)")
 def changeUserByEmail(String email) {
     // ...
 }
@@ -241,11 +242,11 @@ are combined with a logical **OR** — the user is authorized if **at least one*
 the `@Authorizations` container annotation.
 
 In the example below the user is authorized if they hold `USER_EDIT_ALL`, **or** if they
-hold `USER_EDIT_OWN` and are editing their own account:
+hold `USER_EDIT_SELF` and are editing their own account:
 
 ```groovy
 @Authorize(authority = "USER_EDIT_ALL")
-@Authorize(authority = "USER_EDIT_OWN", expression = "@userService.getLoggedUser().stringId.equals(#id)")
+@Authorize(authority = "USER_EDIT_SELF", expression = "@userService.getLoggedUser().stringId.equals(#id)")
 def changeUser(String id) {
     // ...
 }

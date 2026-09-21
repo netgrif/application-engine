@@ -3,6 +3,7 @@ package com.netgrif.application.engine.workflow.service;
 import com.google.common.collect.Ordering;
 import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties;
 import com.netgrif.application.engine.auth.service.GroupService;
+import com.netgrif.application.engine.objects.annotations.Authorize;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.*;
@@ -312,6 +313,8 @@ public class WorkflowService implements IWorkflowService {
         }
     }
 
+    @Override
+    @Authorize(expression = "@workflowAuthorizationService.canCallCreate(#createCaseParams.getAuthor(), #createCaseParams.getProcessId())")
     public CreateCaseEventOutcome createCase(CreateCaseParams createCaseParams) {
         fillAndValidateAttributes(createCaseParams);
         PetriNet petriNet = createCaseParams.getProcess();
@@ -416,6 +419,7 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
+    @Authorize(expression = "@workflowAuthorizationService.canCallDelete(@userService.getLoggedUserFromContext(), #deleteCaseParams.getUseCaseId())")
     public DeleteCaseEventOutcome deleteCase(DeleteCaseParams deleteCaseParams) {
         fillAndValidateAttributes(deleteCaseParams);
 

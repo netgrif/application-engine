@@ -96,7 +96,8 @@ public class PetriNetController {
         }
     }
 
-    @Authorize(authority = {"ADMIN", "PROCESS_UPLOAD"})
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "PROCESS_UPLOAD")
     @Operation(summary = "Import new process",
             description = "Caller must have the ADMIN role. Imports an entirely new process or a new version of an existing process.",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -127,7 +128,8 @@ public class PetriNetController {
         }
     }
 
-    @Authorize(authority = {"ADMIN", "PROCESS_VIEW_ALL"})
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "PROCESS_VIEW")
     @Operation(summary = "Get all processes", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<Page<PetriNetReference>> getAll(@RequestParam(value = "indentifier", required = false) String identifier, @RequestParam(value = "version", required = false) String version, Pageable pageable, Authentication auth, Locale locale) {
@@ -184,7 +186,8 @@ public class PetriNetController {
         return new TransactionsResource(net.getTransactions().values(), netId, locale);
     }
 
-    @Authorize(authority = {"ADMIN", "PROCESS_DOWNLOAD"})
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "PROCESS_DOWNLOAD")
     @Operation(summary = "Download process model", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{netId}/file", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public FileSystemResource getNetFile(@PathVariable("netId") String netId, @RequestParam(value = "title", required = false) String title, Authentication auth, HttpServletResponse response) {
@@ -222,7 +225,8 @@ public class PetriNetController {
         return resources;
     }
 
-    @Authorize(authority = {"ADMIN", "PROCESS_DELETE"})
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "PROCESS_DELETE")
     @Authorize(expression = "@petriNetAuthorizationService.canCallProcessDelete(#auth.getPrincipal(), #processId)")
     @Operation(summary = "Delete process",
             description = "Caller must have the ADMIN role. Removes the specified process, along with it's cases, tasks and process roles.",

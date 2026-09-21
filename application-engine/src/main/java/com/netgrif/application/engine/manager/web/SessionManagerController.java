@@ -34,7 +34,7 @@ public class SessionManagerController {
     @Autowired
     private ISessionManagerService sessionManagerService;
 
-    @Authorize(authority = {"ADMIN"})
+    @Authorize(authority = "ADMIN")
     @Operation(summary = "Get All logged users",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -48,7 +48,7 @@ public class SessionManagerController {
         return new AllLoggedUsersResponse(loggedUsers);
     }
 
-    @Authorize(authority = {"ADMIN"})
+    @Authorize(authority = "ADMIN")
     @Operation(summary = "Logout current user",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -63,7 +63,7 @@ public class SessionManagerController {
         return new MessageLogoutResponse(true);
     }
 
-    @Authorize(authority = {"ADMIN"})
+    @Authorize(authority = "ADMIN")
     @Operation(summary = "Logout all user",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "BasicAuth")})

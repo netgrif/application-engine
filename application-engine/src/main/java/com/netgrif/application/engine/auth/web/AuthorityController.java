@@ -10,6 +10,7 @@ import com.netgrif.application.engine.workflow.web.responsebodies.MessageResourc
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -29,6 +30,7 @@ import java.util.Optional;
 @Slf4j
 @RestController
 @RequestMapping("/api/authority")
+@RequiredArgsConstructor
 @ConditionalOnProperty(
         value = "nae.user.web.enabled",
         havingValue = "true",
@@ -37,10 +39,10 @@ import java.util.Optional;
 @Tag(name = "Authority")
 public class AuthorityController {
 
-    @Autowired
-    private AuthorityService authorityService;
+    private final AuthorityService authorityService;
 
-    @Authorize(authority = {"AUTHORITY_DELETE", "ADMIN"})
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "AUTHORITY_DELETE")
     @Operation(description = "Delete authority", security = {@SecurityRequirement(name = "BasicAuth")})
     @DeleteMapping(value = "/delete/{name}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource delete(@PathVariable String name, Authentication auth) {
@@ -54,8 +56,9 @@ public class AuthorityController {
         }
     }
 
-    @Authorize(authority = {"AUTHORITY_CREATE", "ADMIN"})
-    @Operation(description = "Delete authority", security = {@SecurityRequirement(name = "BasicAuth")})
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "AUTHORITY_CREATE")
+    @Operation(description = "Create authority", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<AuthorityDto> create(@RequestBody NewAuthorityRequest request) {
         try {
@@ -68,7 +71,6 @@ public class AuthorityController {
         }
     }
 
-    @Authorize(authority = {"AUTHORITY_GET_ALL", "ADMIN"})
     @Operation(description = "Delete authority", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/all", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<Page<AuthorityDto>> getAll(Pageable pageable) {
@@ -77,7 +79,6 @@ public class AuthorityController {
         return ResponseEntity.ok(new PageImpl<>(authorityDtoList, pageable, authorities.getTotalElements()));
     }
 
-    @Authorize(authority = {"AUTHORITY_VIEW", "ADMIN"})
     @Operation(description = "Delete authority", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{name}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<AuthorityDto> getOne(@PathVariable("name") String name) {
@@ -90,7 +91,6 @@ public class AuthorityController {
         }
     }
 
-    @Authorize(authority = {"AUTHORITY_VIEW", "ADMIN"})
     @Operation(description = "Delete authority", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/scope/{scope}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<List<AuthorityDto>> getAllByScope(@PathVariable("scope") String scope, Authentication auth) {
