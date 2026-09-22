@@ -2,6 +2,7 @@ package com.netgrif.application.engine.pfql.service.utils;
 
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.ApplicationContextProvider;
+import com.netgrif.application.engine.elastic.service.ElasticsearchQuerySanitizer;
 import com.netgrif.application.engine.petrinet.domain.QPetriNet;
 import com.netgrif.application.engine.petrinet.domain.version.QVersion;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
@@ -12,12 +13,14 @@ import com.netgrif.application.engine.pfql.domain.enums.ComparisonType;
 import com.netgrif.application.engine.pfql.service.QueryLangErrorListener;
 import com.netgrif.application.engine.pfql.service.QueryLangEvaluator;
 import com.netgrif.application.engine.pfql.service.QueryLangExplainEvaluator;
+import com.netgrif.application.engine.pfql.service.formatters.QueryLangPlaceholderHandler;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.DateTimePath;
 import com.querydsl.core.types.dsl.StringPath;
 import lombok.extern.slf4j.Slf4j;
+import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
@@ -36,13 +39,20 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SearchUtils {
 
+    public static final List<String> validQueryResourcePrefixes = List.of("case", "cases", "task", "tasks", "process",
+            "processes", "user", "users");
+
+    private static final String QUERY_DELIMITER = ": ";
+
     public static final Map<ComparisonType, List<Integer>> comparisonOperators = Map.of(
             ComparisonType.ID, List.of(QueryLangParser.EQ, QueryLangParser.NEQ, QueryLangParser.IN),
             ComparisonType.STRING, List.of(QueryLangParser.EQ, QueryLangParser.NEQ, QueryLangParser.CONTAINS, QueryLangParser.LT, QueryLangParser.LTE, QueryLangParser.GT, QueryLangParser.GTE),
             ComparisonType.NUMBER, List.of(QueryLangParser.EQ, QueryLangParser.NEQ, QueryLangParser.LT, QueryLangParser.LTE, QueryLangParser.GT, QueryLangParser.GTE),
             ComparisonType.DATE, List.of(QueryLangParser.EQ, QueryLangParser.NEQ, QueryLangParser.LT, QueryLangParser.LTE, QueryLangParser.GT, QueryLangParser.GTE),
             ComparisonType.DATETIME, List.of(QueryLangParser.EQ, QueryLangParser.NEQ, QueryLangParser.LT, QueryLangParser.LTE, QueryLangParser.GT, QueryLangParser.GTE),
-            ComparisonType.BOOLEAN, List.of(QueryLangParser.EQ, QueryLangParser.NEQ)
+            ComparisonType.BOOLEAN, List.of(QueryLangParser.EQ, QueryLangParser.NEQ),
+            ComparisonType.NULL, List.of(QueryLangParser.EQ, QueryLangParser.NEQ),
+            ComparisonType.LIKE, List.of(QueryLangParser.EQ, QueryLangParser.NEQ)
     );
 
     public static final Map<String, String> processAttrToSortPropMapping = Map.of(
@@ -92,6 +102,7 @@ public class SearchUtils {
 
     public static final String LEFT_OPEN_ENDPOINT = "(";
     public static final String RIGHT_OPEN_ENDPOINT = ")";
+    protected static final String[] ELASTIC_EXCLUDE_FROM_ESCAPING = new String[]{"~", " "};
 
     public static String toDateString(LocalDate localDate) {
         return localDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
@@ -180,7 +191,7 @@ public class SearchUtils {
     }
 
     public static String getStringValue(String queryLangString) {
-        return queryLangString.replace("'", "");
+        return queryLangString.replaceAll("^[\"']+|[\"']+$", "");
     }
 
     public static ObjectId getObjectIdValue(String queryLangString) {
@@ -399,6 +410,28 @@ public class SearchUtils {
     }
 
     public static String buildElasticQuery(String attribute, int op, String value, boolean not) {
+        value = quoteAndSanitizeForElastic(value);
+        return doBuildElasticQuery(attribute, op, value, not);
+    }
+
+    public static String buildElasticQueryInList(String attribute, List<String> values, boolean not) {
+        values = quoteAndSanitizeForElastic(values);
+        String valuesQuery = "(" + String.join(" OR ", values) + ")";
+        return doBuildElasticQuery(attribute, QueryLangParser.IN, valuesQuery, not);
+    }
+
+    public static String buildElasticQueryInRange(String attribute, String leftValue, boolean leftEndpointOpen, String rightValue, boolean rightEndpointOpen, boolean not) {
+        leftValue = quoteAndSanitizeForElastic(leftValue);
+        rightValue = quoteAndSanitizeForElastic(rightValue);
+        String query = "("
+                + doBuildElasticQuery(attribute, leftEndpointOpen ? QueryLangParser.GT : QueryLangParser.GTE, leftValue, false)
+                + " AND "
+                + doBuildElasticQuery(attribute, rightEndpointOpen ? QueryLangParser.LT : QueryLangParser.LTE, rightValue, false)
+                + ")";
+        return not ? "NOT " + query : query;
+    }
+
+    protected static String doBuildElasticQuery(String attribute, int op, String value, boolean not) {
         String query = null;
         switch (op) {
             case QueryLangParser.EQ:
@@ -436,17 +469,122 @@ public class SearchUtils {
         return query;
     }
 
-    public static String buildElasticQueryInList(String attribute, List<String> values, boolean not) {
-        String valuesQuery = "(" + String.join(" OR ", values) + ")";
-        return buildElasticQuery(attribute, QueryLangParser.IN, valuesQuery, not);
+    protected static List<String> quoteAndSanitizeForElastic(List<String> values) {
+        return values.stream().map(SearchUtils::quoteAndSanitizeForElastic).collect(Collectors.toList());
     }
 
-    public static String buildElasticQueryInRange(String attribute, String leftValue, boolean leftEndpointOpen, String rightValue, boolean rightEndpointOpen, boolean not) {
-        String query = "("
-                + buildElasticQuery(attribute, leftEndpointOpen ? QueryLangParser.GT : QueryLangParser.GTE, leftValue, false)
-                + " AND "
-                + buildElasticQuery(attribute, rightEndpointOpen ? QueryLangParser.LT : QueryLangParser.LTE, rightValue, false)
-                + ")";
-        return not ? "NOT " + query : query;
+    /**
+     * Adds quotes for value that is going to be used in the Elasticsearch query. If the value does not contain a fuzzy symbol,
+     * origin value wrapped in quotes is returned. For example, `someValue anotherValue` -> `"someValue anotherValue"`. If the value
+     * contains a fuzzy symbol, it places the fuzzy symbol after every term. For example, `someVxlue anotherVxlue~AUTO` ->
+     * `(someVxlue~AUTO AND anotherVxlue~AUTO)`. The originValue is also sanitized using {@link ElasticsearchQuerySanitizer#sanitize(String, String[])}.
+     */
+    protected static String quoteAndSanitizeForElastic(String originValue) {
+        originValue = ElasticsearchQuerySanitizer.sanitize(originValue, ELASTIC_EXCLUDE_FROM_ESCAPING);
+        if (originValue == null || (!containsWhitespace(originValue) && !originValue.isEmpty())) {
+            return originValue;
+        }
+
+        int fuzzyIndex = originValue.indexOf('~');
+        return fuzzyIndex != -1 ? resolvePhraseWithFuzzy(originValue, fuzzyIndex) : "\"" + originValue + "\"";
+    }
+
+    protected static String resolvePhraseWithFuzzy(String originPhraseWithFuzzy, int fuzzyIndex) {
+        String fuzzy = originPhraseWithFuzzy.substring(fuzzyIndex);
+        String originPhraseWithoutFuzzy = originPhraseWithFuzzy.substring(0, fuzzyIndex);
+        String[] splitPhrase = originPhraseWithoutFuzzy.trim().split("\\s+");
+        return "(" + String.join(fuzzy + " AND ", splitPhrase) + fuzzy + ")";
+    }
+
+    protected static boolean containsWhitespace(String value) {
+        for (int i = 0; i < value.length(); i++) {
+            if (Character.isWhitespace(value.charAt(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Fills {@code {}} placeholders in the query string with the provided arguments, in order.
+     * Uses {@link String#format} semantics by replacing {@code {}} with {@code %s} internally.
+     *
+     * @param query the query string with optional {@code {}} placeholders
+     * @param args  values to substitute
+     * @return the query string with placeholders filled
+     */
+    public static String formatPlaceholders(String query, QueryLangPlaceholderHandler handler, Object... args) {
+        if (args == null || args.length == 0) {
+            return query;
+        }
+        if (query == null) {
+            throw new IllegalArgumentException("Query cannot be null when placeholder arguments are provided.");
+        }
+
+        StringBuilder result = new StringBuilder(query);
+        int argIndex = 0;
+        int searchFrom = 0;
+
+        while (argIndex < args.length) {
+            int idx = result.indexOf("{}", searchFrom);
+            if (idx == -1) {
+                break;
+            }
+            String replacement = handler.format(args[argIndex++]);
+            result.replace(idx, idx + 2, replacement);
+            searchFrom = idx + replacement.length();
+        }
+        if (argIndex < args.length) {
+            throw new IllegalArgumentException(
+                    "Too many placeholder arguments supplied: expected " + argIndex + " but got " + args.length + ".");
+        }
+        if (result.indexOf("{}", searchFrom) != -1) {
+            throw new IllegalArgumentException("Too many placeholders present: not enough arguments provided.");
+        }
+        return result.toString();
+    }
+
+    /**
+     * Checks if a PFQL query string begins with a resource token that matches one of the expected token types.
+     * The method tokenizes the trimmed query and compares the first token's type against the provided list.
+     *
+     * @param query              the PFQL query string to check (will be trimmed before tokenization)
+     * @param expectedTokenTypes a list of token type constants (e.g., {@link QueryLangParser#CASE},
+     *                           {@link QueryLangParser#TASK}) that are considered valid resource prefixes
+     * @return {@code true} if the first token of the query matches one of the expected types; {@code false} otherwise
+     * @see #buildResourcePrefix(int)
+     * @see #validQueryResourcePrefixes
+     */
+    public static boolean hasResourcePrefix(String query, List<Integer> expectedTokenTypes) {
+        CharStream input = CharStreams.fromString(query.trim());
+        QueryLangLexer lexer = new QueryLangLexer(input);
+        lexer.removeErrorListeners();
+        Token firstToken = lexer.nextToken();
+        return expectedTokenTypes.contains(firstToken.getType());
+    }
+
+    /**
+     * Builds a canonical PFQL prefix string (resource keyword + delimiter).
+     * The keyword text is derived from the grammar via the lexer.
+     * The delimiter form ({@value QUERY_DELIMITER}) corresponds to the
+     * {@code SPACE? ':' SPACE} alternative of the {@code delimeter} rule.
+     *
+     * @param singularTokenType the singular resource token type (e.g. {@link QueryLangParser#CASE})
+     * @return the canonical prefix string (e.g. {@code "case: "})
+     */
+    public static String buildResourcePrefix(int singularTokenType) {
+        String symbolicName = QueryLangParser.VOCABULARY.getSymbolicName(singularTokenType);
+        if (symbolicName == null) {
+            throw new IllegalArgumentException("Unknown token type: " + singularTokenType);
+        }
+        CharStream input = CharStreams.fromString(symbolicName.toLowerCase());
+        QueryLangLexer lexer = new QueryLangLexer(input);
+        lexer.removeErrorListeners();
+        Token token = lexer.nextToken();
+        if (token.getType() != singularTokenType) {
+            throw new IllegalArgumentException(
+                    "Symbolic name '" + symbolicName + "' does not tokenize to expected type " + singularTokenType);
+        }
+        return token.getText() + QUERY_DELIMITER;
     }
 }

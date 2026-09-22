@@ -2541,6 +2541,7 @@ class ActionDelegate {
      * <pre>
      *     searchCase("case: processIdentifier eq 'query_test' and data.number_0.value == 3")
      *     searchCase("case: id eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
+     *     searchCase("id eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
      * </pre>
      *
      * @param query query language string starting with {@code case:}
@@ -2560,6 +2561,7 @@ class ActionDelegate {
      * <pre>
      *     pagedSearchCases("cases: processIdentifier eq 'query_test' page 1 size 5 sort by title desc")
      *     pagedSearchCases("cases: author eq 'user@mail.com' and creationDate gt 2020-03-03")
+     *     pagedSearchCases("author eq 'user@mail.com' and creationDate gt 2020-03-03")
      * </pre>
      *
      * @param query query language string starting with {@code cases:}
@@ -2579,6 +2581,7 @@ class ActionDelegate {
      * <pre>
      *     searchCases("cases: processIdentifier eq 'query_test' and data.boolean_0.value == true")
      *     searchCases("cases: title contains 'Test' sort by creationDate desc")
+     *     searchCases("title contains 'Test' sort by creationDate desc")
      * </pre>
      *
      * @param query query language string starting with {@code cases:}
@@ -2597,6 +2600,7 @@ class ActionDelegate {
      * <pre>
      *     countCases("cases: processIdentifier eq 'query_test'")
      *     countCases("cases: data.boolean_0.value == true and data.text_0.value != '4'")
+     *     countCases("data.boolean_0.value == true and data.text_0.value != '4'")
      * </pre>
      *
      * @param query query language string starting with {@code cases:}
@@ -2615,6 +2619,7 @@ class ActionDelegate {
      * <pre>
      *     existsCase("cases: processIdentifier eq 'query_test'")
      *     existsCase("cases: id in ('5f9b1c2d3e4f5a6b7c8d9e0f', '5f9b1c2d3e4f5a6b7c8d9e10')")
+     *     existsCase("id in ('5f9b1c2d3e4f5a6b7c8d9e0f', '5f9b1c2d3e4f5a6b7c8d9e10')")
      * </pre>
      *
      * @param query query language string starting with {@code cases:}
@@ -2633,6 +2638,7 @@ class ActionDelegate {
      * <pre>
      *     searchTask("task: transitionId eq 't1' and caseId eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
      *     searchTask("task: id eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
+     *     searchTask("id eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
      * </pre>
      *
      * @param query query language string starting with {@code task:}
@@ -2652,6 +2658,7 @@ class ActionDelegate {
      * <pre>
      *     pagedSearchTasks("tasks: title eq 'test' page 0 size 10 sort by lastFinish desc")
      *     pagedSearchTasks("tasks: userId eq 'user1' and state eq enabled")
+     *     pagedSearchTasks("userId eq 'user1' and state eq enabled")
      * </pre>
      *
      * @param query query language string starting with {@code tasks:}
@@ -2671,6 +2678,7 @@ class ActionDelegate {
      * <pre>
      *     searchTasks("tasks: processId eq 'my_process' and userId in ('user1', 'user2')")
      *     searchTasks("tasks: title contains 'Approve' sort by title asc")
+     *     searchTasks("title contains 'Approve' sort by title asc")
      * </pre>
      *
      * @param query query language string starting with {@code tasks:}
@@ -2689,6 +2697,7 @@ class ActionDelegate {
      * <pre>
      *     countTasks("tasks: caseId eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
      *     countTasks("tasks: transitionId eq 't1' and userId eq 'user1'")
+     *     countTasks("transitionId eq 't1' and userId eq 'user1'")
      * </pre>
      *
      * @param query query language string starting with {@code tasks:}
@@ -2707,6 +2716,7 @@ class ActionDelegate {
      * <pre>
      *     existsTask("tasks: caseId eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
      *     existsTask("tasks: transitionId eq 't1' and userId not eq 'user1'")
+     *     existsTask("transitionId eq 't1' and userId not eq 'user1'")
      * </pre>
      *
      * @param query query language string starting with {@code tasks:}
@@ -2725,6 +2735,7 @@ class ActionDelegate {
      * <pre>
      *     searchProcess("process: identifier == 'query_test'")
      *     searchProcess("process: identifier eq 'my_process' and version eq 1.0.0")
+     *     searchProcess("identifier eq 'my_process' and version eq 1.0.0")
      * </pre>
      *
      * @param query query language string starting with {@code process:}
@@ -2744,6 +2755,7 @@ class ActionDelegate {
      * <pre>
      *     pagedSearchProcesses("processes: identifier eq 'my_process' page 0 size 10 sort by version desc")
      *     pagedSearchProcesses("processes: version in (1.0.0 : 2.0.0)")
+     *     pagedSearchProcesses("version in (1.0.0 : 2.0.0)")
      * </pre>
      *
      * @param query query language string starting with {@code processes:}
@@ -2763,6 +2775,7 @@ class ActionDelegate {
      * <pre>
      *     searchProcesses("processes: title contains 'Test' sort by identifier asc")
      *     searchProcesses("processes: identifier in ('process_a', 'process_b')")
+     *     searchProcesses("identifier in ('process_a', 'process_b')")
      * </pre>
      *
      * @param query query language string starting with {@code processes:}
@@ -2781,6 +2794,7 @@ class ActionDelegate {
      * <pre>
      *     countProcesses("processes: identifier eq 'my_process'")
      *     countProcesses("processes: version gte 1.0.0")
+     *     countProcesses("version gte 1.0.0")
      * </pre>
      *
      * @param query query language string starting with {@code processes:}
@@ -2799,6 +2813,7 @@ class ActionDelegate {
      * <pre>
      *     existsProcess("processes: identifier eq 'my_process'")
      *     existsProcess("processes: version eq 1.0.0")
+     *     existsProcess("version eq 1.0.0")
      * </pre>
      *
      * @param query query language string starting with {@code processes:}
@@ -2817,6 +2832,7 @@ class ActionDelegate {
      * <pre>
      *     searchUser("user: email eq 'user@mail.com'")
      *     searchUser("user: name eq 'John' and surname eq 'Doe'")
+     *     searchUser("name eq 'John' and surname eq 'Doe'")
      * </pre>
      *
      * @param query query language string starting with {@code user:}
@@ -2836,6 +2852,7 @@ class ActionDelegate {
      * <pre>
      *     pagedSearchUsers("users: name eq 'John' page 0 size 25 sort by surname asc")
      *     pagedSearchUsers("users: email contains '@company.com'")
+     *     pagedSearchUsers("email contains '@company.com'")
      * </pre>
      *
      * @param query query language string starting with {@code users:}
@@ -2855,6 +2872,7 @@ class ActionDelegate {
      * <pre>
      *     searchUsers("users: surname eq 'Doe' sort by name asc")
      *     searchUsers("users: email in ('a@mail.com', 'b@mail.com')")
+     *     searchUsers("email in ('a@mail.com', 'b@mail.com')")
      * </pre>
      *
      * @param query query language string starting with {@code users:}
@@ -2873,6 +2891,7 @@ class ActionDelegate {
      * <pre>
      *     countUsers("users: email contains '@company.com'")
      *     countUsers("users: name eq 'John'")
+     *     countUsers("name eq 'John'")
      * </pre>
      *
      * @param query query language string starting with {@code users:}
@@ -2891,6 +2910,7 @@ class ActionDelegate {
      * <pre>
      *     existsUser("users: email eq 'user@mail.com'")
      *     existsUser("users: name eq 'John' and surname eq 'Doe'")
+     *     existsUser("name eq 'John' and surname eq 'Doe'")
      * </pre>
      *
      * @param query query language string starting with {@code users:}

@@ -143,7 +143,7 @@ class TaskPermissionsTest {
         Case testCase = prepareTestCase("src/test/resources/petriNets/permissions/" + VIEW_TEST_NET, "t_001")
         Case testCaseNoDefault = prepareTestCase("src/test/resources/petriNets/permissions/" + VIEW_TEST_NET_NO_DEFAULT, "t_007")
 
-        Thread.sleep(1000)
+        Thread.sleep(3000)
 
         def mapElastic = [:]
         def mapMongo = [:]
@@ -191,7 +191,7 @@ class TaskPermissionsTest {
         Case testCase = prepareTestCase("src/test/resources/petriNets/permissions/" + VIEW_TEST_NET, "t_001")
         Case testCaseNoDefault = prepareTestCase("src/test/resources/petriNets/permissions/" + VIEW_TEST_NET_NO_DEFAULT, "t_007")
 
-        Thread.sleep(1000)
+        Thread.sleep(3000)
 
         def mapElastic = [:]
         def mapMongo = [:]
@@ -232,7 +232,7 @@ class TaskPermissionsTest {
         Case testCase = prepareTestCase("src/test/resources/petriNets/permissions/" + ASSIGN_TEST_NET, "t_001")
         Case testCaseNoDefault = prepareTestCase("src/test/resources/petriNets/permissions/" + ASSIGN_TEST_NET_NO_DEFAULT, "t_007")
 
-        Thread.sleep(1000)
+        Thread.sleep(3000)
 
         def resultMap = [:]
 
@@ -255,7 +255,7 @@ class TaskPermissionsTest {
         Case testCase = prepareTestCase("src/test/resources/petriNets/permissions/" + FINISH_TEST_NET, "t_001")
         Case testCaseNoDefault = prepareTestCase("src/test/resources/petriNets/permissions/" + FINISH_TEST_NET_NO_DEFAULT, "t_007")
 
-        Thread.sleep(1000)
+        Thread.sleep(3000)
 
         def resultMap = [:]
 
@@ -281,7 +281,7 @@ class TaskPermissionsTest {
         Case testCase = prepareTestCase("src/test/resources/petriNets/permissions/" + CANCEL_TEST_NET, "t_001")
         Case testCaseNoDefault = prepareTestCase("src/test/resources/petriNets/permissions/" + CANCEL_TEST_NET_NO_DEFAULT, "t_007")
 
-        Thread.sleep(1000)
+        Thread.sleep(3000)
 
         def resultMap = [:]
 
