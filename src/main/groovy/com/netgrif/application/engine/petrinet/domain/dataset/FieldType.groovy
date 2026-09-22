@@ -18,6 +18,7 @@ enum FieldType {
     USERLIST("userList"),
     TABULAR("tabular"),
     CASE_REF("caseRef"),
+    PROCESS_REF("processRef"),
     DATETIME("dateTime"),
     BUTTON("button"),
     TASK_REF("taskRef"),

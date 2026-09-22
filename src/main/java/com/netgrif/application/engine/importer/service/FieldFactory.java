@@ -235,6 +235,9 @@ public final class FieldFactory {
             case CASE_REF:
                 field = buildCaseField(data);
                 break;
+            case PROCESS_REF:
+                field = buildProcessField(data);
+                break;
             case DATE_TIME:
                 field = buildDateTimeField(data);
                 break;
@@ -264,7 +267,7 @@ public final class FieldFactory {
                 field = buildI18nField(data, importer);
                 break;
             case STRING_COLLECTION:
-                field = buildStringCollectionField(data, importer);
+                field = buildStringCollectionField(data);
                 break;
             default:
                 throw new IllegalArgumentException(data.getType() + " is not a valid Field type");
@@ -317,7 +320,17 @@ public final class FieldFactory {
         return field;
     }
 
-    private StringCollectionField buildStringCollectionField(Data data, Importer importer) {
+    private ProcessField buildProcessField(Data data) {
+        ProcessField field = new ProcessField();
+        setDefaultValues(field, data, defaultValues -> {
+            if (defaultValues != null) {
+                field.setDefaultValue(defaultValues);
+            }
+        });
+        return field;
+    }
+
+    private StringCollectionField buildStringCollectionField(Data data) {
         StringCollectionField field = new StringCollectionField();
         setDefaultValues(field, data, defaultValues -> {
             if (defaultValues != null) {
