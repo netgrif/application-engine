@@ -226,7 +226,7 @@
 		<i18nString name="version_increment">Inkrement verzie</i18nString>
 		<i18nString name="xml_file">XML súbor</i18nString>
 		<i18nString name="xml_text">XML text</i18nString>
-		<i18nString name="deploy_label">Navrhnúť</i18nString>
+		<i18nString name="deploy_label">Nasadiť</i18nString>
 		<i18nString name="deploy_finish">Nasadiť</i18nString>
 		<i18nString name="edit_label">Upraviť</i18nString>
 		<i18nString name="form_label">Formulár</i18nString>
