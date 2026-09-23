@@ -2542,13 +2542,15 @@ class ActionDelegate {
      *     searchCase("case: processIdentifier eq 'query_test' and data.number_0.value == 3")
      *     searchCase("case: id eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
      *     searchCase("id eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
+     *     searchCase("id eq {}", myCaseId)
      * </pre>
      *
      * @param query query language string starting with {@code case:}
+     * @param args arguments for query placeholders
      * @return matching {@link Case} or {@code null} if none is found
      */
-    Case searchCase(String query) {
-        return caseSearchService.searchOne(query)
+    Case searchCase(String query, Object... args) {
+        return caseSearchService.searchOne(query, args)
     }
 
     /**
@@ -2562,33 +2564,37 @@ class ActionDelegate {
      *     pagedSearchCases("cases: processIdentifier eq 'query_test' page 1 size 5 sort by title desc")
      *     pagedSearchCases("cases: author eq 'user@mail.com' and creationDate gt 2020-03-03")
      *     pagedSearchCases("author eq 'user@mail.com' and creationDate gt 2020-03-03")
+     *     pagedSearchCases("author eq {} and creationDate gt {}", myEmail, myDate)
      * </pre>
      *
      * @param query query language string starting with {@code cases:}
+     * @param args arguments for query placeholders
      * @return {@link Page} of matching cases
      */
-    Page<Case> pagedSearchCases(String query) {
-        return caseSearchService.searchAll(query)
+    Page<Case> pagedSearchCases(String query, Object... args) {
+        return caseSearchService.searchAll(query, args)
     }
 
     /**
      * Searches for all {@link Case} instances matching the given query and returns them as a list.
      * <p>
      * The query must start with the resource keyword {@code cases} (plural). This is a convenience
-     * method returning only the content of {@link #pagedSearchCases(String)}.
+     * method returning only the content of {@link #pagedSearchCases(String, Object...)}.
      * </p>
      * Example:
      * <pre>
      *     searchCases("cases: processIdentifier eq 'query_test' and data.boolean_0.value == true")
      *     searchCases("cases: title contains 'Test' sort by creationDate desc")
      *     searchCases("title contains 'Test' sort by creationDate desc")
+     *     searchCases("title contains {} sort by creationDate desc", myTitle)
      * </pre>
      *
      * @param query query language string starting with {@code cases:}
+     * @param args arguments for query placeholders
      * @return list of matching cases
      */
-    List<Case> searchCases(String query) {
-        return pagedSearchCases(query).content
+    List<Case> searchCases(String query, Object... args) {
+        return pagedSearchCases(query, args).content
     }
 
     /**
@@ -2601,13 +2607,15 @@ class ActionDelegate {
      *     countCases("cases: processIdentifier eq 'query_test'")
      *     countCases("cases: data.boolean_0.value == true and data.text_0.value != '4'")
      *     countCases("data.boolean_0.value == true and data.text_0.value != '4'")
+     *     countCases("data.boolean_0.value == {} and data.text_0.value != {}", myBoolean, myText)
      * </pre>
      *
      * @param query query language string starting with {@code cases:}
+     * @param args arguments for query placeholders
      * @return number of matching cases
      */
-    long countCases(String query) {
-        return caseSearchService.count(query)
+    long countCases(String query, Object... args) {
+        return caseSearchService.count(query, args)
     }
 
     /**
@@ -2620,13 +2628,15 @@ class ActionDelegate {
      *     existsCase("cases: processIdentifier eq 'query_test'")
      *     existsCase("cases: id in ('5f9b1c2d3e4f5a6b7c8d9e0f', '5f9b1c2d3e4f5a6b7c8d9e10')")
      *     existsCase("id in ('5f9b1c2d3e4f5a6b7c8d9e0f', '5f9b1c2d3e4f5a6b7c8d9e10')")
+     *     existsCase("id in {}", myListOfIds)
      * </pre>
      *
      * @param query query language string starting with {@code cases:}
+     * @param args arguments for query placeholders
      * @return {@code true} if a matching case exists, {@code false} otherwise
      */
-    boolean existsCase(String query) {
-        return caseSearchService.exists(query)
+    boolean existsCase(String query, Object... args) {
+        return caseSearchService.exists(query, args)
     }
 
     /**
@@ -2639,13 +2649,15 @@ class ActionDelegate {
      *     searchTask("task: transitionId eq 't1' and caseId eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
      *     searchTask("task: id eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
      *     searchTask("id eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
+     *     searchTask("id eq {}", myId)
      * </pre>
      *
      * @param query query language string starting with {@code task:}
+     * @param args arguments for query placeholders
      * @return matching {@link Task} or {@code null} if none is found
      */
-    Task searchTask(String query) {
-        return taskSearchService.searchOne(query)
+    Task searchTask(String query, Object... args) {
+        return taskSearchService.searchOne(query, args)
     }
 
     /**
@@ -2659,33 +2671,37 @@ class ActionDelegate {
      *     pagedSearchTasks("tasks: title eq 'test' page 0 size 10 sort by lastFinish desc")
      *     pagedSearchTasks("tasks: userId eq 'user1' and state eq enabled")
      *     pagedSearchTasks("userId eq 'user1' and state eq enabled")
+     *     pagedSearchTasks("userId eq {} and state eq enabled", myUserId)
      * </pre>
      *
      * @param query query language string starting with {@code tasks:}
+     * @param args arguments for query placeholders
      * @return {@link Page} of matching tasks
      */
-    Page<Task> pagedSearchTasks(String query) {
-        return taskSearchService.searchAll(query)
+    Page<Task> pagedSearchTasks(String query, Object... args) {
+        return taskSearchService.searchAll(query, args)
     }
 
     /**
      * Searches for all {@link Task} instances matching the given query and returns them as a list.
      * <p>
      * The query must start with the resource keyword {@code tasks} (plural). This is a convenience
-     * method returning only the content of {@link #pagedSearchTasks(String)}.
+     * method returning only the content of {@link #pagedSearchTasks(String, Object...)}.
      * </p>
      * Example:
      * <pre>
      *     searchTasks("tasks: processId eq 'my_process' and userId in ('user1', 'user2')")
      *     searchTasks("tasks: title contains 'Approve' sort by title asc")
      *     searchTasks("title contains 'Approve' sort by title asc")
+     *     searchTasks("title contains {} sort by title asc", myTitle)
      * </pre>
      *
      * @param query query language string starting with {@code tasks:}
+     * @param args arguments for query placeholders
      * @return list of matching tasks
      */
-    List<Task> searchTasks(String query) {
-        return pagedSearchTasks(query).content
+    List<Task> searchTasks(String query, Object... args) {
+        return pagedSearchTasks(query, args).content
     }
 
     /**
@@ -2698,13 +2714,15 @@ class ActionDelegate {
      *     countTasks("tasks: caseId eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
      *     countTasks("tasks: transitionId eq 't1' and userId eq 'user1'")
      *     countTasks("transitionId eq 't1' and userId eq 'user1'")
+     *     countTasks("transitionId eq {} and userId eq {}", myTransId, myUserId)
      * </pre>
      *
      * @param query query language string starting with {@code tasks:}
+     * @param args arguments for query placeholders
      * @return number of matching tasks
      */
-    long countTasks(String query) {
-        return taskSearchService.count(query)
+    long countTasks(String query, Object... args) {
+        return taskSearchService.count(query, args)
     }
 
     /**
@@ -2717,13 +2735,15 @@ class ActionDelegate {
      *     existsTask("tasks: caseId eq '5f9b1c2d3e4f5a6b7c8d9e0f'")
      *     existsTask("tasks: transitionId eq 't1' and userId not eq 'user1'")
      *     existsTask("transitionId eq 't1' and userId not eq 'user1'")
+     *     existsTask("transitionId eq {} and userId eq {}", myTransId, myUserId)
      * </pre>
      *
      * @param query query language string starting with {@code tasks:}
+     * @param args arguments for query placeholders
      * @return {@code true} if a matching task exists, {@code false} otherwise
      */
-    boolean existsTask(String query) {
-        return taskSearchService.exists(query)
+    boolean existsTask(String query, Object... args) {
+        return taskSearchService.exists(query, args)
     }
 
     /**
@@ -2736,13 +2756,15 @@ class ActionDelegate {
      *     searchProcess("process: identifier == 'query_test'")
      *     searchProcess("process: identifier eq 'my_process' and version eq 1.0.0")
      *     searchProcess("identifier eq 'my_process' and version eq 1.0.0")
+     *     searchProcess("identifier eq {} and version eq {}", myIdentifier, myVersion)
      * </pre>
      *
      * @param query query language string starting with {@code process:}
+     * @param args arguments for query placeholders
      * @return matching {@link PetriNet} or {@code null} if none is found
      */
-    PetriNet searchProcess(String query) {
-        return processSearchService.searchOne(query)
+    PetriNet searchProcess(String query, Object... args) {
+        return processSearchService.searchOne(query, args)
     }
 
     /**
@@ -2756,33 +2778,35 @@ class ActionDelegate {
      *     pagedSearchProcesses("processes: identifier eq 'my_process' page 0 size 10 sort by version desc")
      *     pagedSearchProcesses("processes: version in (1.0.0 : 2.0.0)")
      *     pagedSearchProcesses("version in (1.0.0 : 2.0.0)")
+     *     pagedSearchProcesses("version in ({} : {})", myVersionFrom, myVersionTo)
      * </pre>
      *
      * @param query query language string starting with {@code processes:}
      * @return {@link Page} of matching processes
      */
-    Page<PetriNet> pagedSearchProcesses(String query) {
-        return processSearchService.searchAll(query)
+    Page<PetriNet> pagedSearchProcesses(String query, Object... args) {
+        return processSearchService.searchAll(query, args)
     }
 
     /**
      * Searches for all {@link PetriNet} (process) instances matching the given query and returns them as a list.
      * <p>
      * The query must start with the resource keyword {@code processes} (plural). This is a convenience
-     * method returning only the content of {@link #pagedSearchProcesses(String)}.
+     * method returning only the content of {@link #pagedSearchProcesses(String, Object...)}.
      * </p>
      * Example:
      * <pre>
      *     searchProcesses("processes: title contains 'Test' sort by identifier asc")
      *     searchProcesses("processes: identifier in ('process_a', 'process_b')")
      *     searchProcesses("identifier in ('process_a', 'process_b')")
+     *     searchProcesses("identifier in {}", myListOfIdentifiers)
      * </pre>
      *
      * @param query query language string starting with {@code processes:}
      * @return list of matching processes
      */
-    List<PetriNet> searchProcesses(String query) {
-        return pagedSearchProcesses(query).content
+    List<PetriNet> searchProcesses(String query, Object... args) {
+        return pagedSearchProcesses(query, args).content
     }
 
     /**
@@ -2795,13 +2819,14 @@ class ActionDelegate {
      *     countProcesses("processes: identifier eq 'my_process'")
      *     countProcesses("processes: version gte 1.0.0")
      *     countProcesses("version gte 1.0.0")
+     *     countProcesses("version gte {}", myVersion)
      * </pre>
      *
      * @param query query language string starting with {@code processes:}
      * @return number of matching processes
      */
-    long countProcesses(String query) {
-        return processSearchService.count(query)
+    long countProcesses(String query, Object... args) {
+        return processSearchService.count(query, args)
     }
 
     /**
@@ -2814,13 +2839,14 @@ class ActionDelegate {
      *     existsProcess("processes: identifier eq 'my_process'")
      *     existsProcess("processes: version eq 1.0.0")
      *     existsProcess("version eq 1.0.0")
+     *     existsProcess("version gte {}", myVersion)
      * </pre>
      *
      * @param query query language string starting with {@code processes:}
      * @return {@code true} if a matching process exists, {@code false} otherwise
      */
-    boolean existsProcess(String query) {
-        return processSearchService.exists(query)
+    boolean existsProcess(String query, Object... args) {
+        return processSearchService.exists(query, args)
     }
 
     /**
@@ -2833,13 +2859,14 @@ class ActionDelegate {
      *     searchUser("user: email eq 'user@mail.com'")
      *     searchUser("user: name eq 'John' and surname eq 'Doe'")
      *     searchUser("name eq 'John' and surname eq 'Doe'")
+     *     searchUser("name eq {} and surname eq {}", myFirstName, mySurname)
      * </pre>
      *
      * @param query query language string starting with {@code user:}
      * @return matching {@link IUser} or {@code null} if none is found
      */
-    IUser searchUser(String query) {
-        return userSearchService.searchOne(query)
+    IUser searchUser(String query, Object... args) {
+        return userSearchService.searchOne(query, args)
     }
 
     /**
@@ -2853,33 +2880,35 @@ class ActionDelegate {
      *     pagedSearchUsers("users: name eq 'John' page 0 size 25 sort by surname asc")
      *     pagedSearchUsers("users: email contains '@company.com'")
      *     pagedSearchUsers("email contains '@company.com'")
+     *     pagedSearchUsers("email contains {}", mySubstring)
      * </pre>
      *
      * @param query query language string starting with {@code users:}
      * @return {@link Page} of matching users
      */
-    Page<IUser> pagedSearchUsers(String query) {
-        return userSearchService.searchAll(query)
+    Page<IUser> pagedSearchUsers(String query, Object... args) {
+        return userSearchService.searchAll(query, args)
     }
 
     /**
      * Searches for all {@link IUser} instances matching the given query and returns them as a list.
      * <p>
      * The query must start with the resource keyword {@code users} (plural). This is a convenience
-     * method returning only the content of {@link #pagedSearchUsers(String)}.
+     * method returning only the content of {@link #pagedSearchUsers(String, Object...)}.
      * </p>
      * Example:
      * <pre>
      *     searchUsers("users: surname eq 'Doe' sort by name asc")
      *     searchUsers("users: email in ('a@mail.com', 'b@mail.com')")
      *     searchUsers("email in ('a@mail.com', 'b@mail.com')")
+     *     searchUsers("email in {}", myEmails)
      * </pre>
      *
      * @param query query language string starting with {@code users:}
      * @return list of matching users
      */
-    List<IUser> searchUsers(String query) {
-        return pagedSearchUsers(query).content
+    List<IUser> searchUsers(String query, Object... args) {
+        return pagedSearchUsers(query, args).content
     }
 
     /**
@@ -2892,13 +2921,14 @@ class ActionDelegate {
      *     countUsers("users: email contains '@company.com'")
      *     countUsers("users: name eq 'John'")
      *     countUsers("name eq 'John'")
+     *     countUsers("name eq {}", myName)
      * </pre>
      *
      * @param query query language string starting with {@code users:}
      * @return number of matching users
      */
-    long countUsers(String query) {
-        return userSearchService.count(query)
+    long countUsers(String query, Object... args) {
+        return userSearchService.count(query, args)
     }
 
     /**
@@ -2911,13 +2941,14 @@ class ActionDelegate {
      *     existsUser("users: email eq 'user@mail.com'")
      *     existsUser("users: name eq 'John' and surname eq 'Doe'")
      *     existsUser("name eq 'John' and surname eq 'Doe'")
+     *     existsUser("name eq {}", myName)
      * </pre>
      *
      * @param query query language string starting with {@code users:}
      * @return {@code true} if a matching user exists, {@code false} otherwise
      */
-    boolean existsUser(String query) {
-        return userSearchService.exists(query)
+    boolean existsUser(String query, Object... args) {
+        return userSearchService.exists(query, args)
     }
 
     /**
@@ -2933,14 +2964,15 @@ class ActionDelegate {
      *     search("case: processIdentifier eq 'query_test' and data.number_0.value == 3")
      *     search("cases: processIdentifier eq 'query_test' page 1 size 5 sort by title desc")
      *     search("process: identifier == 'query_test'")
+     *     search("process: identifier == {}", myIdentifier)
      * </pre>
      *
      * @param query query language string starting with a resource keyword
      * @return a single resource instance (singular form), a {@link List} of instances (plural form),
      *         or {@code null} if nothing matches
      */
-    Object search(String query) {
-        Object result = searchService.search(query)
+    Object search(String query, Object... args) {
+        Object result = searchService.search(query, args)
         if (result instanceof Page<?>) {
             return result.content
         }
@@ -2957,13 +2989,14 @@ class ActionDelegate {
      * <pre>
      *     count("cases: processIdentifier eq 'query_test' and data.boolean_0.value == true")
      *     count("users: email contains '@company.com'")
+     *     count("users: email contains {}", mySubstring)
      * </pre>
      *
      * @param query query language string starting with a resource keyword
      * @return number of matching instances
      */
-    long count(String query) {
-        return searchService.count(query)
+    long count(String query, Object... args) {
+        return searchService.count(query, args)
     }
 
     /**
@@ -2976,12 +3009,13 @@ class ActionDelegate {
      * <pre>
      *     exists("cases: processIdentifier eq 'query_test'")
      *     exists("tasks: transitionId eq 't1' and userId eq 'user1'")
+     *     exists("tasks: transitionId eq {} and userId eq {}", myTransId, myUserId)
      * </pre>
      *
      * @param query query language string starting with a resource keyword
      * @return {@code true} if a matching instance exists, {@code false} otherwise
      */
-    boolean exists(String query) {
-        return searchService.exists(query)
+    boolean exists(String query, Object... args) {
+        return searchService.exists(query, args)
     }
 }
