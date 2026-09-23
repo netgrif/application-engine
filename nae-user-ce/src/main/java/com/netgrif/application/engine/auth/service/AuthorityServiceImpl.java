@@ -40,6 +40,11 @@ public class AuthorityServiceImpl implements AuthorityService {
         this.mongoTemplate = mongoTemplate;
     }
 
+    @Autowired
+    public void setAuthorityProperties(AuthorityConfigurationProperties authorityProperties) {
+        this.authorityProperties = authorityProperties;
+    }
+
     @Override
     public Page<Authority> findAll(Pageable pageable) {
         return authorityRepository.findAll(pageable);
