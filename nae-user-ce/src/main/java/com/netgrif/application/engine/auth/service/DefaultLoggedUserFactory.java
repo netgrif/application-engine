@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.adapter.spring.auth.service;
+package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;

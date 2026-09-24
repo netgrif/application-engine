@@ -1,12 +1,14 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
+import com.netgrif.application.engine.adapter.spring.auth.domain.AnonymousUser;
+import com.netgrif.application.engine.adapter.spring.auth.domain.AnonymousUserRef;
+import com.netgrif.application.engine.auth.service.AnonymousUserRefService;
+import com.netgrif.application.engine.auth.service.AuthorityService;
 import com.netgrif.application.engine.auth.service.GroupService;
-import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.ActorFieldValue;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.ActorListFieldValue;
-import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
@@ -109,6 +111,12 @@ public class TaskService implements ITaskService {
 
     @Autowired
     protected IValidationService validationService;
+
+    @Autowired
+    protected AnonymousUserRefService anonymousUserRefService;
+
+    @Autowired
+    protected AuthorityService authorityService;
 
     @Lazy
     @Autowired
@@ -216,7 +224,7 @@ public class TaskService implements ITaskService {
             throw new IllegalArgumentException("Task with id=%s is not assigned to any user.".formatted(task.getStringId()));
         }
         // TODO: impersonation
-        if (!task.getUserId().equals(user.getStringId()) && !((Boolean) user.getAttributes().containsKey("anonymous"))) {
+        if (!task.getUserId().equals(user.getStringId()) && !((Boolean) user.isAnonymous())) {
             throw new IllegalArgumentException("User that is not assigned tried to finish task");
         }
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
@@ -1009,7 +1017,16 @@ public class TaskService implements ITaskService {
     }
 
     private void setUser(Task task) {
-        if (task.getUserId() != null) {
+        if (task.getUserId() != null && task.getAssignee().isAnonymous()) {
+            Optional<AnonymousUserRef> anonymousUserRefOptional = anonymousUserRefService.getRef(task.getAssignee().getRealmId());
+            if (anonymousUserRefOptional.isEmpty()) {
+                throw new IllegalArgumentException("Anonymous user with id " + task.getAssignee().getId() + " does not exist");
+            }
+            AnonymousUser anonymousUser = new AnonymousUser(anonymousUserRefOptional.get(), authorityService.getOrCreate(Authority.anonymous));
+            task.setUser(anonymousUser);
+            return;
+        }
+        if (task.getUserId() != null && !task.getAssignee().isAnonymous()) {
             task.setUser(userService.findById(task.getUserId(), task.getUserRealmId()));
         }
     }

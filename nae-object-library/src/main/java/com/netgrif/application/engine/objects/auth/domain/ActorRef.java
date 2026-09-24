@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.Set;
 
 /**
  * Represents a reference to an actor (user) in the system.
@@ -40,6 +41,15 @@ public class ActorRef implements Serializable {
     private String displayName;
 
     /**
+     * The set of authorities (permissions/roles) granted to this actor.
+     * Authorities define what actions the actor is allowed to perform in the system.
+     * This set typically includes both system-level authorities and process-specific roles.
+     *
+     * @see Authority
+     */
+    private Set<String> authorities;
+
+    /**
      * Gets the username of the actor.
      * This is an alias for {@link #identifier}.
      *
@@ -57,5 +67,23 @@ public class ActorRef implements Serializable {
      */
     public String getFullName() {
         return displayName;
+    }
+
+    /**
+     * Determines whether this actor represents an anonymous user.
+     * An actor is considered anonymous if it has at least one authority with the name
+     * {@link Authority#anonymous}.
+     * <p>
+     * This method is typically used to check access permissions and determine whether
+     * the user needs to authenticate before performing certain operations. Anonymous users
+     * usually have limited access rights compared to authenticated users.
+     * </p>
+     *
+     * @return {@code true} if the actor has the anonymous authority, {@code false} otherwise.
+     * Returns {@code false} if authorities is {@code null}.
+     * @see Authority#anonymous
+     */
+    public boolean isAnonymous() {
+        return authorities != null && authorities.stream().allMatch(it -> it.equals(Authority.anonymous));
     }
 }
