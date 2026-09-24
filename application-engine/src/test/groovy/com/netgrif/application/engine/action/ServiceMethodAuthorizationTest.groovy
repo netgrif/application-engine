@@ -57,4 +57,58 @@ class ServiceMethodAuthorizationTest {
             assertNotNull(outcome)
         }
     }
+
+    @Test
+    void testAllAuthorityServiceButtonsPostSetActions() {
+        testHelper.truncateDbs()
+
+        def netOptional = importHelper.createNet("authority_service_methods_test.xml")
+        assertTrue(netOptional.isPresent())
+        def net = netOptional.get()
+
+        Case useCase = importHelper.createCase("Authority Service Test Case", net)
+        assertNotNull(useCase)
+
+        Task task = taskService.findOne(useCase.tasks.first().task)
+        assertNotNull(task)
+
+        // Trigger set on each button field
+        net.dataSet.values().findAll { it.type.name().equalsIgnoreCase("BUTTON") }.each { buttonField ->
+            def outcome = dataService.setData(task.stringId, ImportHelper.populateDataset([
+                    (buttonField.stringId): [
+                            "type": "button"
+                    ]
+            ]))
+            assertNotNull(outcome)
+        }
+    }
+
+    @Test
+    void testAllAuthorityApiButtonsPostSetActions() {
+        executeAllButtonsOfNet("authority_api_methods_test.xml", "Authority API Test Case")
+    }
+
+    private void executeAllButtonsOfNet(String netFileName, String caseTitle) {
+        testHelper.truncateDbs()
+
+        def netOptional = importHelper.createNet(netFileName)
+        assertTrue(netOptional.isPresent())
+        def net = netOptional.get()
+
+        Case useCase = importHelper.createCase(caseTitle, net)
+        assertNotNull(useCase)
+
+        Task task = taskService.findOne(useCase.tasks.first().task)
+        assertNotNull(task)
+
+        // Trigger set on each button field
+        net.dataSet.values().findAll { it.type.name().equalsIgnoreCase("BUTTON") }.each { buttonField ->
+            def outcome = dataService.setData(task.stringId, ImportHelper.populateDataset([
+                    (buttonField.stringId): [
+                            "type": "button"
+                    ]
+            ]))
+            assertNotNull(outcome)
+        }
+    }
 }
