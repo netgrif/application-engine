@@ -67,12 +67,9 @@ public interface AuthorityService {
 
     Optional<Authority> findOptionalByName(String id);
 
-    @Cacheable("defaultUserAuthoritiesCache")
     Set<Authority> getDefaultUserAuthorities();
 
-    @Cacheable("defaultAnonymousAuthoritiesCache")
     Set<Authority> getDefaultAnonymousAuthorities();
 
-    @Cacheable("defaultAdminAuthoritiesCache")
     Set<Authority> getDefaultAdminAuthorities();
 }
