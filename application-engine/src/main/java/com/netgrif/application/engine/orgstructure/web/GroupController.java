@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.orgstructure.web;
 
 import com.netgrif.application.engine.auth.service.GroupService;
+import com.netgrif.application.engine.objects.annotations.Authorize;
 import com.netgrif.application.engine.orgstructure.web.responsebodies.Group;
 import com.netgrif.application.engine.orgstructure.web.responsebodies.GroupsResource;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,7 +38,8 @@ public class GroupController {
         this.service = service;
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "GROUP_VIEW")
     @Operation(summary = "Get all groups in the system",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "BasicAuth")})

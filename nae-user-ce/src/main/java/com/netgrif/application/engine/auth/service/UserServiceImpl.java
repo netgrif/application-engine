@@ -6,6 +6,7 @@ import com.netgrif.application.engine.adapter.spring.workflow.service.FilterImpo
 import com.netgrif.application.engine.auth.config.GroupConfigurationProperties;
 import com.netgrif.application.engine.auth.provider.CollectionNameProvider;
 import com.netgrif.application.engine.auth.repository.UserRepository;
+import com.netgrif.application.engine.objects.annotations.Authorize;
 import com.netgrif.application.engine.objects.auth.constants.UserConstants;
 import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
@@ -152,6 +153,19 @@ public class UserServiceImpl implements UserService {
             log.debug("User [{}] found in realm [{}]", username, realmId);
         } else {
             log.warn("User [{}] not found in realm [{}]", username, realmId);
+        }
+        return userOpt;
+    }
+
+    @Override
+    public Optional<AbstractUser> findUserByEmail(String email, String realmId) {
+        log.debug("Finding user by username [{}] in realm [{}]", email, realmId);
+        String collectionName = collectionNameProvider.getCollectionNameForRealm(realmId);
+        Optional<AbstractUser> userOpt = userRepository.findByEmail(email, mongoTemplate, collectionName).map(user -> user);
+        if (userOpt.isPresent()) {
+            log.debug("User [{}] found in realm [{}]", email, realmId);
+        } else {
+            log.warn("User [{}] not found in realm [{}]", email, realmId);
         }
         return userOpt;
     }

@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
+    <id>authority_api_methods_test</id>
+    <version>1.0.0</version>
+    <initials>AAMT</initials>
+    <title>Authority Action API Method test</title>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>true</anonymousRole>
+    <transitionRole>false</transitionRole>
+
+    <!-- DATA -->
+    <!-- Authority Action API methods -->
+    <data type="button">
+        <id>btn_find_all_authorities</id>
+        <title/>
+        <placeholder>findAllAuthorities</placeholder>
+        <event type="set">
+            <id>find_all_authorities_set</id>
+            <actions phase="post">
+                <action>
+                    findAllAuthorities();
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_get_or_create_authority</id>
+        <title/>
+        <placeholder>getOrCreateAuthority</placeholder>
+        <event type="set">
+            <id>get_or_create_authority_set</id>
+            <actions phase="post">
+                <action>
+                    getOrCreateAuthority("API_TEST_AUTHORITY");
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_get_authority</id>
+        <title/>
+        <placeholder>getAuthority</placeholder>
+        <event type="set">
+            <id>get_authority_set</id>
+            <actions phase="post">
+                <action>
+                    getAuthority(getOrCreateAuthority("API_TEST_AUTHORITY").stringId);
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_get_authority_by_name</id>
+        <title/>
+        <placeholder>getAuthorityByName</placeholder>
+        <event type="set">
+            <id>get_authority_by_name_set</id>
+            <actions phase="post">
+                <action>
+                    getOrCreateAuthority("API_TEST_AUTHORITY");
+                    getAuthorityByName("API_TEST_AUTHORITY");
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_find_authority_by_name</id>
+        <title/>
+        <placeholder>findAuthorityByName</placeholder>
+        <event type="set">
+            <id>find_authority_by_name_set</id>
+            <actions phase="post">
+                <action>
+                    findAuthorityByName("API_TEST_MISSING_AUTHORITY");
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_find_authorities_by_ids</id>
+        <title/>
+        <placeholder>findAuthoritiesByIds</placeholder>
+        <event type="set">
+            <id>find_authorities_by_ids_set</id>
+            <actions phase="post">
+                <action>
+                    findAuthoritiesByIds([getOrCreateAuthority("API_TEST_AUTHORITY").stringId]);
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_find_authorities_by_scope</id>
+        <title/>
+        <placeholder>findAuthoritiesByScope</placeholder>
+        <event type="set">
+            <id>find_authorities_by_scope_set</id>
+            <actions phase="post">
+                <action>
+                    findAuthoritiesByScope("*");
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_search_authorities</id>
+        <title/>
+        <placeholder>searchAuthorities</placeholder>
+        <event type="set">
+            <id>search_authorities_set</id>
+            <actions phase="post">
+                <action>
+                    searchAuthorities("API_TEST");
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_delete_authority</id>
+        <title/>
+        <placeholder>deleteAuthority</placeholder>
+        <event type="set">
+            <id>delete_authority_set</id>
+            <actions phase="post">
+                <action>
+                    getOrCreateAuthority("API_TEST_AUTHORITY_TO_DELETE");
+                    deleteAuthority("API_TEST_AUTHORITY_TO_DELETE");
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_default_user_authorities</id>
+        <title/>
+        <placeholder>defaultUserAuthorities</placeholder>
+        <event type="set">
+            <id>default_user_authorities_set</id>
+            <actions phase="post">
+                <action>
+                    defaultUserAuthorities();
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_default_anonymous_authorities</id>
+        <title/>
+        <placeholder>defaultAnonymousAuthorities</placeholder>
+        <event type="set">
+            <id>default_anonymous_authorities_set</id>
+            <actions phase="post">
+                <action>
+                    defaultAnonymousAuthorities();
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_default_admin_authorities</id>
+        <title/>
+        <placeholder>defaultAdminAuthorities</placeholder>
+        <event type="set">
+            <id>default_admin_authorities_set</id>
+            <actions phase="post">
+                <action>
+                    defaultAdminAuthorities();
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>t1</id>
+        <x>250</x>
+        <y>150</y>
+        <label>Execute Authority API Tests</label>
+        <dataRef>
+            <id>btn_find_all_authorities</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_get_or_create_authority</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_get_authority</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_get_authority_by_name</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_find_authority_by_name</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_find_authorities_by_ids</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_find_authorities_by_scope</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_search_authorities</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_delete_authority</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_default_user_authorities</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_default_anonymous_authorities</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_default_admin_authorities</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+    </transition>
+</document>

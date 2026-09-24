@@ -1,0 +1,794 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
+    <id>service_methods_test</id>
+    <version>1.0.0</version>
+    <initials>SMT</initials>
+    <title>Service Method test</title>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>true</anonymousRole>
+    <transitionRole>false</transitionRole>
+
+    <!-- DATA -->
+    <!-- TaskService methods -->
+    <data type="button">
+        <id>btn_task_service_find_one</id>
+        <title/>
+        <placeholder>taskService.findOne</placeholder>
+        <event type="set">
+            <id>task_service_find_one_set</id>
+            <actions phase="post">
+                <action>
+                    taskService.findOne(useCase.tasks.first().task);
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_task_service_find_by_id</id>
+        <title/>
+        <placeholder>taskService.findById</placeholder>
+        <event type="set">
+            <id>task_service_find_by_id_set</id>
+            <actions phase="post">
+                <action>
+                    taskService.findById(useCase.tasks.first().task);
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_task_service_find_optional_by_id</id>
+        <title/>
+        <placeholder>taskService.findOptionalById</placeholder>
+        <event type="set">
+            <id>task_service_find_optional_by_id_set</id>
+            <actions phase="post">
+                <action>
+                    taskService.findOptionalById(useCase.tasks.first().task);
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_task_service_find_all_by_id</id>
+        <title/>
+        <placeholder>taskService.findAllById</placeholder>
+        <event type="set">
+            <id>task_service_find_all_by_id_set</id>
+            <actions phase="post">
+                <action>
+                    taskService.findAllById([useCase.tasks.first().task]);
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_task_service_find_all_by_case</id>
+        <title/>
+        <placeholder>taskService.findAllByCase</placeholder>
+        <event type="set">
+            <id>task_service_find_all_by_case_set</id>
+            <actions phase="post">
+                <action>
+                    taskService.findAllByCase(useCase.stringId);
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_task_service_save</id>
+        <title/>
+        <placeholder>taskService.save</placeholder>
+        <event type="set">
+            <id>task_service_save_set</id>
+            <actions phase="post">
+                <action>
+                    taskService.save(taskService.findOne(useCase.tasks.first().task));
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_task_service_reload_tasks</id>
+        <title/>
+        <placeholder>taskService.reloadTasks</placeholder>
+        <event type="set">
+            <id>task_service_reload_tasks_set</id>
+            <actions phase="post">
+                <action>
+                    taskService.reloadTasks(useCase, true);
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_task_service_search_all</id>
+        <title/>
+        <placeholder>taskService.searchAll</placeholder>
+        <event type="set">
+            <id>task_service_search_all_set</id>
+            <actions phase="post">
+                <action>
+                    taskService.searchAll(com.netgrif.application.engine.adapter.spring.workflow.domain.QTask.task.transitionId.eq("t1"));
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_task_service_search_one</id>
+        <title/>
+        <placeholder>taskService.searchOne</placeholder>
+        <event type="set">
+            <id>task_service_search_one_set</id>
+            <actions phase="post">
+                <action>
+                    taskService.searchOne(com.netgrif.application.engine.adapter.spring.workflow.domain.QTask.task.transitionId.eq("t1"));
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <!-- WorkflowService methods -->
+    <data type="button">
+        <id>btn_workflow_service_find_one</id>
+        <title/>
+        <placeholder>workflowService.findOne</placeholder>
+        <event type="set">
+            <id>workflow_service_find_one_set</id>
+            <actions phase="post">
+                <action>
+                    workflowService.findOne(useCase.stringId);
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_workflow_service_find_one_no_net</id>
+        <title/>
+        <placeholder>workflowService.findOneNoNet</placeholder>
+        <event type="set">
+            <id>workflow_service_find_one_no_net_set</id>
+            <actions phase="post">
+                <action>
+                    workflowService.findOneNoNet(useCase.stringId);
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_workflow_service_find_all_by_id</id>
+        <title/>
+        <placeholder>workflowService.findAllById</placeholder>
+        <event type="set">
+            <id>workflow_service_find_all_by_id_set</id>
+            <actions phase="post">
+                <action>
+                    workflowService.findAllById([useCase.stringId]);
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_workflow_service_get_all</id>
+        <title/>
+        <placeholder>workflowService.getAll</placeholder>
+        <event type="set">
+            <id>workflow_service_get_all_set</id>
+            <actions phase="post">
+                <action>
+                    workflowService.getAll(org.springframework.data.domain.PageRequest.of(0, 10));
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_workflow_service_save</id>
+        <title/>
+        <placeholder>workflowService.save</placeholder>
+        <event type="set">
+            <id>workflow_service_save_set</id>
+            <actions phase="post">
+                <action>
+                    workflowService.save(useCase);
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_workflow_service_update_marking</id>
+        <title/>
+        <placeholder>workflowService.updateMarking</placeholder>
+        <event type="set">
+            <id>workflow_service_update_marking_set</id>
+            <actions phase="post">
+                <action>
+                    workflowService.updateMarking(useCase);
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_workflow_service_set_petri_net</id>
+        <title/>
+        <placeholder>workflowService.setPetriNet</placeholder>
+        <event type="set">
+            <id>workflow_service_set_petri_net_set</id>
+            <actions phase="post">
+                <action>
+                    workflowService.setPetriNet(useCase);
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_workflow_service_search_all</id>
+        <title/>
+        <placeholder>workflowService.searchAll</placeholder>
+        <event type="set">
+            <id>workflow_service_search_all_set</id>
+            <actions phase="post">
+                <action>
+                    workflowService.searchAll(com.netgrif.application.engine.adapter.spring.workflow.domain.QCase.case$.processIdentifier.eq(useCase.processIdentifier));
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_workflow_service_search_one</id>
+        <title/>
+        <placeholder>workflowService.searchOne</placeholder>
+        <event type="set">
+            <id>workflow_service_search_one_set</id>
+            <actions phase="post">
+                <action>
+                    workflowService.searchOne(com.netgrif.application.engine.adapter.spring.workflow.domain.QCase.case$.processIdentifier.eq(useCase.processIdentifier));
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <!-- UserService methods -->
+    <data type="button">
+        <id>btn_user_service_get_logged_or_system</id>
+        <title/>
+        <placeholder>userService.getLoggedOrSystem</placeholder>
+        <event type="set">
+            <id>user_service_get_logged_or_system_set</id>
+            <actions phase="post">
+                <action>
+                    userService.getLoggedOrSystem();
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_user_service_get_system</id>
+        <title/>
+        <placeholder>userService.getSystem</placeholder>
+        <event type="set">
+            <id>user_service_get_system_set</id>
+            <actions phase="post">
+                <action>
+                    userService.getSystem();
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_user_service_find_by_id</id>
+        <title/>
+        <placeholder>userService.findById</placeholder>
+        <event type="set">
+            <id>user_service_find_by_id_set</id>
+            <actions phase="post">
+                <action>
+                    userService.findById(useCase.author.id, null);
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_user_service_find_by_email</id>
+        <title/>
+        <placeholder>userService.findByEmail</placeholder>
+        <event type="set">
+            <id>user_service_find_by_email_set</id>
+            <actions phase="post">
+                <action>
+                    userService.findByEmail(userService.getLoggedOrSystem().getEmail(), null);
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_user_service_find_all</id>
+        <title/>
+        <placeholder>userService.findAll</placeholder>
+        <event type="set">
+            <id>user_service_find_all_set</id>
+            <actions phase="post">
+                <action>
+                    userService.findAll();
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_user_service_find_user_by_username</id>
+        <title/>
+        <placeholder>userService.findUserByUsername</placeholder>
+        <event type="set">
+            <id>user_service_find_user_by_username_set</id>
+            <actions phase="post">
+                <action>
+                    userService.findUserByUsername(userService.getLoggedOrSystem().getUsername(), null);
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_user_service_save_user</id>
+        <title/>
+        <placeholder>userService.saveUser</placeholder>
+        <event type="set">
+            <id>user_service_save_user_set</id>
+            <actions phase="post">
+                <action>
+                    userService.saveUser(userService.getLoggedOrSystem());
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <!-- GroupService methods -->
+    <data type="button">
+        <id>btn_group_service_find_by_id</id>
+        <title/>
+        <placeholder>groupService.findById</placeholder>
+        <event type="set">
+            <id>group_service_find_by_id_set</id>
+            <actions phase="post">
+                <action>
+                    groupService.findById(groupService.getDefaultUserGroup(userService.getLoggedOrSystem()).stringId);
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_group_service_find_by_predicate</id>
+        <title/>
+        <placeholder>groupService.findByPredicate</placeholder>
+        <event type="set">
+            <id>group_service_find_by_predicate_set</id>
+            <actions phase="post">
+                <action>
+                    groupService.findByPredicate(new com.netgrif.application.engine.objects.auth.domain.QGroup("group").identifier.eq("default"), org.springframework.data.domain.PageRequest.of(0, 10));
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_group_service_find_by_identifier</id>
+        <title/>
+        <placeholder>groupService.findByIdentifier</placeholder>
+        <event type="set">
+            <id>group_service_find_by_identifier_set</id>
+            <actions phase="post">
+                <action>
+                    groupService.findByIdentifier("default");
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_group_service_get_default_user_group</id>
+        <title/>
+        <placeholder>groupService.getDefaultUserGroup</placeholder>
+        <event type="set">
+            <id>group_service_get_default_user_group_set</id>
+            <actions phase="post">
+                <action>
+                    groupService.getDefaultUserGroup(userService.getLoggedOrSystem());
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_group_service_find_all</id>
+        <title/>
+        <placeholder>groupService.findAll</placeholder>
+        <event type="set">
+            <id>group_service_find_all_set</id>
+            <actions phase="post">
+                <action>
+                    groupService.findAll(org.springframework.data.domain.PageRequest.of(0, 10));
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_group_service_save</id>
+        <title/>
+        <placeholder>groupService.save</placeholder>
+        <event type="set">
+            <id>group_service_save_set</id>
+            <actions phase="post">
+                <action>
+                    groupService.save(groupService.getDefaultUserGroup(userService.getLoggedOrSystem()));
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <!-- PetriNetService methods -->
+    <data type="button">
+        <id>btn_petrinet_service_get_petrinet</id>
+        <title/>
+        <placeholder>petriNetService.getPetriNet</placeholder>
+        <event type="set">
+            <id>petrinet_service_get_petrinet_set</id>
+            <actions phase="post">
+                <action>
+                    petriNetService.getPetriNet(useCase.petriNetId);
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_petrinet_service_get_default_version_by_identifier</id>
+        <title/>
+        <placeholder>petriNetService.getDefaultVersionByIdentifier</placeholder>
+        <event type="set">
+            <id>petrinet_service_get_default_version_by_identifier_set</id>
+            <actions phase="post">
+                <action>
+                    petriNetService.getDefaultVersionByIdentifier(useCase.processIdentifier);
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_petrinet_service_get_latest_version_by_identifier</id>
+        <title/>
+        <placeholder>petriNetService.getLatestVersionByIdentifier</placeholder>
+        <event type="set">
+            <id>petrinet_service_get_latest_version_by_identifier_set</id>
+            <actions phase="post">
+                <action>
+                    petriNetService.getLatestVersionByIdentifier(useCase.processIdentifier);
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_petrinet_service_get_all</id>
+        <title/>
+        <placeholder>petriNetService.getAll</placeholder>
+        <event type="set">
+            <id>petrinet_service_get_all_set</id>
+            <actions phase="post">
+                <action>
+                    petriNetService.getAll(org.springframework.data.domain.PageRequest.of(0, 10));
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_petrinet_service_get_all_default</id>
+        <title/>
+        <placeholder>petriNetService.getAllDefault</placeholder>
+        <event type="set">
+            <id>petrinet_service_get_all_default_set</id>
+            <actions phase="post">
+                <action>
+                    petriNetService.getAllDefault(org.springframework.data.domain.PageRequest.of(0, 10));
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_petrinet_service_find_all_by_id</id>
+        <title/>
+        <placeholder>petriNetService.findAllById</placeholder>
+        <event type="set">
+            <id>petrinet_service_find_all_by_id_set</id>
+            <actions phase="post">
+                <action>
+                    petriNetService.findAllById([useCase.petriNetId]);
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_petrinet_service_save</id>
+        <title/>
+        <placeholder>petriNetService.save</placeholder>
+        <event type="set">
+            <id>petrinet_service_save_set</id>
+            <actions phase="post">
+                <action>
+                    petriNetService.save(petriNetService.getPetriNet(useCase.petriNetId));
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>t1</id>
+        <x>250</x>
+        <y>150</y>
+        <label>Execute Service Tests</label>
+        <!-- TaskService -->
+        <dataRef>
+            <id>btn_task_service_find_one</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_task_service_find_by_id</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_task_service_find_optional_by_id</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_task_service_find_all_by_id</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_task_service_find_all_by_case</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_task_service_save</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_task_service_reload_tasks</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_task_service_search_all</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_task_service_search_one</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+
+        <!-- WorkflowService -->
+        <dataRef>
+            <id>btn_workflow_service_find_one</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_workflow_service_find_one_no_net</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_workflow_service_find_all_by_id</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_workflow_service_get_all</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_workflow_service_save</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_workflow_service_update_marking</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_workflow_service_set_petri_net</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_workflow_service_search_all</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_workflow_service_search_one</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+
+        <!-- UserService -->
+        <dataRef>
+            <id>btn_user_service_get_logged_or_system</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_user_service_get_system</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_user_service_find_by_id</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_user_service_find_by_email</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_user_service_find_all</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_user_service_find_user_by_username</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_user_service_save_user</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+
+        <!-- GroupService -->
+        <dataRef>
+            <id>btn_group_service_find_by_id</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_group_service_find_by_predicate</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_group_service_find_by_identifier</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_group_service_get_default_user_group</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_group_service_find_all</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_group_service_save</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+
+        <!-- PetriNetService -->
+        <dataRef>
+            <id>btn_petrinet_service_get_petrinet</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_petrinet_service_get_default_version_by_identifier</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_petrinet_service_get_latest_version_by_identifier</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_petrinet_service_get_all</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_petrinet_service_get_all_default</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_petrinet_service_find_all_by_id</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_petrinet_service_save</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+    </transition>
+</document>

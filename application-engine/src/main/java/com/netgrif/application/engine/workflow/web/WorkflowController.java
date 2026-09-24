@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.workflow.web;
 
+import com.netgrif.application.engine.objects.annotations.Authorize;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList;
@@ -80,7 +81,7 @@ public class WorkflowController {
     private IDataService dataService;
 
 
-    @PreAuthorize("@workflowAuthorizationService.canCallCreate(#auth.getPrincipal(), #body.netId)")
+    @Authorize(expression = "@workflowAuthorizationService.canCallCreate(#auth.getPrincipal(), #body.netId)")
     @Operation(summary = "Create new case", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/case", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage> createCase(@RequestBody CreateCaseBody body, Authentication auth, Locale locale) {
@@ -188,7 +189,7 @@ public class WorkflowController {
         return resources;
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @Authorize(authority = "ADMIN")
     @Operation(summary = "Reload tasks of case",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -224,7 +225,7 @@ public class WorkflowController {
 //        }
 //    }
 
-    @PreAuthorize("@workflowAuthorizationService.canCallDelete(#auth.getPrincipal(), #caseId)")
+    @Authorize(expression = "@workflowAuthorizationService.canCallDelete(#auth.getPrincipal(), #caseId)")
     @Operation(summary = "Delete case", security = {@SecurityRequirement(name = "BasicAuth")})
     @DeleteMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage> deleteCase(Authentication auth, @PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) {

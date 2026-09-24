@@ -3,6 +3,7 @@ package com.netgrif.application.engine.elastic.web;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService;
 import com.netgrif.application.engine.elastic.web.requestbodies.IndexParams;
+import com.netgrif.application.engine.objects.annotations.Authorize;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.ReindexingTask;
 import com.netgrif.application.engine.workflow.service.CaseSearchService;
@@ -79,7 +80,8 @@ public class ElasticController {
         this.indexService = indexService;
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "ELASTIC_REINDEX")
     @Operation(summary = "Reindex specified cases",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -117,7 +119,8 @@ public class ElasticController {
         }
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "ELASTIC_REINDEX")
     @Operation(summary = "Reindex all or stale cases with bulk index",
             description = "Reindex all or stale cases (specified by IndexParams.indexAll param) with bulk index. Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "BasicAuth")})

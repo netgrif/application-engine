@@ -8,6 +8,7 @@ import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
 import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository
 import com.netgrif.application.engine.elastic.service.ElasticIndexService
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.petrinet.domain.repository.UriNodeRepository
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -15,6 +16,8 @@ import com.netgrif.application.engine.startup.runner.*
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.mongodb.core.MongoTemplate
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 
 @Component
@@ -111,6 +114,12 @@ class TestHelper {
             superCreator.run()
             finisherRunner.run()
         }
+    }
+
+    void setAuthentication() {
+        def user = userService.system
+        def auth = new UsernamePasswordAuthenticationToken(ActorTransformer.toLoggedUser(user), user)
+        SecurityContextHolder.getContext().setAuthentication(auth)
     }
 
     private void clearMongoCollections() {
