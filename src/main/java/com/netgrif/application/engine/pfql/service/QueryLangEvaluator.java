@@ -38,30 +38,30 @@ import static com.netgrif.application.engine.pfql.service.utils.SearchUtils.*;
 
 public class QueryLangEvaluator extends QueryLangBaseListener {
 
-    private final ParseTreeProperty<String> elasticQuery = new ParseTreeProperty<>();
-    private final ParseTreeProperty<Predicate> mongoQuery = new ParseTreeProperty<>();
-    private final String elasticFuzzyMaxDistance = "AUTO";
+    protected final ParseTreeProperty<String> elasticQuery = new ParseTreeProperty<>();
+    protected final ParseTreeProperty<Predicate> mongoQuery = new ParseTreeProperty<>();
+    protected final String elasticFuzzyMaxDistance = "AUTO";
 
-    private final IUserService userService;
+    protected final IUserService userService;
 
     @Getter
-    private QueryType resourceType;
+    protected QueryType resourceType;
     @Getter
-    private Boolean multiple;
+    protected Boolean multiple;
     @Getter
     @Setter
-    private Boolean searchWithElastic = false;
+    protected Boolean searchWithElastic = false;
     @Getter
-    private Predicate fullMongoQuery;
+    protected Predicate fullMongoQuery;
     @Getter
-    private String fullElasticQuery;
+    protected String fullElasticQuery;
     @Getter
     @Setter
-    private Pageable pageable;
+    protected Pageable pageable;
 
-    private int pageNumber = 0;
-    private int pageSize = 20;
-    private final List<Sort.Order> sortOrders = new ArrayList<>();
+    protected int pageNumber = 0;
+    protected int pageSize = 20;
+    protected final List<Sort.Order> sortOrders = new ArrayList<>();
 
     public QueryLangEvaluator(IUserService userService) {
         this.userService = userService;
@@ -83,12 +83,12 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         return mongoQuery.get(node);
     }
 
-    private void processBasicExpression(ParseTree child, ParseTree current) {
+    protected void processBasicExpression(ParseTree child, ParseTree current) {
         setMongoQuery(current, getMongoQuery(child));
         setElasticQuery(current, getElasticQuery(child));
     }
 
-    private void processOrExpression(List<ParseTree> children, ParseTree current) {
+    protected void processOrExpression(List<ParseTree> children, ParseTree current) {
         List<Predicate> predicates = children.stream()
                 .map(this::getMongoQuery)
                 .filter(Objects::nonNull)
@@ -106,7 +106,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         setElasticQuery(current, elasticQuery.isBlank() ? null : elasticQuery);
     }
 
-    private void processAndExpression(List<ParseTree> children, ParseTree current) {
+    protected void processAndExpression(List<ParseTree> children, ParseTree current) {
         List<Predicate> predicates = children.stream()
                 .map(this::getMongoQuery)
                 .filter(Objects::nonNull)
@@ -124,7 +124,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         setElasticQuery(current, elasticQuery.isBlank() ? null : elasticQuery);
     }
 
-    private void processConditionGroup(ParseTree child, ParseTree current, Boolean not, Boolean parenthesis) {
+    protected void processConditionGroup(ParseTree child, ParseTree current, Boolean not, Boolean parenthesis) {
         Predicate predicate = getMongoQuery(child);
         String elasticQuery = getElasticQuery(child);
 
@@ -146,7 +146,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         setElasticQuery(current, elasticQuery);
     }
 
-    private String handleStringComparisonWithPlaceholders(QueryLangParser.StringComparisonContext ctx) {
+    protected String handleStringComparisonWithPlaceholders(QueryLangParser.StringComparisonContext ctx) {
         if (ctx.STRING() != null) {
             return getStringValue(ctx.STRING().getText());
         }
@@ -158,7 +158,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         throw new IllegalArgumentException("Wrong or missing query value on string comparison");
     }
 
-    private ObjectId handleObjectIdComparisonWithPlaceholders(QueryLangParser.ObjectIdComparisonContext ctx) {
+    protected ObjectId handleObjectIdComparisonWithPlaceholders(QueryLangParser.ObjectIdComparisonContext ctx) {
         if (ctx.STRING() != null) {
             return getObjectIdValue(ctx.STRING().getText());
         }
@@ -170,7 +170,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         throw new IllegalArgumentException("Wrong or missing query value on object id comparison");
     }
 
-    private List<String> handleStringListComparison(QueryLangParser.StringListContext ctx) {
+    protected List<String> handleStringListComparison(QueryLangParser.StringListContext ctx) {
         List<String> result = new ArrayList<>();
 
         if (ctx.STRING() != null && !ctx.STRING().isEmpty()) {
@@ -187,7 +187,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         return result;
     }
 
-    private List<ObjectId> handleObjectIdListComparison(QueryLangParser.StringListContext ctx) {
+    protected List<ObjectId> handleObjectIdListComparison(QueryLangParser.StringListContext ctx) {
         List<ObjectId> result = new ArrayList<>();
 
         if (ctx.STRING() != null && !ctx.STRING().isEmpty()) {
@@ -207,7 +207,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         return result;
     }
 
-    private String handleLoggedUserStringAttribute(QueryLangParser.LoggedUserStringAttributeContext ctx) {
+    protected String handleLoggedUserStringAttribute(QueryLangParser.LoggedUserStringAttributeContext ctx) {
         LoggedUser loggedUser = this.userService.getLoggedOrSystem().transformToLoggedUser();
         if (ctx.LOGGED_USER_ID() != null) {
             return loggedUser.getId();
@@ -222,7 +222,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
     }
 
     /// returns pair, where the first element is left value and the second element is right value
-    private Pair<String, String> handleInRangeStringComparison(QueryLangParser.StringRangeContext ctx) {
+    protected Pair<String, String> handleInRangeStringComparison(QueryLangParser.StringRangeContext ctx) {
         List<ParseTree> filteredChildren = ctx.children.stream()
                 .filter(node -> node instanceof TerminalNode && ((TerminalNode) node).getSymbol().getType() == QueryLangParser.STRING
                         || node instanceof QueryLangParser.LoggedUserStringAttributeContext)
@@ -251,7 +251,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         return Pair.of(left, right);
     }
 
-    private String handleBooleanComparison(QueryLangParser.BooleanComparisonContext ctx) {
+    protected String handleBooleanComparison(QueryLangParser.BooleanComparisonContext ctx) {
         if (ctx.BOOLEAN() != null) {
             return ctx.BOOLEAN().getText();
         }
@@ -263,15 +263,15 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         throw new IllegalArgumentException("Wrong or missing query value on boolean comparison");
     }
 
-    private Predicate getEmptyMongoQuery() {
+    protected Predicate getEmptyMongoQuery() {
         return new BooleanBuilder();
     }
 
-    private String getEmptyElasticQuery() {
+    protected String getEmptyElasticQuery() {
         return "*";
     }
 
-    private void handleNoneConditions() {
+    protected void handleNoneConditions() {
         fullMongoQuery = getEmptyMongoQuery();
         fullElasticQuery = getEmptyElasticQuery();
     }
@@ -1882,7 +1882,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         this.searchWithElastic = true;
     }
 
-    private boolean shouldBeNotNull(QueryLangParser.NullComparisonContext ctx) {
+    protected boolean shouldBeNotNull(QueryLangParser.NullComparisonContext ctx) {
         if (ctx == null) {
             throw new IllegalArgumentException("Null comparison context must be provided");
         }

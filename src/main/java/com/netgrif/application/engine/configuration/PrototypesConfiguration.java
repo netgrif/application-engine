@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.configuration;
 
+import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.auth.web.responsebodies.UserResourceAssembler;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.pdf.generator.service.PdfDataHelper;
@@ -9,15 +10,20 @@ import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfDataH
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfDrawer;
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGenerator;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate;
+import com.netgrif.application.engine.pfql.service.QueryLangEvaluator;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
 
 @Configuration
+@RequiredArgsConstructor
 public class PrototypesConfiguration {
+
+    private final IUserService userService;
 
     @Bean("importer")
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -59,5 +65,12 @@ public class PrototypesConfiguration {
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public UserResourceAssembler userResourceAssembler() {
         return new UserResourceAssembler();
+    }
+
+    @Bean("queryLangEvaluator")
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    @ConditionalOnMissingBean(QueryLangEvaluator.class)
+    public QueryLangEvaluator queryLangEvaluator() {
+        return new QueryLangEvaluator(userService);
     }
 }
