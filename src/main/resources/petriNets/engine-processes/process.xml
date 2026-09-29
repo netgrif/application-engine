@@ -302,9 +302,6 @@
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
-				<component>
-					<name>richtextarea</name>
-				</component>
 			</dataRef>
 			<dataRef>
 				<id>title</id>
