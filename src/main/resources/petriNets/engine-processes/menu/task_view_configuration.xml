@@ -224,6 +224,20 @@
         <id>task_all_allowed_nets</id>
         <title name="task_all_allowed_nets">All allowed nets?</title>
         <init>true</init>
+        <event type="set">
+            <id>0</id>
+            <actions phase="post">
+                <action>
+                    trans: t.settings,
+                    task_all_allowed_nets: f.task_all_allowed_nets,
+                    task_allowed_nets: f.task_allowed_nets,
+                    task_inherit_allowed_nets: f.task_inherit_allowed_nets;
+
+                    make [task_allowed_nets, task_inherit_allowed_nets], hidden on trans when { task_all_allowed_nets.value }
+                    make [task_allowed_nets, task_inherit_allowed_nets], editable on trans when { !task_all_allowed_nets.value }
+                </action>
+            </actions>
+        </event>
     </data>
     <data type="boolean">
         <id>task_inherit_allowed_nets</id>
@@ -452,7 +466,7 @@
             <dataRef>
                 <id>task_allowed_nets</id>
                 <logic>
-                    <behavior>editable</behavior>
+                    <behavior>hidden</behavior>
                 </logic>
                 <layout>
                     <x>1</x>
@@ -466,7 +480,7 @@
             <dataRef>
                 <id>task_inherit_allowed_nets</id>
                 <logic>
-                    <behavior>editable</behavior>
+                    <behavior>hidden</behavior>
                 </logic>
                 <layout>
                     <x>2</x>
