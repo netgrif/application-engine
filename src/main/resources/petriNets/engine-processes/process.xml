@@ -707,9 +707,6 @@
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
-				<component>
-					<name>richtextarea</name>
-				</component>
 			</dataRef>
 			<dataRef>
 				<id>log_delete</id>
@@ -775,9 +772,6 @@
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
-				<component>
-					<name>richtextarea</name>
-				</component>
 			</dataRef>
 			<dataRef>
 				<id>version_increment</id>
@@ -882,9 +876,6 @@
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
-				<component>
-					<name>richtextarea</name>
-				</component>
 			</dataRef>
 			<dataRef>
 				<id>log_delete</id>
