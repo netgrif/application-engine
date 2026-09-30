@@ -6,6 +6,7 @@ import com.netgrif.application.engine.objects.workflow.domain.Task
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -33,10 +34,13 @@ class ServiceMethodAuthorizationTest {
     @Autowired
     private ITaskService taskService
 
+    @BeforeEach
+    void init() {
+        testHelper.truncateDbs()
+    }
+
     @Test
     void testAllServiceButtonsPostSetActions() {
-        testHelper.truncateDbs()
-
         def netOptional = importHelper.createNet("service_methods_test.xml")
         assertTrue(netOptional.isPresent())
         def net = netOptional.get()
@@ -60,8 +64,6 @@ class ServiceMethodAuthorizationTest {
 
     @Test
     void testAllAuthorityServiceButtonsPostSetActions() {
-        testHelper.truncateDbs()
-
         def netOptional = importHelper.createNet("authority_service_methods_test.xml")
         assertTrue(netOptional.isPresent())
         def net = netOptional.get()
@@ -85,17 +87,11 @@ class ServiceMethodAuthorizationTest {
 
     @Test
     void testAllAuthorityApiButtonsPostSetActions() {
-        executeAllButtonsOfNet("authority_api_methods_test.xml", "Authority API Test Case")
-    }
-
-    private void executeAllButtonsOfNet(String netFileName, String caseTitle) {
-        testHelper.truncateDbs()
-
-        def netOptional = importHelper.createNet(netFileName)
+        def netOptional = importHelper.createNet("authority_api_methods_test.xml")
         assertTrue(netOptional.isPresent())
         def net = netOptional.get()
 
-        Case useCase = importHelper.createCase(caseTitle, net)
+        Case useCase = importHelper.createCase("Authority API Test Case", net)
         assertNotNull(useCase)
 
         Task task = taskService.findOne(useCase.tasks.first().task)
