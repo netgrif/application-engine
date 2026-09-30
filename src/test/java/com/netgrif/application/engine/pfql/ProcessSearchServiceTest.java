@@ -57,6 +57,10 @@ public class ProcessSearchServiceTest {
         assertNotNull(result);
         assertEquals(testNet.getStringId(), result.getStringId());
 
+        result = processSearchService.searchOne("identifier eq 'query_lang_test'");
+        assertNotNull(result);
+        assertEquals(testNet.getStringId(), result.getStringId());
+
         result = processSearchService.searchOne("process: identifier eq 'wrong'");
         assertNull(result);
     }
@@ -68,6 +72,12 @@ public class ProcessSearchServiceTest {
         assertThrows(IllegalArgumentException.class, () -> processSearchService.searchAll("cases: processIdentifier eq 'xxx'"));
 
         Page<PetriNet> result = processSearchService.searchAll("processes: identifier eq 'query_lang_test'");
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+        assertEquals(20, result.getPageable().getPageSize());
+        assertEquals(testNet.getStringId(), result.getContent().get(0).getStringId());
+
+        result = processSearchService.searchAll("identifier eq 'query_lang_test'");
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
         assertEquals(20, result.getPageable().getPageSize());
@@ -90,6 +100,9 @@ public class ProcessSearchServiceTest {
         long result = processSearchService.count("process: identifier eq 'query_lang_test'");
         assertEquals(1, result);
 
+        result = processSearchService.count("identifier eq 'query_lang_test'");
+        assertEquals(1, result);
+
         result = processSearchService.count("processes: identifier eq 'query_lang_test'");
         assertEquals(1, result);
 
@@ -106,6 +119,9 @@ public class ProcessSearchServiceTest {
         assertThrows(IllegalArgumentException.class, () -> processSearchService.exists("case: identifier eq 'xxx'"));
 
         boolean result = processSearchService.exists("process: identifier eq 'query_lang_test'");
+        assertTrue(result);
+
+        result = processSearchService.exists("identifier eq 'query_lang_test'");
         assertTrue(result);
 
         result = processSearchService.exists("processes: identifier eq 'query_lang_test'");

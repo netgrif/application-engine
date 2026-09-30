@@ -33,6 +33,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public final class FieldFactory {
 
+    private static final String FILTER_FIELD_VALIDATION_RULE = "query";
+
     @Value("${nae.storage.default-type:local}")
     private String defaultStorageType;
 
@@ -233,6 +235,9 @@ public final class FieldFactory {
             case CASE_REF:
                 field = buildCaseField(data);
                 break;
+            case PROCESS_REF:
+                field = buildProcessField(data);
+                break;
             case DATE_TIME:
                 field = buildDateTimeField(data);
                 break;
@@ -262,7 +267,7 @@ public final class FieldFactory {
                 field = buildI18nField(data, importer);
                 break;
             case STRING_COLLECTION:
-                field = buildStringCollectionField(data, importer);
+                field = buildStringCollectionField(data);
                 break;
             default:
                 throw new IllegalArgumentException(data.getType() + " is not a valid Field type");
@@ -315,7 +320,17 @@ public final class FieldFactory {
         return field;
     }
 
-    private StringCollectionField buildStringCollectionField(Data data, Importer importer) {
+    private ProcessField buildProcessField(Data data) {
+        ProcessField field = new ProcessField();
+        setDefaultValues(field, data, defaultValues -> {
+            if (defaultValues != null) {
+                field.setDefaultValue(defaultValues);
+            }
+        });
+        return field;
+    }
+
+    private StringCollectionField buildStringCollectionField(Data data) {
         StringCollectionField field = new StringCollectionField();
         setDefaultValues(field, data, defaultValues -> {
             if (defaultValues != null) {
@@ -559,18 +574,21 @@ public final class FieldFactory {
     private CaseFilterField buildCaseFilterField(Data data) {
         CaseFilterField field = new CaseFilterField();
         setDefaultValue(field, data, field::setDefaultValue);
+        field.setValidations(getFilterValidationAsList());
         return field;
     }
 
     private TaskFilterField buildTaskFilterField(Data data) {
         TaskFilterField field = new TaskFilterField();
         setDefaultValue(field, data, field::setDefaultValue);
+        field.setValidations(getFilterValidationAsList());
         return field;
     }
 
     private ProcessFilterField buildProcessFilterField(Data data) {
         ProcessFilterField field = new ProcessFilterField();
         setDefaultValue(field, data, field::setDefaultValue);
+        field.setValidations(getFilterValidationAsList());
         return field;
     }
 
@@ -862,5 +880,12 @@ public final class FieldFactory {
 
     private void resolveStorage(Data data, StorageField<?> field) {
         field.setStorage(StorageFactory.createStorage(data, storageResolverService, defaultStorageType));
+    }
+
+    private List<com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation> getFilterValidationAsList() {
+        com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation defaultValidation = makeValidation(FILTER_FIELD_VALIDATION_RULE, null, false);
+        List<com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation> validations = new ArrayList<>();
+        validations.add(defaultValidation);
+        return validations;
     }
 }

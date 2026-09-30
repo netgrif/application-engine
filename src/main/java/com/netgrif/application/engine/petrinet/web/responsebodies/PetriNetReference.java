@@ -1,10 +1,11 @@
 package com.netgrif.application.engine.petrinet.web.responsebodies;
 
-
 import com.netgrif.application.engine.auth.domain.Author;
+import com.netgrif.application.engine.petrinet.domain.DeploymentState;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataFieldReference;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class PetriNetReference extends Reference {
 
     private String identifier;
@@ -22,7 +24,7 @@ public class PetriNetReference extends Reference {
     private LocalDateTime createdDate;
     private Author author;
     private List<DataFieldReference> immediateData;
-
+    private DeploymentState deploymentState;
 
     public PetriNetReference() {
         super();
@@ -37,10 +39,7 @@ public class PetriNetReference extends Reference {
     }
 
     public PetriNetReference(String stringId, String title, String identifier, String version, String initials, String icon, LocalDateTime createdDate, Author author) {
-        super(stringId, title);
-        this.identifier = identifier;
-        this.version = version;
-        this.initials = initials;
+        this(stringId, identifier, version, title, initials, null);
         this.icon = icon;
         this.createdDate = createdDate;
         this.author = author;
@@ -52,5 +51,6 @@ public class PetriNetReference extends Reference {
         this.createdDate = net.getCreationDate();
         this.author = net.getAuthor();
         this.immediateData = net.getImmediateFields().stream().map(field -> new DataFieldReference(field, locale)).collect(Collectors.toList());
+        this.deploymentState = net.getDeploymentState();
     }
 }

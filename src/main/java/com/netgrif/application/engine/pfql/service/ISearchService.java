@@ -1,11 +1,11 @@
 package com.netgrif.application.engine.pfql.service;
 
 public interface ISearchService {
-    String explainQuery(String query);
+    String explainQuery(String query, Object... args);
 
-    Object search(String query);
+    Object search(String query, Object... args);
 
-    long count(String query);
+    long count(String query, Object... args);
 
-    boolean exists(String query);
+    boolean exists(String query, Object... args);
 }

@@ -92,7 +92,10 @@ public class MenuItemUtils {
      * */
     public static boolean isCyclicNodePath(Case folderItem, String destUri) {
         String oldNodePath = (String) folderItem.getFieldValue(MenuItemConstants.FIELD_NODE_PATH);
-        return oldNodePath != null && destUri.contains(oldNodePath);
+        if (oldNodePath == null || destUri == null) {
+            return false;
+        }
+        return destUri.contains(oldNodePath + "/") || destUri.endsWith(oldNodePath);
     }
 
     /**

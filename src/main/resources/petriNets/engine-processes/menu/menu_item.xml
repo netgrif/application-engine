@@ -256,6 +256,20 @@
 		<id>childItemForms</id>
 		<title/>
 	</data>
+	<data type="i18n">
+		<id>empty_child_items_info</id>
+		<title/>
+		<init dynamic="true">
+			new com.netgrif.application.engine.petrinet.domain.I18nString("This menu item has no child items to order.",
+				[sk: "Táto menu položka neobsahuje žiadnu položku na zoradenie", de: "Zu diesem Menüpunkt gibt es keine Untergerichte."])
+		</init>
+		<component>
+			<name>text</name>
+			<property key="plainText">true</property>
+			<property key="fontSize">20</property>
+			<property key="boldText">true</property>
+		</component>
+	</data>
 	<data type="boolean" immediate="true">
 		<id>is_folder</id>
 		<title/>
@@ -299,7 +313,7 @@
 	<data type="text" immediate="true">
 		<id>menu_icon</id>
 		<title name="icon_identifier">Menu icon identifier</title>
-		<desc name="icon_identifier_desc">Material icon identifier. List of icons with identifiers is available online.</desc>
+		<desc name="icon_identifier_desc">Material icon identifier</desc>
 		<action trigger="set">
 			icon: f.this,
 			iconPreview: f.menu_icon_preview;
@@ -326,7 +340,6 @@
 	<data type="enumeration">
 		<id>menu_name_as_visible</id>
 		<title name="name">Name of the item</title>
-		<desc name="name_desc">Will be shown in the menu</desc>
 		<component>
 			<name>autocomplete</name>
 		</component>
@@ -334,7 +347,6 @@
 	<data type="i18n" immediate="true">
 		<id>menu_name</id>
 		<title name="name">Name of the item</title>
-		<desc name="name_desc">Will be shown in the menu</desc>
 		<action trigger="set">
 			menu_name_as_visible: f.menu_name_as_visible,
 			name: f.menu_name;
@@ -457,6 +469,16 @@
 			<init dynamic="true">[:]</init>
 		</options>
 	</data>
+	<data type="multichoice_map" immediate="true">
+		<id>allowed_authorities</id>
+		<title name="allowed_authorities">Allowed authorities</title>
+		<options>
+			<option key="ROLE_USER" name="opt_user">User</option>
+			<option key="ROLE_ADMIN" name="opt_admin">Admin</option>
+			<option key="ROLE_ANONYMOUS" name="opt_anonym">Anonymous</option>
+		</options>
+		<init>ROLE_USER</init>
+	</data>
 	<data type="boolean" immediate="true">
 		<id>use_custom_view</id>
 		<title name="use_custom_view">Use custom view?</title>
@@ -502,7 +524,7 @@
 	<data type="text" immediate="true">
 		<id>tab_icon</id>
 		<title name="tab_icon">Tab icon identifier</title>
-		<desc name="tab_icon_identifier_desc">Material icon identifier. List of icons with identifiers is available online.</desc>
+		<desc name="tab_icon_identifier_desc">Material icon identifier</desc>
 		<action trigger="set">
 			icon: f.this,
 			iconPreview: f.tab_icon_preview;
@@ -665,13 +687,16 @@
 		<options>
 			<init dynamic="true">com.netgrif.application.engine.menu.service.MenuItemTemplateHolder.transformToOptions()</init>
 		</options>
+		<component>
+			<name>autocomplete</name>
+		</component>
 	</data>
 
 	<!-- I18NS -->
 	<i18n locale="sk">
 		<i18nString name="icon_preview">Náhľad ikony</i18nString>
 		<i18nString name="icon_identifier">Identifikátor ikony</i18nString>
-		<i18nString name="icon_identifier_desc">Identifikátor Material ikony. Zoznam ikon s identifikátormi je dostupný online.</i18nString>
+		<i18nString name="icon_identifier_desc">Identifikátor Material ikony.</i18nString>
 		<i18nString name="allow_roles">Pridaj k povoleným roliam</i18nString>
 		<i18nString name="remove_from_allowed_roles">Odstráň z povolených rolí</i18nString>
 		<i18nString name="ban_roles">Pridaj k zakázaným roliam</i18nString>
@@ -684,9 +709,8 @@
 		<i18nString name="duplicate_view_identifier">Identifikátor duplikovanej položky</i18nString>
 		<i18nString name="duplicate_view_identifier_desc">Musí byť jedinečný</i18nString>
 		<i18nString name="name">Názov položky</i18nString>
-		<i18nString name="name_desc">Bude zobrazený v menu</i18nString>
 		<i18nString name="tab_icon">Identifikátor ikony v karte</i18nString>
-		<i18nString name="tab_icon_identifier_desc">Identifikátor Material ikony. Zoznam ikon s identifikátormi je dostupný online.</i18nString>
+		<i18nString name="tab_icon_identifier_desc">Identifikátor Material ikony.</i18nString>
 		<i18nString name="tab_icon_preview">Náhľad ikony v karte</i18nString>
 		<i18nString name="display_tab_icon">Zobraziť ikonu v karte?</i18nString>
 		<i18nString name="tab_name">Názov položky</i18nString>
@@ -719,14 +743,18 @@
 		<i18nString name="children_order">Zoradiť pod-položky</i18nString>
 		<i18nString name="create_item_finish">Vytvoriť menu položku</i18nString>
 		<i18nString name="configuration_templates">Konfiguračná šablóna</i18nString>
-		<i18nString name="role_settings">Rola</i18nString>
-		<i18nString name="view_settings">Zobrazenie</i18nString>
+		<i18nString name="role_settings">Povolenia</i18nString>
+		<i18nString name="view_settings">Zobrazenie v karte</i18nString>
 		<i18nString name="model_title">Menu položka</i18nString>
+		<i18nString name="allowed_authorities">Povolené autority</i18nString>
+		<i18nString name="opt_user">Používateľ</i18nString>
+		<i18nString name="opt_admin">Admin</i18nString>
+		<i18nString name="opt_anonym">Anonymný používateľ</i18nString>
 	</i18n>
 	<i18n locale="de">
 		<i18nString name="icon_preview">Ikonevorschau</i18nString>
 		<i18nString name="icon_identifier">Ikone ID</i18nString>
-		<i18nString name="icon_identifier_desc">Material Ikone ID. Liste den Ikonen mit IDs ist online verfügbar.</i18nString>
+		<i18nString name="icon_identifier_desc">Material Ikone ID</i18nString>
 		<i18nString name="allow_roles">Zu zulässigen Rollen hinzufügen</i18nString>
 		<i18nString name="remove_from_allowed_roles">Aus zulässigen Rollen entfernen</i18nString>
 		<i18nString name="ban_roles">Zu verbotenen Rollen hinzufügen</i18nString>
@@ -734,7 +762,7 @@
 		<i18nString name="available_processes">Ihre Prozesse</i18nString>
 		<i18nString name="available_processes_desc">Wählen Sie einen Prozess mit Rollen aus, die Sie zu Listen mit zulässigen oder verbotenen Rollen hinzufügen möchten.</i18nString>
 		<i18nString name="available_roles">Verfügbare Rollen</i18nString>
-		<i18nString name="tab_icon_identifier_desc">Material Ikone ID. Liste den Ikonen mit IDs ist online verfügbar.</i18nString>
+		<i18nString name="tab_icon_identifier_desc">Material Ikone ID</i18nString>
 		<i18nString name="custom_view_selector_desc">Beispiel: "demo-tabbed-views"</i18nString>
 		<i18nString name="roles_management_title">Rollen</i18nString>
 		<i18nString name="roles_allowed">Zulässige Rollen</i18nString>
@@ -747,7 +775,6 @@
 		<i18nString name="duplicate_view_identifier">Identifikator der kopierten Ansicht</i18nString>
 		<i18nString name="duplicate_view_identifier_desc">Muss einzigartig sein</i18nString>
 		<i18nString name="name">Titel des Eintrages</i18nString>
-		<i18nString name="name_desc">Wird im Menü angezeigt</i18nString>
 		<i18nString name="tab_icon">Ikonen Identifikator der Registerkarte</i18nString>
 		<i18nString name="tab_icon_preview">Vorschau der Registerkarte Ikone</i18nString>
 		<i18nString name="display_tab_icon">Zeige die Registerkarte Ikone an?</i18nString>
@@ -774,9 +801,13 @@
 		<i18nString name="children_order">Untereintrage sortieren</i18nString>
 		<i18nString name="create_item_finish">Erstellen</i18nString>
 		<i18nString name="configuration_templates">Konfigurationsvorlage</i18nString>
-		<i18nString name="role_settings">Rolle</i18nString>
-		<i18nString name="view_settings">Ansicht</i18nString>
+		<i18nString name="role_settings">Berechtigungen</i18nString>
+		<i18nString name="view_settings">Ansicht der Registerkarte</i18nString>
 		<i18nString name="model_title">Menüeintrag</i18nString>
+		<i18nString name="allowed_authorities">Zulässige Behörden</i18nString>
+		<i18nString name="opt_user">Benutzer</i18nString>
+		<i18nString name="opt_admin">Admin</i18nString>
+		<i18nString name="opt_anonym">Anonymer Nutzer</i18nString>
 	</i18n>
 
 	<!-- TRANSITIONS -->
@@ -874,49 +905,6 @@
 				</event>
 			</dataRef>
 			<dataRef>
-				<id>move_dest_uri</id>
-				<logic>
-					<behavior>editable</behavior>
-					<behavior>required</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>2</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>move_dest_uri_new_node</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>2</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>move_add_node</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>3</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
 				<id>configuration_templates</id>
 				<logic>
 					<behavior>editable</behavior>
@@ -929,6 +917,34 @@
 					<cols>4</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>menu_icon</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>menu_icon_preview</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
 				</layout>
 			</dataRef>
 		</dataGroup>
@@ -1294,6 +1310,28 @@
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
+				<event type="set">
+					<id>0</id>
+					<actions phase="post">
+						<action>
+							duplicate_view_identifier: f.duplicate_view_identifier,
+							duplicate_new_title: f.duplicate_new_title;
+
+							if (duplicate_view_identifier.value != null &amp;&amp; !duplicate_view_identifier.value.isEmpty()
+									|| duplicate_new_title.value == null) {
+								return
+							}
+
+							String defaultName = duplicate_new_title.value.defaultValue
+							if (defaultName == null || defaultName.isEmpty()) {
+								defaultName = duplicate_new_title.value.translations?.values()?.find()
+							}
+
+							String identifier = com.netgrif.application.engine.menu.utils.MenuItemUtils.sanitize(defaultName)
+							change duplicate_view_identifier value { identifier }
+						</action>
+					</actions>
+				</event>
 			</dataRef>
 			<dataRef>
 				<id>duplicate_view_identifier</id>
@@ -1309,6 +1347,27 @@
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
+				<event type="set">
+					<id>0</id>
+					<actions phase="post">
+						<action>
+							duplicate_view_identifier: f.duplicate_view_identifier;
+
+							if (menuItemService.existsMenuItem(duplicate_view_identifier.value)) {
+								change duplicate_view_identifier validations { validation('''regex $.^''',
+										new com.netgrif.application.engine.petrinet.domain.I18nString("Such menu item already exists",
+												[sk: "Taká položka menu už existuje", de: "Ein solcher Menüeintrag existiert bereits"]))
+								}
+							} else {
+								change duplicate_view_identifier validations { null }
+								String sanitizedIdentifier = com.netgrif.application.engine.menu.utils.MenuItemUtils.sanitize(duplicate_view_identifier.value)
+								if (duplicate_view_identifier.value != sanitizedIdentifier) {
+									change duplicate_view_identifier value { sanitizedIdentifier }
+								}
+							}
+						</action>
+					</actions>
+				</event>
 			</dataRef>
 		</dataGroup>
 		<event type="finish">
@@ -1319,6 +1378,7 @@
 					title: f.duplicate_new_title;
 
 					duplicateMenuItem(useCase, title.value, identifier.value)
+					Frontend.reloadMenu()
 				</action>
 			</actions>
 			<title name="duplicate_item_finish">Duplicate</title>
@@ -1343,30 +1403,53 @@
 		</roleRef>
 		<dataGroup>
 			<id>children_order_0</id>
-			<cols>4</cols>
+			<cols>3</cols>
 			<layout>grid</layout>
+			<dataRef>
+				<id>empty_child_items_info</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
 			<dataRef>
 				<id>childItemForms</id>
 				<logic>
 					<behavior>editable</behavior>
-					<action trigger="get">
-						forms: f.childItemForms,
-						ids: f.childItemIds;
-
-						def orderedTaskIds = ids.value?.collect { id -> workflowService.findOne(id).tasks.find { it.transition == "row_for_ordering" }.task }
-						change forms value { orderedTaskIds }
-					</action>
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>0</y>
+					<y>1</y>
 					<rows>1</rows>
-					<cols>4</cols>
+					<cols>3</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
 			</dataRef>
 		</dataGroup>
+		<event type="assign">
+			<id>assign</id>
+			<actions phase="pre">
+				<action>
+					trans: t.this,
+					empty_child_items_info: f.empty_child_items_info,
+					forms: f.childItemForms,
+					ids: f.childItemIds;
+
+					def orderedTaskIds = ids.value?.collect { id -> workflowService.findOne(id).tasks.find { it.transition == "row_for_ordering" }.task } ?: []
+					make empty_child_items_info, visible on trans when { orderedTaskIds.isEmpty() }
+					make empty_child_items_info, hidden on trans when { !orderedTaskIds.isEmpty() }
+					change forms value { orderedTaskIds }
+				</action>
+			</actions>
+		</event>
 	</transition>
 	<transition>
 		<id>row_for_ordering</id>
@@ -1495,7 +1578,7 @@
 		<id>role_settings</id>
 		<x>400</x>
 		<y>48</y>
-		<label name="role_settings">Role</label>
+		<label name="role_settings">Permissions</label>
 		<icon>person</icon>
 		<assignPolicy>auto</assignPolicy>
 		<roleRef>
@@ -1515,13 +1598,28 @@
 			<cols>3</cols>
 			<layout>grid</layout>
 			<dataRef>
-				<id>processes_available</id>
+				<id>allowed_authorities</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
 					<y>0</y>
+					<rows>1</rows>
+					<cols>3</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>processes_available</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
 					<rows>2</rows>
 					<cols>1</cols>
 					<offset>0</offset>
@@ -1536,7 +1634,7 @@
 				</logic>
 				<layout>
 					<x>1</x>
-					<y>0</y>
+					<y>1</y>
 					<rows>2</rows>
 					<cols>1</cols>
 					<offset>0</offset>
@@ -1551,7 +1649,7 @@
 				</logic>
 				<layout>
 					<x>2</x>
-					<y>0</y>
+					<y>1</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<offset>0</offset>
@@ -1565,7 +1663,7 @@
 				</logic>
 				<layout>
 					<x>2</x>
-					<y>1</y>
+					<y>2</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<offset>0</offset>
@@ -1579,7 +1677,7 @@
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>2</y>
+					<y>3</y>
 					<rows>1</rows>
 					<cols>3</cols>
 					<offset>0</offset>
@@ -1593,7 +1691,7 @@
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>3</y>
+					<y>4</y>
 					<rows>1</rows>
 					<cols>2</cols>
 					<offset>0</offset>
@@ -1608,7 +1706,7 @@
 				</logic>
 				<layout>
 					<x>2</x>
-					<y>3</y>
+					<y>4</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<offset>0</offset>
@@ -1622,7 +1720,7 @@
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>4</y>
+					<y>5</y>
 					<rows>1</rows>
 					<cols>2</cols>
 					<offset>0</offset>
@@ -1637,7 +1735,7 @@
 				</logic>
 				<layout>
 					<x>2</x>
-					<y>4</y>
+					<y>5</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<offset>0</offset>
@@ -1666,7 +1764,7 @@
 		<id>view_settings</id>
 		<x>528</x>
 		<y>48</y>
-		<label name="view_settings">View</label>
+		<label name="view_settings">Tab view</label>
 		<icon>image</icon>
 		<assignPolicy>auto</assignPolicy>
 		<roleRef>

@@ -939,6 +939,9 @@ public class DataService implements IDataService {
 //                validateTaskRefValue(listTask, taskId);
                 value = listTask;
                 break;
+            case "processRef":
+                value = parseListStringValues(node);
+                break;
             case "stringCollection":
                 value = parseListStringValues(node);
                 break;
