@@ -137,9 +137,9 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Group save(Group group) {
         if (groupRepository.existsById(group.getStringId())) {
-            log.info("Updating group: [{}]", group.getIdentifier());
+            log.debug("Updating group: [{}]", group.getIdentifier());
         } else {
-            log.info("Saving new group: [{}]", group.getIdentifier());
+            log.debug("Saving new group: [{}]", group.getIdentifier());
         }
         group.setModifiedAt(LocalDateTime.now());
         return groupRepository.save(group);

@@ -45,9 +45,8 @@ public class UserDto {
         if (user instanceof com.netgrif.application.engine.objects.auth.domain.User domainUser) {
             Map<String, Credential<?>> credentials = domainUser.getCredentials();
             enabledCredentialsAttribute.setValue(
-                    (credentials == null ? java.util.Map.<String, Credential<?>>of() : credentials)
+                    (credentials == null ? Map.<String, Credential<?>>of() : credentials)
                             .values().stream()
-                            .filter(java.util.Objects::nonNull)
                             .filter(Credential::isEnabled)
                             .map(Credential::getType)
                             .filter(java.util.Objects::nonNull)

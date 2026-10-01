@@ -122,12 +122,16 @@ class GroupServiceTest {
     @Test
     void addAndRemoveRole() {
         FileInputStream file = new FileInputStream("src/test/resources/simple_role.xml");
-        ImportPetriNetEventOutcome netWithRoleOutcome = petriNetService.importPetriNet(ImportPetriNetParams.with()
-                .xmlFile(file)
-                .releaseType(VersionType.MAJOR)
-                .author(userService.getSystem())
-                .build())
+        ImportPetriNetEventOutcome netWithRoleOutcome
+        new FileInputStream("src/test/resources/simple_role.xml").withCloseable { xml ->
+            netWithRoleOutcome = petriNetService.importPetriNet(ImportPetriNetParams.with()
+                    .xmlFile(xml)
+                    .releaseType(VersionType.MAJOR)
+                    .author(userService.getSystem())
+                    .build())
+        }
         file.close()
+        assert netWithRoleOutcome != null
         ProcessRole role = netWithRoleOutcome.getNet().getRoles().values().find { it.importId == "simple_role"}
         Group group = groupService.create("addAndRemoveRole", "Add and remove role test group", dummy)
         group = groupService.addRole(group.getStringId(), role.getStringId())

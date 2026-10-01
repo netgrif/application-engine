@@ -5,6 +5,7 @@ import com.netgrif.application.engine.objects.dto.response.authority.AuthorityDt
 import com.netgrif.application.engine.objects.dto.response.petrinet.ProcessRoleDto;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -22,7 +23,7 @@ public record GroupDto(String id,
         return new GroupDto(group.getStringId(), group.getDisplayName(), group.getIdentifier(), group.getOwnerUsername(),
                 group.getAuthoritySet().stream().map(AuthorityDto::fromAuthority).collect(Collectors.toSet()),
                 group.getProcessRoles().stream().map(processRole -> new ProcessRoleDto(processRole, locale)).collect(Collectors.toSet()),
-                group.getGroupIds(),
+                group.getGroupIds() == null ? new HashSet<>() : new HashSet<>(group.getGroupIds()),
                 group.getSubgroupIds()
         );
     }

@@ -410,37 +410,8 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
                 .collect(Collectors.toList());
         Set<String> deletedRoleStringIds = deletedRoleIds.stream().map(ProcessResourceId::toString).collect(Collectors.toSet());
 
-        Pageable realmPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
-        Pageable usersPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
-
-        Page<Realm> realms;
-        do {
-            realms = realmService.getSmallRealm(realmPageable);
-
-            realms.forEach(realm -> {
-                Page<AbstractUser> users;
-                users = this.userService.findAllByProcessRoles(new HashSet<>(deletedRoleIds), realm.getName(), usersPageable);
-                while (users.hasContent()) {
-                    for (AbstractUser user : users) {
-                        log.info("[{}]: Removing deleted roles of Petri net {} version {} from user {} with id {}",
-                                net.getStringId(), net.getIdentifier(), net.getVersion().toString(), user.getFullName(), user.getStringId());
-
-                        if (user.getProcessRoles().isEmpty()) {
-                            continue;
-                        }
-
-                        Set<ProcessResourceId> newRoles = user.getProcessRoles().stream()
-                                .filter(role -> !deletedRoleStringIds.contains(role.getStringId()))
-                                .map(ProcessRole::get_id)
-                                .collect(Collectors.toSet());
-                        this.assignRolesToUser(user, newRoles, loggedUser);
-                    }
-                    users = this.userService.findAllByProcessRoles(new HashSet<>(deletedRoleIds), realm.getName(), usersPageable);
-                }
-            });
-
-            realmPageable = realmPageable.next();
-        } while (realms.hasNext());
+        deleteRolesOfNetFromUser(net, deletedRoleIds, deletedRoleStringIds, loggedUser);
+        deleteRolesOfNetFromGroup(net, deletedRoleIds, deletedRoleStringIds);
 
         log.info("[{}]: Deleting all roles of Petri net {} version {}", net.getStringId(), net.getIdentifier(),
                 net.getVersion().toString());
@@ -519,16 +490,15 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
 
     private void deleteRolesOfNetFromUser(PetriNet net, List<ProcessResourceId> deletedRoleIds, Set<String> deletedRoleStringIds, LoggedUser loggedUser) {
         Pageable realmPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
+        Pageable usersPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
         Page<Realm> realms;
         do {
             realms = realmService.getSmallRealm(realmPageable);
 
             realms.forEach(realm -> {
-                Pageable usersPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
                 Page<AbstractUser> users;
-                do {
-                    users = this.userService.findAllByProcessRoles(new HashSet<>(deletedRoleIds), realm.getName(), usersPageable);
-
+                users = this.userService.findAllByProcessRoles(new HashSet<>(deletedRoleIds), realm.getName(), usersPageable);
+                while (users.hasContent()) {
                     for (AbstractUser user : users) {
                         log.info("[{}]: Removing deleted roles of Petri net {} version {} from user {} with id {}",
                                 net.getStringId(), net.getIdentifier(), net.getVersion().toString(), user.getFullName(), user.getStringId());
@@ -543,9 +513,8 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
                                 .collect(Collectors.toSet());
                         this.assignRolesToUser(user, newRoles, loggedUser);
                     }
-
-                    usersPageable = usersPageable.next();
-                } while (users.hasNext());
+                    users = this.userService.findAllByProcessRoles(new HashSet<>(deletedRoleIds), realm.getName(), usersPageable);
+                }
             });
 
             realmPageable = realmPageable.next();
@@ -554,9 +523,8 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
 
     private void deleteRolesOfNetFromGroup(PetriNet net, List<ProcessResourceId> deletedRoleIds, Set<String> deletedRoleStringIds) {
         Pageable groupPageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
-        Page<Group> groups;
-        do {
-            groups = groupService.findAllByProcessRoles(new HashSet<>(deletedRoleIds), groupPageable);
+        Page<Group> groups = groupService.findAllByProcessRoles(new HashSet<>(deletedRoleIds), groupPageable);
+        while (groups.hasContent()) {
             for (Group group : groups) {
                 log.info("[{}]: Removing deleted roles of Petri net {} version {} from group {} with id {}",
                         net.getStringId(), net.getIdentifier(), net.getVersion().toString(), group.getFullName(), group.getStringId());
@@ -569,7 +537,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
                         .collect(Collectors.toSet());
                 assignRolesToGroup(group, newRoles);
             }
-            groupPageable = groupPageable.next();
-        } while (groups.hasNext());
+            groups = groupService.findAllByProcessRoles(new HashSet<>(deletedRoleIds), groupPageable);
+        }
     }
 }

@@ -208,8 +208,8 @@ public interface GroupService {
     /**
      * Removes a user from a group specified by its unique identifier.
      *
-     * @param user            the user to be removed
-     * @param groupIdentifier the unique identifier of the target group
+     * @param groupId   the unique identifier of the target group
+     * @param user      the user to remove
      * @return the updated {@link Group}
      */
     Group removeUser(String groupId, AbstractUser user);

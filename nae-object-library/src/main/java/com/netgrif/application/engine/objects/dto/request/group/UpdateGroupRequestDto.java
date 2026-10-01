@@ -1,4 +1,9 @@
 package com.netgrif.application.engine.objects.dto.request.group;
 
-public record UpdateGroupRequestDto(String id, String identifier, String displayName) {
+import jakarta.validation.constraints.NotBlank;
+
+public record UpdateGroupRequestDto(
+        @NotBlank(message = "Group ID cannot be null") String id,
+        String identifier,
+        String displayName) {
 }

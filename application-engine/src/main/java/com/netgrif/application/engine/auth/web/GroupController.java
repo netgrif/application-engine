@@ -14,6 +14,7 @@ import com.netgrif.application.engine.objects.dto.request.group.CreateGroupReque
 import com.netgrif.application.engine.objects.dto.request.group.GroupSearchRequestDto;
 import com.netgrif.application.engine.objects.dto.request.group.UpdateGroupRequestDto;
 import com.netgrif.application.engine.objects.dto.response.group.GroupDto;
+import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -87,18 +88,22 @@ public class GroupController {
         if (!realmExists(request.realmId())) {
             String message = "Cannot create group, realm with id [" + request.realmId() + "] does not exist";
             log.error(message);
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(ResponseMessage.createErrorMessage(message));
         }
-        AbstractUser user = userService.findById(request.ownerId(), null);
+        AbstractUser user = userService.findById(request.ownerId(), request.realmId());
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseMessage.createErrorMessage("User with id [%s] not found".formatted(request.ownerId())));
+            String message = "User with id [%s] not found in realm [%s]".formatted(request.ownerId(), request.realmId());
+            log.error(message);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseMessage.createErrorMessage(message));
         }
         try {
             groupService.create(request.identifier(), request.displayName(), user);
             return ResponseEntity.ok(ResponseMessage.createSuccessMessage("Group created successfully"));
         } catch (IllegalArgumentException e) {
+            log.error("Failed to create group", e);
             return ResponseEntity.badRequest().body(ResponseMessage.createErrorMessage(e.getMessage()));
         } catch (Exception e) {
+            log.error("Failed to create group", e);
             return ResponseEntity.internalServerError().body(ResponseMessage.createErrorMessage("Failed to create group with identifier [%s]".formatted(request.identifier())));
         }
     }
@@ -187,7 +192,7 @@ public class GroupController {
         } catch (IllegalArgumentException e) {
             String message = "Failed to assign members to group [%s]".formatted(groupId);
             log.error(message, e);
-            return ResponseEntity.badRequest().body(ResponseMessage.createErrorMessage("Assigning members to group " + groupId + " has failed!"));
+            return ResponseEntity.badRequest().body(ResponseMessage.createErrorMessage(message));
         }
     }
 
@@ -235,7 +240,7 @@ public class GroupController {
         } catch (IllegalArgumentException e) {
             String message = "Failed to remove member [%s] from group [%s]".formatted(userId, groupId);
             log.error(message, e);
-            return ResponseEntity.badRequest().body("Failed to remove member from group: " + e.getMessage());
+            return ResponseEntity.badRequest().body(message);
         }
     }
 
@@ -257,7 +262,7 @@ public class GroupController {
         } catch (IllegalArgumentException e) {
             String message = "Assigning roles to group [" + groupId + "] has failed!";
             log.error(message, e);
-            return ResponseEntity.badRequest().body(ResponseMessage.createErrorMessage("Assigning roles to group " + groupId + " has failed!"));
+            return ResponseEntity.badRequest().body(ResponseMessage.createErrorMessage(message));
         }
     }
 
@@ -272,13 +277,25 @@ public class GroupController {
     @PatchMapping(value = "/{id}/roles/add", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ResponseMessage> addRolesToGroup(@PathVariable("id") String groupId, @RequestBody Set<String> roleIds) {
         try {
-            roleIds.forEach(roleId -> groupService.addRole(groupId, roleId));
+            Group group = groupService.findById(groupId);
+            List<ProcessRole> processRoleList = roleIds.stream().map(roleId -> {
+                ProcessRole processRole = processRoleService.findById(roleId);
+                if (processRole == null) {
+                    throw new IllegalArgumentException("Process role with id [" + roleId + "] does not exist");
+                }
+                return processRole;
+            }).toList();
+
+            for (ProcessRole processRole : processRoleList) {
+                group = groupService.addRole(group, processRole);
+            }
+
             log.info("Process roles {} added to group with id [{}]", roleIds, groupId);
             return ResponseEntity.ok(ResponseMessage.createSuccessMessage("Selected roles added to group " + groupId));
         } catch (IllegalArgumentException e) {
             String message = "Adding roles to group [" + groupId + "] has failed!";
             log.error(message, e);
-            return ResponseEntity.badRequest().body(ResponseMessage.createErrorMessage("Adding roles to group " + groupId + " has failed!"));
+            return ResponseEntity.badRequest().body(ResponseMessage.createErrorMessage(message));
         }
     }
 
@@ -345,6 +362,7 @@ public class GroupController {
         }
     }
 
+    @PreAuthorize("@authorizationServiceImpl.hasAuthority('ADMIN')")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Groups retrieved successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid group data"),
@@ -378,9 +396,12 @@ public class GroupController {
             groupService.save(group);
             return ResponseEntity.ok(ResponseMessage.createSuccessMessage("Group with id [%s] updated successfully".formatted(groupUpdate.id())));
         } catch (IllegalArgumentException e) {
+            log.error("Group with id [{}] does not exist", groupUpdate.id(), e);
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(ResponseMessage.createErrorMessage("Failed to update group with id [%s]".formatted(groupUpdate.id())));
+            String message = "Failed to update group with id [%s]".formatted(groupUpdate.id());
+            log.error(message, e);
+            return ResponseEntity.internalServerError().body(ResponseMessage.createErrorMessage(message));
         }
     }
 

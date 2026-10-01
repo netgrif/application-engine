@@ -33,7 +33,7 @@ public class UserResourceHelperService implements IUserResourceHelperService {
 //                getLocalisedUser(user, getImpersonated(loggedUser, small), locale) :
 //                getLocalisedUser(user, locale);
         UserDto result = getLocalisedUser(user, locale);
-        return new UserResource(result, "profile");
+        return new UserResource(result);
     }
 
     @Override

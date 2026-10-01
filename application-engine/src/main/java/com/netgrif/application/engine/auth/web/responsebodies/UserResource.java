@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class UserResource extends EntityModel<UserDto> {
 
-    public UserResource(UserDto content, String selfRel) {
+    public UserResource(UserDto content) {
         super(content, new ArrayList<>());
     }
 

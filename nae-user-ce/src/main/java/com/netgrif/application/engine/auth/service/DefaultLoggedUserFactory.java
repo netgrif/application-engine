@@ -60,9 +60,7 @@ public class DefaultLoggedUserFactory implements ActorTransformer.LoggedUserFact
 
         user.getAuthorityIds().forEach(authorityId -> {
             Authority authority = authorityService.getOne(authorityId);
-            if (authority != null) {
-                user.getAuthoritySet().add(authority);
-            }
+            user.getAuthoritySet().add(authority);
         });
     }
 
