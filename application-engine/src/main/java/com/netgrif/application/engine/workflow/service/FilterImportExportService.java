@@ -259,6 +259,11 @@ public class FilterImportExportService implements IFilterImportExportService {
                     QTask.task.transitionId.eq(IMPORT_FILTER_TRANSITION)
                             .and(QTask.task.caseId.eq(filterCase.get().getStringId()))
             );
+
+            if (importedFilterTask == null) {
+                return;
+            }
+
             importedFilterTaskIds.put(filter.getCaseId(), importedFilterTask.getStringId());
 
             // TODO: delete after fixed issue: https://netgrif.atlassian.net/jira/servicedesk/projects/NGSD/issues/

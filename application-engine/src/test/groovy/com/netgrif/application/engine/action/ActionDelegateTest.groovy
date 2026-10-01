@@ -98,8 +98,12 @@ class ActionDelegateTest {
     void importFiltersTest(){
         prepareFilterImportFile()
 
-        List<String> actionDelegateList = actionDelegate.importFilters()
-        assert actionDelegateList.size() == 2
+        actionDelegate.importFilters()
+        List<Case> filters = workflowService.search(
+                QCase.case$.processIdentifier.eq(FilterRunner.FILTER_PETRI_NET_IDENTIFIER),
+                Pageable.ofSize(4)
+        ).content
+        assert filters.size() == 4
     }
 
     private void prepareFilterImportFile() {
