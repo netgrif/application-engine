@@ -8,6 +8,7 @@ import com.netgrif.application.engine.auth.web.requestbodies.UserCreateRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.UserSearchRequestBody;
 import com.netgrif.application.engine.auth.web.responsebodies.PreferencesResource;
 import com.netgrif.application.engine.auth.web.responsebodies.User;
+import com.netgrif.application.engine.objects.annotations.Authorize;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
@@ -54,7 +55,8 @@ public class UserController {
     private final RealmService realmService;
     private final UserFactory userFactory;
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "USER_CREATE")
     @Operation(summary = "Create a new user", description = "Creates a new user in the realm specified by id.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "User successfully created"),
@@ -172,44 +174,8 @@ public class UserController {
         return ResponseEntity.ok(userFactory.getUser(user, locale));
     }
 
-//    todo step 2, only used in test on frontend
-//    @Operation(summary = "Update user", security = {@SecurityRequirement(name = "X-Auth-Token")})
-//    @PostMapping(value = "/update", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<User> updateUser(@RequestBody UpdateUserRequest updates, Authentication auth, Locale locale) {
-
-    /// /        todo should this be kept? not relevant anymore?
-//        if (!serverAuthProperties.isEnableProfileEdit()) {
-//            return null;
-//        }
-//        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-//        String actorId = updates.getStringId();
-//        IUser user;
-//        try {
-//            user = userService.findById(actorId, updatedUser.getRealmId());
-//        } catch (IllegalArgumentException e) {
-//            log.error("Could not find user with id [{}]", actorId, e);
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-//        }
-//        user = userService.update(user, updates.getUpdatedUser());
-//        securityContextService.saveToken(actorId);
-//        if (Objects.equals(loggedUser.getId(), actorId)) {
-//            loggedUser.setFirstName(user.getFirstName());
-//            loggedUser.setLastName(user.getLastName());
-//            securityContextService.reloadSecurityContext(loggedUser);
-//        }
-//        log.info("Updating user " + user.getEmail() + " with data " + updatedUser);
-//        return ResponseEntity.ok(User.createUser(user));
-//    }
-
-//    todo not used on front, is it needed?
-//    @Operation(summary = "Get all users with specified roles", security = {@SecurityRequirement(name = "X-Auth-Token")})
-//    @PostMapping(value = "/role", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<Page<IUser>> getAllWithRole(@RequestBody Set<String> roleIds, Pageable pageable, Locale locale) {
-//        Set<ProcessResourceId> roleResourceIds = roleIds == null ? null : roleIds.stream().map(ProcessResourceId::new).collect(Collectors.toSet());
-//        Page<IUser> page = userService.findAllActiveByProcessRoles(roleResourceIds, pageable);
-//        return ResponseEntity.ok();
-//    }
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "ROLE_ASSIGN_TO_USER")
     @Operation(summary = "Assign roles to the user", description = "Caller must have the ADMIN role", security = {@SecurityRequirement(name = "X-Auth-Token")})
     @PutMapping(value = "/{realmId}/{id}/roles", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponses(value = {
@@ -231,29 +197,6 @@ public class UserController {
         }
     }
 
-//
-//    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
-//    @Operation(summary = "Assign negative roles to the user", description = "Caller must have the ADMIN role", security = {@SecurityRequirement(name = "X-Auth-Token")})
-//    @PutMapping(value = "/{realmId}/{id}/negativeRole", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "Selected negative roles assigned successfully"),
-//            @ApiResponse(responseCode = "400", description = "Requested roles or user with defined id does not exist"),
-//            @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
-//            @ApiResponse(responseCode = "500", description = "Internal server error")
-//    })
-//    public ResponseEntity<ResponseMessage> assignNegativeRolesToUser(@PathVariable("realmId") String realmId, @PathVariable("id") String actorId, @RequestBody Set<String> roleIds, Authentication auth) {
-//        try {
-//            AbstractUser user = userService.findById(actorId, realmId);
-//            processRoleService.assignNegativeRolesToUser(user, roleIds.stream().map(ProcessResourceId::new).collect(Collectors.toSet()), (LoggedUser) auth.getPrincipal());
-//            log.info("Negative process roles {} assigned to user [{}]", roleIds, actorId);
-//            return ResponseEntity.ok(ResponseMessage.createSuccessMessage("Selected negative roles assigned to user " + actorId));
-//        } catch (IllegalArgumentException e) {
-//            log.error("Assigning negative roles to user with id [{}] has failed!", actorId, e);
-//            return ResponseEntity.badRequest().body(ResponseMessage.createErrorMessage("Assigning negative roles to user " + actorId + " has failed!"));
-//        }
-//    }
-//
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Get all authorities of the system",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "X-Auth-Token")})
@@ -267,7 +210,8 @@ public class UserController {
         return ResponseEntity.ok(authorityService.findAll(Pageable.unpaged()).stream().toList());
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "AUTHORITY_ASSIGN_TO_USER")
     @Operation(summary = "Assign authority to the user",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "X-Auth-Token")})

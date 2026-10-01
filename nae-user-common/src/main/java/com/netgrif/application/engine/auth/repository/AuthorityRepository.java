@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -34,4 +35,6 @@ public interface AuthorityRepository extends MongoRepository<Authority, String> 
      * @return a {@link Page} containing the matching {@link Authority} entities
      */
     Page<Authority> findAllBy_idIn(Collection<ObjectId> ids, Pageable pageable);
+
+    List<Authority> findAllByNameStartsWith(String prefix);
 }
