@@ -51,6 +51,8 @@ public class CaseSearchRequest implements Serializable {
 
     public Map<String, String> tags;
 
+    public Map<String, Float> fullTextFields;
+
     public CaseSearchRequest(Map<String, Object> request) {
         if (request.containsKey("process") && request.get("process") instanceof List) {
             List<String> processIdentifiers = (List<String>) request.get("process");
@@ -93,6 +95,9 @@ public class CaseSearchRequest implements Serializable {
         }
         if (request.containsKey("group") && request.get("group") instanceof List) {
             this.group = (List<String>) request.get("group");
+        }
+        if (request.containsKey("fullTextFields") && request.get("fullTextFields") instanceof Map) {
+            this.fullTextFields = (Map<String, Float>) request.get("fullTextFields");
         }
     }
 

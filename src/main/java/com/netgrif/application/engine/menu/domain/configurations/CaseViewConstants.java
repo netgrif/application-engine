@@ -26,4 +26,5 @@ public class CaseViewConstants extends ViewConstants {
     public static final String FIELD_ALL_ALLOWED_NETS = "case_all_allowed_nets";
     public static final String FIELD_ALLOWED_NETS = "case_allowed_nets";
     public static final String FIELD_INHERIT_ALLOWED_NETS = "case_inherit_allowed_nets";
+    public static final String FIELD_FULLTEXT_FIELDS = "case_fulltext_fields";
 }
