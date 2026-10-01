@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -97,7 +98,15 @@ public class CaseSearchRequest implements Serializable {
             this.group = (List<String>) request.get("group");
         }
         if (request.containsKey("fullTextFields") && request.get("fullTextFields") instanceof Map) {
-            this.fullTextFields = (Map<String, Float>) request.get("fullTextFields");
+            Map<?, ?> fields = (Map<?, ?>) request.get("fullTextFields");
+            Map<String, Float> convertedFields = new HashMap<>();
+            for (Map.Entry<?, ?> field : fields.entrySet()) {
+                if (!(field.getKey() instanceof String) || !(field.getValue() instanceof Number)) {
+                    throw new IllegalArgumentException("fullTextFields must map strings to numbers");
+                }
+                convertedFields.put((String) field.getKey(), ((Number) field.getValue()).floatValue());
+            }
+            this.fullTextFields = convertedFields;
         }
     }
 
