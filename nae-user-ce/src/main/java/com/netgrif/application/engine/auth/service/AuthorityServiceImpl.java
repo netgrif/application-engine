@@ -155,7 +155,6 @@ public class AuthorityServiceImpl implements AuthorityService {
      * @return set of authorities
      * */
     @Override
-    @Cacheable("defaultUserAuthoritiesCache")
     public Set<Authority> getDefaultUserAuthorities() {
         return authorityProperties.getDefaultUserAuthorities().stream().map(this::findByScope).flatMap(Collection::stream).collect(Collectors.toSet());
     }
@@ -165,7 +164,6 @@ public class AuthorityServiceImpl implements AuthorityService {
      * @return set of authorities
      * */
     @Override
-    @Cacheable("defaultAnonymousAuthoritiesCache")
     public Set<Authority> getDefaultAnonymousAuthorities() {
         return authorityProperties.getDefaultAnonymousAuthorities().stream().map(this::findByScope).flatMap(Collection::stream).collect(Collectors.toSet());
     }
@@ -175,7 +173,6 @@ public class AuthorityServiceImpl implements AuthorityService {
      * @return set of authorities
      * */
     @Override
-    @Cacheable("defaultAdminAuthoritiesCache")
     public Set<Authority> getDefaultAdminAuthorities() {
         return authorityProperties.getDefaultAdminAuthorities().stream().map(this::findByScope).flatMap(Collection::stream).collect(Collectors.toSet());
     }

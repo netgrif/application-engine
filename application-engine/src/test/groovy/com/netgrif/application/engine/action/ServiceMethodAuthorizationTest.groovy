@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.action
 
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.auth.config.AuthorityConfigurationProperties
 import com.netgrif.application.engine.objects.workflow.domain.Case
 import com.netgrif.application.engine.objects.workflow.domain.Task
 import com.netgrif.application.engine.startup.ImportHelper
@@ -33,6 +34,9 @@ class ServiceMethodAuthorizationTest {
 
     @Autowired
     private ITaskService taskService
+
+    @Autowired
+    private AuthorityConfigurationProperties authorityConfigurationProperties
 
     @BeforeEach
     void init() {

@@ -7,6 +7,7 @@ import com.netgrif.application.engine.auth.service.AuthorityService
 import com.netgrif.application.engine.objects.auth.domain.Authority
 import com.netgrif.application.engine.objects.auth.dto.AuthoritySearchDto
 import org.bson.types.ObjectId
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -41,12 +42,34 @@ class AuthorityServiceTest {
     @Autowired
     private CacheManager cacheManager
 
+    private List<String> originalUserAuthorities
+
+    private List<String> originalAnonymousAuthorities
+
+    private List<String> originalAdminAuthorities
+
     @BeforeEach
     void init() {
         testHelper.truncateDbs()
         cacheManager.cacheNames.each { name ->
             cacheManager.getCache(name)?.clear()
         }
+
+        originalUserAuthorities = new ArrayList<>(authorityConfigurationProperties.defaultUserAuthorities)
+        originalAnonymousAuthorities = new ArrayList<>(authorityConfigurationProperties.defaultAnonymousAuthorities)
+        originalAdminAuthorities = new ArrayList<>(authorityConfigurationProperties.defaultAdminAuthorities)
+
+        testHelper.truncateDbs()
+        cacheManager.cacheNames.each { name ->
+            cacheManager.getCache(name)?.clear()
+        }
+    }
+
+    @AfterEach
+    void cleanup() {
+        authorityConfigurationProperties.setDefaultUserAuthorities(originalUserAuthorities)
+        authorityConfigurationProperties.setDefaultAnonymousAuthorities(originalAnonymousAuthorities)
+        authorityConfigurationProperties.setDefaultAdminAuthorities(originalAdminAuthorities)
     }
 
     @Test
