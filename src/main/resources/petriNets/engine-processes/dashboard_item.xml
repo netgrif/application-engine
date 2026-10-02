@@ -231,7 +231,6 @@
         <id>icon_color</id>
         <title name="icon_color">Icon color</title>
         <desc name="icon_color_desc">Icon color of item. Valid CSS property value font-color.</desc>
-        <init>#0790ff</init>
         <event type="set">
             <id>icon_color_set</id>
             <actions phase="post">
@@ -284,7 +283,6 @@
         <id>font_color</id>
         <title name="font_color">Font color</title>
         <desc name="font_color_desc">Font color of item name. Valid CSS property value font-color.</desc>
-        <init>#0790ff</init>
     </data>
     <data type="text" immediate="true">
         <id>font_weight</id>

@@ -53,6 +53,11 @@ public class DashboardManagementBody {
      */
     private boolean logoutDashboard = false;
 
+    /**
+     * color of dashboard toolbar
+     * */
+    private String toolbarColor = null;
+
 
     public DashboardManagementBody(String id, I18nString name) {
         this.id = id;
@@ -69,6 +74,9 @@ public class DashboardManagementBody {
         }
         if (this.logo != null) {
             outcome.putDataSetEntry(DashboardManagementConstants.FIELD_LOGO, FieldType.TEXT, this.logo);
+        }
+        if (this.toolbarColor != null) {
+            outcome.putDataSetEntry(DashboardManagementConstants.FIELD_TOOLBAR_COLOR, FieldType.TEXT, this.toolbarColor);
         }
         outcome.putDataSetEntry(DashboardManagementConstants.FIELD_SIMPLE_DASHBOARD, FieldType.BOOLEAN, this.simpleDashboard);
         outcome.putDataSetEntry(DashboardManagementConstants.FIELD_PROFILE_DASHBOARD, FieldType.BOOLEAN, this.profileDashboard);
