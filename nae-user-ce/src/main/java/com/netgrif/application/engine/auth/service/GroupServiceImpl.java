@@ -354,6 +354,9 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Group assignAuthorities(String groupId, Set<String> authorityIds) {
+        if (authorityIds == null) {
+            return findById(groupId);
+        }
         Group group = this.findById(groupId);
         Set<String> currentAuthorityIds = group.getAuthorityIds();
 
@@ -400,6 +403,9 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Group assignSubgroups(String parentGroupId, Set<String> childGroupIds) {
+        if (childGroupIds == null) {
+            return findById(parentGroupId);
+        }
         Group parentGroup = this.findById(parentGroupId);
         Set<String> currentSubgroupIds = parentGroup.getSubgroupIds();
 
