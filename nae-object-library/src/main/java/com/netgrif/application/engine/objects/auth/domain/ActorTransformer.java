@@ -31,11 +31,11 @@ public class ActorTransformer {
 
         default void resolveProcessRoles(AbstractActor user) {};
 
-        default void resolveProcessRolesRecursively(AbstractActor actor, Set<String> processRoleIds) {};
+        default void resolveProcessRolesRecursively(AbstractActor actor, Set<String> processRoleIds, Set<String> visitedGroupIds) {};
 
         default void resolveAuthorities(AbstractActor user) {};
 
-        default void resolveAuthoritiesRecursively(AbstractActor actor, Set<String> authorityIds) {};
+        default void resolveAuthoritiesRecursively(AbstractActor actor, Set<String> authorityIds, Set<String> visitedGroupIds) {};
     }
 
     /**

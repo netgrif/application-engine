@@ -7,6 +7,7 @@ import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Component
@@ -28,7 +29,7 @@ public class DefaultLoggedUserFactory implements ActorTransformer.LoggedUserFact
     public void resolveProcessRoles(AbstractActor user) {
         Set<String> processRoleIds = user.getProcessRoleIds();
         user.getGroupIds().forEach(groupId -> {
-            resolveProcessRolesRecursively(groupService.findById(groupId), processRoleIds);
+            resolveProcessRolesRecursively(groupService.findById(groupId), processRoleIds, new HashSet<>());
         });
 
         user.getProcessRoleIds().forEach(processRoleId -> {
@@ -40,13 +41,14 @@ public class DefaultLoggedUserFactory implements ActorTransformer.LoggedUserFact
     }
 
     @Override
-    public void resolveProcessRolesRecursively(AbstractActor actor, Set<String> processRoleIds) {
+    public void resolveProcessRolesRecursively(AbstractActor actor, Set<String> processRoleIds, Set<String> visitedGroupIds) {
         processRoleIds.addAll(actor.getProcessRoleIds());
         if (!actor.getGroupIds().isEmpty()) {
-            actor.getGroupIds().forEach(groupId -> {
+            actor.getGroupIds().stream().filter(groupId -> !visitedGroupIds.contains(groupId)).forEach(groupId -> {
                 Group group = groupService.findById(groupId);
                 processRoleIds.addAll(group.getProcessRoleIds());
-                resolveProcessRolesRecursively(group, processRoleIds);
+                visitedGroupIds.add(groupId);
+                resolveProcessRolesRecursively(group, processRoleIds, visitedGroupIds);
             });
         }
     }
@@ -55,7 +57,7 @@ public class DefaultLoggedUserFactory implements ActorTransformer.LoggedUserFact
     public void resolveAuthorities(AbstractActor user) {
         Set<String> authorityIds = user.getAuthorityIds();
         user.getGroupIds().forEach(groupId -> {
-            resolveAuthoritiesRecursively(groupService.findById(groupId), authorityIds);
+            resolveAuthoritiesRecursively(groupService.findById(groupId), authorityIds, new HashSet<>());
         });
 
         user.getAuthorityIds().forEach(authorityId -> {
@@ -65,13 +67,14 @@ public class DefaultLoggedUserFactory implements ActorTransformer.LoggedUserFact
     }
 
     @Override
-    public void resolveAuthoritiesRecursively(AbstractActor actor, Set<String> authorityIds) {
+    public void resolveAuthoritiesRecursively(AbstractActor actor, Set<String> authorityIds, Set<String> visitedGroupIds) {
         authorityIds.addAll(actor.getAuthorityIds());
         if (!actor.getGroupIds().isEmpty()) {
-            actor.getGroupIds().forEach(groupId -> {
+            actor.getGroupIds().stream().filter(groupId -> !visitedGroupIds.contains(groupId)).forEach(groupId -> {
                 Group group = groupService.findById(groupId);
                 authorityIds.addAll(group.getAuthorityIds());
-                resolveAuthoritiesRecursively(group, authorityIds);
+                visitedGroupIds.add(groupId);
+                resolveAuthoritiesRecursively(group, authorityIds, visitedGroupIds);
             });
         }
     }

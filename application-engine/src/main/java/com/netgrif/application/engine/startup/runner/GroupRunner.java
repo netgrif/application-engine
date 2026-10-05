@@ -33,11 +33,7 @@ public class GroupRunner implements ApplicationEngineStartupRunner {
     }
 
     protected void createDefaultGroup() {
-        Group systemGroup = groupService.getDefaultSystemGroup();
-        if (systemGroup == null) {
-            groupService.create(userService.getSystem());
-            log.info("Default system group created.");
-        }
+        groupService.getDefaultSystemGroup();
     }
 
 }

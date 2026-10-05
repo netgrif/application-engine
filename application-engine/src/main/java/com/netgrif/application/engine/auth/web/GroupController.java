@@ -34,6 +34,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -97,8 +98,8 @@ public class GroupController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseMessage.createErrorMessage(message));
         }
         try {
-            groupService.create(request.identifier(), request.displayName(), user);
-            return ResponseEntity.ok(ResponseMessage.createSuccessMessage("Group created successfully"));
+            Group group = groupService.create(request.identifier(), request.displayName(), user);
+            return ResponseEntity.created(URI.create("/api/groups/" + group.getId())).body(ResponseMessage.createSuccessMessage("Group created successfully"));
         } catch (IllegalArgumentException e) {
             log.error("Failed to create group", e);
             return ResponseEntity.badRequest().body(ResponseMessage.createErrorMessage(e.getMessage()));
@@ -387,7 +388,7 @@ public class GroupController {
     public ResponseEntity<ResponseMessage> updateGroup(@RequestBody UpdateGroupRequestDto groupUpdate) {
         try {
             Group group = groupService.findById(groupUpdate.id());
-            if (groupUpdate.identifier() != null) {
+            if (groupUpdate.identifier() != null && groupService.findByIdentifier(groupUpdate.identifier()).isEmpty()) {
                 group.setIdentifier(groupUpdate.identifier());
             }
             if (groupUpdate.displayName() != null) {

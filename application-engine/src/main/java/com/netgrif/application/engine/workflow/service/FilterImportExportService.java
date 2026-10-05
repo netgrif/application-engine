@@ -271,6 +271,24 @@ public class FilterImportExportService implements IFilterImportExportService {
             filterCase.get().getDataSet().get(FIELD_FILTER).addBehavior(IMPORT_FILTER_TRANSITION, Collections.singleton(FieldBehavior.VISIBLE));
             workflowService.save(filterCase.get());
         });
+
+        // Import each menu individually
+        menuAndFilters.getMenuList().getMenus().forEach(menu -> {
+            resultMessage.append("\nIMPORTING MENU \"").append(menu.getMenuIdentifier()).append("\":\n");
+            menu.getMenuEntries().forEach(menuItem -> {
+                String filterTaskId = importedFilterTaskIds.get(menuItem.getFilterCaseId());
+                if (filterTaskId == null || filterTaskId.isBlank()) {
+                    log.warn("Menu entry \"{}\" references filter case with original ID '{}', which was not imported. Menu entry was skipped.",
+                            menuItem.getEntryName(), menuItem.getFilterCaseId());
+                    resultMessage.append("\nMenu entry \"").append(menuItem.getEntryName())
+                            .append("\": Filter not found! Menu entry was skipped.\n");
+                    return;
+                }
+                String entryAndFilterCaseId = createMenuItemCase(resultMessage, menuItem, menu.getMenuIdentifier(), parentId, filterTaskId);
+                if (!entryAndFilterCaseId.equals("")) importedEntryAndFilterCaseIds.add(entryAndFilterCaseId);
+            });
+        });
+
         taskService.assignTasks(taskService.findAllById(new ArrayList<>(importedFilterTaskIds.values())), userService.getLoggedUser());
         changeFilterField(importedFilterTaskIds.values());
         return importedFilterTaskIds;
@@ -434,4 +452,3 @@ public class FilterImportExportService implements IFilterImportExportService {
         }
     }
 }
-

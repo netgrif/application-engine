@@ -180,6 +180,14 @@ public class MenuImportExportService implements IMenuImportExportService {
         menuAndFilters.getMenuList().getMenus().forEach(menu -> {
             resultMessage.append("\nIMPORTING MENU \"").append(menu.getMenuIdentifier()).append("\":\n");
             menu.getMenuEntries().forEach(menuItem -> {
+                String filterTaskId = importedFilterTaskIds.get(menuItem.getFilterCaseId());
+                if (filterTaskId == null || filterTaskId.isBlank()) {
+                    log.warn("Menu entry \"{}\" references filter case with original ID '{}', which was not imported. Menu entry was skipped.",
+                            menuItem.getEntryName(), menuItem.getFilterCaseId());
+                    resultMessage.append("\nMenu entry \"").append(menuItem.getEntryName())
+                            .append("\": Filter not found! Menu entry was skipped.\n");
+                    return;
+                }
                 String entryAndFilterCaseId = createMenuItemCase(resultMessage, menuItem, menu.getMenuIdentifier(), parentId, importedFilterTaskIds.get(menuItem.getFilterCaseId()));
                 if (!entryAndFilterCaseId.equals("")) importedEntryAndFilterCaseIds.add(entryAndFilterCaseId);
             });

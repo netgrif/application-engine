@@ -24,7 +24,7 @@ public record GroupDto(String id,
                 group.getAuthoritySet().stream().map(AuthorityDto::fromAuthority).collect(Collectors.toSet()),
                 group.getProcessRoles().stream().map(processRole -> new ProcessRoleDto(processRole, locale)).collect(Collectors.toSet()),
                 group.getGroupIds() == null ? new HashSet<>() : new HashSet<>(group.getGroupIds()),
-                group.getSubgroupIds()
+                group.getSubgroupIds() == null ? new HashSet<>() : new HashSet<>(group.getSubgroupIds())
         );
     }
 
