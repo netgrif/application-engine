@@ -13,24 +13,32 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
+@ActiveProfiles({"test"})
+@SpringBootTest
 class DefaultLoggedUserFactoryTest {
 
-    @Mock
+    @Autowired
     private GroupService groupService;
 
-    @Mock
+    @Autowired
     private ProcessRoleService processRoleService;
 
-    @Mock
+    @Autowired
     private AuthorityService authorityService;
 
+    @Autowired
     private DefaultLoggedUserFactory factory;
 
     static class TestAuthority extends Authority {

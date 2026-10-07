@@ -11,23 +11,28 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
-class ActorMongoEventListenerTest {
+@ExtendWith(SpringExtension.class)
+@ActiveProfiles({"test"})
+@SpringBootTest
+public class ActorMongoEventListenerTest {
 
-    @Mock
+    @Autowired
     private ProcessRoleService processRoleService;
 
-    @Mock
+    @Autowired
     private AuthorityService authorityService;
 
+    @Autowired
     private ActorMongoEventListener listener;
 
     static class TestAuthority extends Authority {
@@ -52,11 +57,6 @@ class ActorMongoEventListenerTest {
         public TestProcessRole(String id) {
             super(id);
         }
-    }
-
-    @BeforeEach
-    void setUp() {
-        listener = new ActorMongoEventListener(processRoleService, authorityService);
     }
 
     @Test
