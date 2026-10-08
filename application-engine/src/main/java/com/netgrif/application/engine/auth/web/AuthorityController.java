@@ -44,7 +44,7 @@ public class AuthorityController {
     @Authorize(authority = "ADMIN")
     @Authorize(authority = "AUTHORITY_DELETE")
     @Operation(description = "Delete authority", security = {@SecurityRequirement(name = "BasicAuth")})
-    @DeleteMapping(value = "/delete/{name}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @DeleteMapping(value = "/delete/{name}", produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource delete(@PathVariable String name, Authentication auth) {
         try {
             authorityService.delete(name);
@@ -71,6 +71,8 @@ public class AuthorityController {
         }
     }
 
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "AUTHORITY_VIEW")
     @Operation(description = "Delete authority", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/all", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<Page<AuthorityDto>> getAll(Pageable pageable) {
@@ -79,6 +81,8 @@ public class AuthorityController {
         return ResponseEntity.ok(new PageImpl<>(authorityDtoList, pageable, authorities.getTotalElements()));
     }
 
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "AUTHORITY_VIEW")
     @Operation(description = "Delete authority", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{name}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<AuthorityDto> getOne(@PathVariable("name") String name) {
@@ -91,8 +95,10 @@ public class AuthorityController {
         }
     }
 
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "AUTHORITY_VIEW")
     @Operation(description = "Delete authority", security = {@SecurityRequirement(name = "BasicAuth")})
-    @GetMapping(value = "/scope/{scope}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(value = "/scope/{scope}", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<List<AuthorityDto>> getAllByScope(@PathVariable("scope") String scope, Authentication auth) {
         List<Authority> authorities = authorityService.findByScope(scope);
         List<AuthorityDto> authorityDtoList = authorities.stream().map(AuthorityDto::new).toList();

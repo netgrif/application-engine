@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * Annotation to define set of authorizing statements
  * */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD, ElementType.TYPE })
+@Target({ ElementType.METHOD })
 public @interface Authorizations {
 
     /**

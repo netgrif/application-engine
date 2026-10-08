@@ -9,7 +9,7 @@ import java.lang.annotation.*;
  * */
 @Repeatable(Authorizations.class)
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD, ElementType.TYPE })
+@Target({ ElementType.METHOD})
 public @interface Authorize {
 
     /**

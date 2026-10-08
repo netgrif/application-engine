@@ -108,7 +108,7 @@ values are created as `Authority` entities on startup alongside the predefined o
 
 ```properties
 # Authorities
-nae.authority.authorizing-objects=EXAMPLE_AUTHORITY_1,EXAMPLE_AUTHORITY_2
+netgrif.engine.authority.additional-authorizing-objects=EXAMPLE_AUTHORITY_1,EXAMPLE_AUTHORITY_2
 ```
 
 ## Authority scopes
@@ -129,17 +129,17 @@ Newly created users receive a set of default authorities. These defaults are con
 per user type using scopes and concrete authority names:
 
 ```properties
-nae.authority.defaultUserAuthorities=USER,PROCESS_VIEW,USER_EDIT_SELF,GROUP_DELETE_OWN
-nae.authority.defaultAnonymousAuthorities=...
-nae.authority.defaultAdminAuthorities=*
+netgrif.engine.authority.default-user-authorities=USER,PROCESS_VIEW,USER_EDIT_SELF,GROUP_DELETE_OWN
+netgrif.engine.authority.default-anonymous-authorities=ANONYMOUS
+netgrif.engine.authority.default-admin-authorities=*
 ```
 
 - `defaultUserAuthorities` — granted to a standard registered user.
 - `defaultAnonymousAuthorities` — granted to the anonymous user.
 - `defaultAdminAuthorities` — granted to the super/admin user (`*` grants everything).
 
-These properties are read by `AuthorityProperties` and resolved (including scopes) by the
-`AuthorityService`.
+These properties are read by `AuthorityConfigurationProperties` and resolved (including scopes) by the
+`AuthorityServiceImpl`.
 
 ## Protecting code with `@Authorize`
 
@@ -284,7 +284,7 @@ Authorities can be managed at runtime through the authority REST controller unde
 |------------------------------|--------------------|-----------------------------------------------|
 | `POST /api/authority/create` | `AUTHORITY_CREATE` | Create (or return existing) authority by name |
 | `DELETE /api/authority/delete/{name}` | `AUTHORITY_DELETE` | Delete an authority by name          |
-| `GET /api/authority/all`     | `AUTHORITY_GET_ALL`* | Retrieve all authorities                    |
+| `GET /api/authority/all`     | `AUTHORITY_VIEW`* | Retrieve all authorities                    |
 | `GET /api/authority/{name}`  | `AUTHORITY_VIEW`   | Retrieve a single authority by name           |
 | `GET /api/authority/scope/{scope}` | `AUTHORITY_VIEW` | Retrieve all authorities within a scope    |
 

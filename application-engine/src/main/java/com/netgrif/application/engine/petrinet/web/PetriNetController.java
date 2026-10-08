@@ -129,6 +129,7 @@ public class PetriNetController {
     }
 
     @Authorize(authority = "ADMIN")
+    @Authorize(authority = "USER")
     @Authorize(authority = "PROCESS_VIEW")
     @Operation(summary = "Get all processes", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)

@@ -41,14 +41,13 @@ public class BaseAuthorizationServiceAspect {
 
     private final ExpressionParser parser;
 
-    private final StandardEvaluationContext evaluationContext;
+    private final BeanFactoryResolver beanResolver;
 
     public BaseAuthorizationServiceAspect(ApplicationContext applicationContext,
                                           UserService userService) {
         this.userService = userService;
         parser = new SpelExpressionParser();
-        evaluationContext = new StandardEvaluationContext();
-        evaluationContext.setBeanResolver(new BeanFactoryResolver(applicationContext));
+        beanResolver = new BeanFactoryResolver(applicationContext);
     }
 
     /**
@@ -114,7 +113,8 @@ public class BaseAuthorizationServiceAspect {
         if (expression == null || expression.isEmpty()) {
             return true;
         }
-
+        StandardEvaluationContext evaluationContext = new StandardEvaluationContext();
+        evaluationContext.setBeanResolver(beanResolver);
         List<Object> args = Arrays.asList(joinPoint.getArgs());
 
         if (NaeReflectionUtils.isGroovyClass(joinPoint.getTarget().getClass())) {
