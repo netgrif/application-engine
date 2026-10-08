@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.auth.service;
 
+import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.adapter.spring.auth.domain.Group;
 import com.netgrif.application.engine.adapter.spring.auth.domain.User;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
@@ -20,6 +21,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -27,6 +30,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.util.Pair;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.*;
 
@@ -35,7 +40,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
+@ActiveProfiles({"test"})
+@SpringBootTest
 class GroupServiceImplTest {
 
     @Mock
@@ -61,6 +68,9 @@ class GroupServiceImplTest {
 
     @Mock
     private ProcessRoleService processRoleService;
+
+    @Autowired
+    private TestHelper testHelper;
 
     private GroupServiceImpl service;
 
@@ -96,6 +106,7 @@ class GroupServiceImplTest {
 
     @BeforeEach
     void setUp() {
+        testHelper.truncateDbs();
         service = new GroupServiceImpl();
         service.setCollectionNameProvider(collectionNameProvider);
         service.setUserService(userService);
