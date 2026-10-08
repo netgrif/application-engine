@@ -26,7 +26,7 @@ public class CollectionNameProvider {
     }
 
     public String getCollectionNameForRealm(String realmId) {
-        if (realmId == null || realmId.isEmpty() || realmId.equals(NULL)) {
+        if (realmId == null || realmId.isBlank() || realmId.equals(NULL)) {
             return getDefaultRealmCollection();
         }
         return USER_MONGO_COLLECTION_PREFIX + realmId;

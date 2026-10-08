@@ -29,14 +29,11 @@ public class AnonymousUser extends AbstractUser {
      */
     private final Map<String, Attribute<?>> attributes = new HashMap<>();
 
-    /**
-     * Constructs a new anonymous user with specified reference and authority.
-     *
-     * @param ref the anonymous user reference containing basic user information
-     * @param anonymousAuthority the authority to be assigned if no specific authorities are provided
-     */
-    public AnonymousUser(AnonymousUserRef ref, Authority anonymousAuthority) {
-        this.id = new ObjectId();
+    public AnonymousUser(AnonymousUserRef ref) {
+        if (ref.getId() == null) {
+            throw new IllegalArgumentException("AnonymousUserRef id cannot be null");
+        }
+        this.id = new ObjectId(ref.getId());
         this.realmId = ref.getRealmId();
         this.username = "anonymous@" + this.realmId;
         this.firstName = ref.getDisplayName();
@@ -45,12 +42,23 @@ public class AnonymousUser extends AbstractUser {
         this.authoritySet = new HashSet<>();
         if (ref.getAuthorities() != null && !ref.getAuthorities().isEmpty()) {
             this.authoritySet.addAll(ref.getAuthorities());
-        } else {
-            this.authoritySet.add(anonymousAuthority);
         }
 
         this.processRoles = ref.getProcessRoles() != null ? new HashSet<>(ref.getProcessRoles()) : new HashSet<>();
         this.groupIds = ref.getGroupIds() != null ? new HashSet<>(ref.getGroupIds()) : new HashSet<>();
+    }
+
+    /**
+     * Constructs a new anonymous user with specified reference and authority.
+     *
+     * @param ref the anonymous user reference containing basic user information
+     * @param anonymousAuthority the authority to be assigned if no specific authorities are provided
+     */
+    public AnonymousUser(AnonymousUserRef ref, Authority anonymousAuthority) {
+        this(ref);
+        if (this.authoritySet.isEmpty()) {
+            this.authoritySet.add(anonymousAuthority);
+        }
     }
 
     /**

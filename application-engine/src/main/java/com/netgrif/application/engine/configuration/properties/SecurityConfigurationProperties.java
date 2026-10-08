@@ -49,7 +49,6 @@ public class SecurityConfigurationProperties {
      * List of authentication providers used for validating user credentials.
      */
     private String[] providers;
-    
 
     /**
      * Defines the server-specific URL patterns that must be handled without authentication.
@@ -70,10 +69,15 @@ public class SecurityConfigurationProperties {
     private String[] anonymousExceptions;
 
     /**
+     * Specifies the key used for anonymous user authentication.
+     * The default value is "anonymousUser".
+     */
+    private String anonymousAuthenticationKey = "anonymousUser";
+
+    /**
      * Headers settings
      */
     private HeadersProperties headers = new HeadersProperties();
-    
 
     /**
      * Encryption-specific configuration properties.
@@ -432,6 +436,12 @@ public class SecurityConfigurationProperties {
         public static class PublicProperties {
 
             /**
+             * Enables or disables public web functionalities.
+             * Default value is true.
+             */
+            private boolean enabled = true;
+
+            /**
              * Public URL for web functionalities.
              */
             private String url;
@@ -459,6 +469,12 @@ public class SecurityConfigurationProperties {
              * Default value is true.
              */
             public boolean userEnabled = true;
+
+            /**
+             * Specifies the principal key used for identifying anonymous users in public web contexts.
+             * The default value is "anonymous".
+             */
+            public String anonymousUserPrincipalKey = "anonymous";
         }
     }
 }
