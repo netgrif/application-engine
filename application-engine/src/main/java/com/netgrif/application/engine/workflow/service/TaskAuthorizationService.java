@@ -19,7 +19,7 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
     private ITaskService taskService;
 
     @Override
-    public Boolean userHasAtLeastOneRolePermission(LoggedUser loggedUser, String taskId, RolePermission... permissions) {
+    public Boolean userHasAtLeastOneRolePermission(AbstractUser loggedUser, String taskId, RolePermission... permissions) {
         return userHasAtLeastOneRolePermission(loggedUser, taskService.findById(taskId), permissions);
     }
 
@@ -40,7 +40,7 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
     }
 
     @Override
-    public Boolean userHasUserListPermission(LoggedUser loggedUser, String taskId, RolePermission... permissions) {
+    public Boolean userHasUserListPermission(AbstractUser loggedUser, String taskId, RolePermission... permissions) {
         return userHasUserListPermission(loggedUser, taskService.findById(taskId), permissions);
     }
 
@@ -63,11 +63,6 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
         }
 
         return checkPermissions(userPermissions, Arrays.stream(permissions).map(RolePermission::toString).toList());
-    }
-
-    @Override
-    public boolean isAssignee(LoggedUser loggedUser, String taskId) {
-        return isAssignee(loggedUser, taskService.findById(taskId));
     }
 
     @Override
@@ -94,7 +89,7 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
     }
 
     @Override
-    public boolean canCallAssign(LoggedUser loggedUser, String taskId) {
+    public boolean canCallAssign(AbstractUser loggedUser, String taskId) {
         // TODO: impersonation loggedUser.getSelfOrImpersonated().isAdmin()
         if (loggedUser.isAdmin()) {
             return true;
@@ -113,7 +108,7 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
     }
 
     @Override
-    public boolean canCallDelegate(LoggedUser loggedUser, String taskId) {
+    public boolean canCallDelegate(AbstractUser loggedUser, String taskId) {
         // TODO: impersonation loggedUser.getSelfOrImpersonated().isAdmin()
         if (loggedUser.isAdmin()) {
             return true;
@@ -132,7 +127,7 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
     }
 
     @Override
-    public boolean canCallFinish(LoggedUser loggedUser, String taskId) throws IllegalTaskStateException {
+    public boolean canCallFinish(AbstractUser loggedUser, String taskId) throws IllegalTaskStateException {
         if (!isAssigned(taskId)) {
             throw new IllegalTaskStateException("Task with ID '%s' cannot be finished, because it is not assigned!".formatted(taskId));
         }
@@ -166,7 +161,7 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
     }
 
     @Override
-    public boolean canCallCancel(LoggedUser loggedUser, String taskId) throws IllegalTaskStateException {
+    public boolean canCallCancel(AbstractUser loggedUser, String taskId) throws IllegalTaskStateException {
         if (!isAssigned(taskId)) {
             throw new IllegalTaskStateException("Task with ID '%s' cannot be canceled, because it is not assigned!".formatted(taskId));
         }
@@ -193,13 +188,13 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
     }
 
     @Override
-    public boolean canCallSaveData(LoggedUser loggedUser, String taskId) {
+    public boolean canCallSaveData(AbstractUser loggedUser, String taskId) {
         // TODO: impersonation loggedUser.getSelfOrImpersonated().isAdmin()
         return loggedUser.isAdmin() || isAssignee(loggedUser, taskId);
     }
 
     @Override
-    public boolean canCallSaveFile(LoggedUser loggedUser, String taskId) {
+    public boolean canCallSaveFile(AbstractUser loggedUser, String taskId) {
         // TODO: impersonation loggedUser.getSelfOrImpersonated().isAdmin()
         return loggedUser.isAdmin() || isAssignee(loggedUser, taskId);
     }

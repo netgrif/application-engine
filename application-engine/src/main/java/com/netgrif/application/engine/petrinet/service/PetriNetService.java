@@ -177,7 +177,6 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    @Transactional
     public ImportPetriNetEventOutcome importPetriNet(ImportPetriNetParams importPetriNetParams) throws IOException,
             MissingPetriNetMetaDataException, MissingIconKeyException {
         validateAttributes(importPetriNetParams);

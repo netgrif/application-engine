@@ -3,12 +3,21 @@ package com.netgrif.application.engine.adapter.spring.utils;
 import com.netgrif.application.engine.adapter.spring.utils.exceptions.AmbiguousMethodCallException;
 import org.springframework.aop.framework.AopProxyUtils;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class NaeReflectionUtils {
+
+    private static final String GROOVY_OBJECT = "groovy.lang.GroovyObject";
+
+    private static final String GROOVY_GENERATED = "groovy.transform.Generated";
+
+    private static final String GROOVY_CLASS_LOADER = "groovy.lang.GroovyClassLoader";
+
+    private static final Map<Class<?>, Boolean> CACHE = new ConcurrentHashMap<>();
 
     private NaeReflectionUtils() {
         throw new IllegalStateException("No instances. Utility class");
@@ -136,6 +145,71 @@ public final class NaeReflectionUtils {
             throw caughtException;
         } else {
             return methodToInvoke;
+        }
+    }
+
+    public static boolean isGroovyClass(Class<?> clazz) {
+        if (clazz == null) {
+            return false;
+        }
+        return CACHE.computeIfAbsent(clazz, NaeReflectionUtils::detect);
+    }
+
+    private static boolean detect(Class<?> clazz) {
+        return implementsGroovyObject(clazz)
+                || loadedByGroovyClassLoader(clazz.getClassLoader())
+                || hasGroovyGeneratedMember(clazz)
+                || hasMetaClassField(clazz);
+    }
+
+    /** Walks the whole type hierarchy and compares interface names as plain strings. */
+    private static boolean implementsGroovyObject(Class<?> clazz) {
+        Deque<Class<?>> queue = new ArrayDeque<>();
+        queue.add(clazz);
+        while (!queue.isEmpty()) {
+            Class<?> current = queue.poll();
+            if (GROOVY_OBJECT.equals(current.getName())) {
+                return true;
+            }
+            queue.addAll(Arrays.asList(current.getInterfaces()));
+            if (current.getSuperclass() != null) {
+                queue.add(current.getSuperclass());
+            }
+        }
+        return false;
+    }
+
+    /** Covers dynamically compiled scripts/actions that have no .class resource on disk. */
+    private static boolean loadedByGroovyClassLoader(ClassLoader loader) {
+        for (Class<?> c = loader == null ? null : loader.getClass(); c != null; c = c.getSuperclass()) {
+            if (GROOVY_CLASS_LOADER.equals(c.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Groovy 3+ marks all synthetic members with @groovy.transform.Generated. */
+    private static boolean hasGroovyGeneratedMember(Class<?> clazz) {
+        return hasGroovyGenerated(clazz)
+                || java.util.Arrays.stream(clazz.getDeclaredMethods()).anyMatch(NaeReflectionUtils::hasGroovyGenerated)
+                || java.util.Arrays.stream(clazz.getDeclaredConstructors()).anyMatch(NaeReflectionUtils::hasGroovyGenerated);
+    }
+
+    private static boolean hasGroovyGenerated(AnnotatedElement element) {
+        for (Annotation annotation : element.getDeclaredAnnotations()) {
+            if (GROOVY_GENERATED.equals(annotation.annotationType().getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean hasMetaClassField(Class<?> clazz) {
+        try {
+            return clazz.getDeclaredField("metaClass") != null;
+        } catch (NoSuchFieldException | SecurityException e) {
+            return false;
         }
     }
 }

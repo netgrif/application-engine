@@ -312,6 +312,7 @@ public class WorkflowService implements IWorkflowService {
         }
     }
 
+    @Override
     public CreateCaseEventOutcome createCase(CreateCaseParams createCaseParams) {
         fillAndValidateAttributes(createCaseParams);
         PetriNet petriNet = createCaseParams.getProcess();
