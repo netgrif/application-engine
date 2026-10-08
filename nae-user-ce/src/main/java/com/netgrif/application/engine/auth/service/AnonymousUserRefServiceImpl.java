@@ -4,6 +4,7 @@ import com.netgrif.application.engine.adapter.spring.auth.domain.AnonymousUserRe
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.objects.auth.domain.Realm;
+import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -33,6 +34,11 @@ public class AnonymousUserRefServiceImpl implements AnonymousUserRefService {
         Realm realm = resolveRealm(realmId);
         if (!realm.isPublicAccess()) {
             log.warn("Public access is disabled for realm {}.", realm.getName());
+            return Optional.empty();
+        }
+        ProcessRole anonymousRole = processRoleService.getAnonymousRole();
+        if (anonymousRole == null) {
+            log.warn("Anonymous role was not found.");
             return Optional.empty();
         }
         return Optional.of(new AnonymousUserRef(realm.getName(), Set.of(authorityService.getOrCreate(Authority.anonymous)), Set.of(processRoleService.getAnonymousRole())));

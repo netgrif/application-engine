@@ -84,6 +84,8 @@ public class ActorRef implements Serializable {
      * @see Authority#anonymous
      */
     public boolean isAnonymous() {
-        return authorities != null && authorities.stream().allMatch(it -> it.equals(Authority.anonymous));
+        return authorities != null
+                && !authorities.isEmpty()
+                && authorities.stream().allMatch(it -> it.equals(Authority.anonymous));
     }
 }

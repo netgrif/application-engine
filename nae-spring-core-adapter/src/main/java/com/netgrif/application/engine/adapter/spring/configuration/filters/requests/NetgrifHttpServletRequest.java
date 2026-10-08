@@ -16,7 +16,7 @@ public class NetgrifHttpServletRequest extends HttpServletRequestWrapper {
 
     public NetgrifHttpServletRequest(HttpServletRequest request, Map<String, Object> additionalParams) {
         super(request);
-        this.additionalParams = additionalParams;
+        this.additionalParams = new HashMap<>(additionalParams);
     }
 
     public Object getAdditionalParameter(String name) {

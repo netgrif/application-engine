@@ -30,6 +30,9 @@ public class AnonymousUser extends AbstractUser {
     private final Map<String, Attribute<?>> attributes = new HashMap<>();
 
     public AnonymousUser(AnonymousUserRef ref) {
+        if (ref.getId() == null) {
+            throw new IllegalArgumentException("AnonymousUserRef id cannot be null");
+        }
         this.id = new ObjectId(ref.getId());
         this.realmId = ref.getRealmId();
         this.username = "anonymous@" + this.realmId;
@@ -53,10 +56,7 @@ public class AnonymousUser extends AbstractUser {
      */
     public AnonymousUser(AnonymousUserRef ref, Authority anonymousAuthority) {
         this(ref);
-        this.authoritySet = new HashSet<>();
-        if (ref.getAuthorities() != null && !ref.getAuthorities().isEmpty()) {
-            this.authoritySet.addAll(ref.getAuthorities());
-        } else {
+        if (this.authoritySet.isEmpty()) {
             this.authoritySet.add(anonymousAuthority);
         }
     }

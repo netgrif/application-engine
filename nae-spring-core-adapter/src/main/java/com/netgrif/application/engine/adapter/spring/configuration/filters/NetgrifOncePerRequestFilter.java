@@ -39,7 +39,11 @@ public abstract class  NetgrifOncePerRequestFilter extends OncePerRequestFilter 
             return;
         }
 
-        NetgrifHttpServletRequest typedRequest = (NetgrifHttpServletRequest) request;
+        if (!(request instanceof NetgrifHttpServletRequest typedRequest)) {
+            log.warn("Request is not a NetgrifHttpServletRequest. Ensure NetgrifHttpRequestTransformFilter runs before this filter.");
+            filterChain.doFilter(request, response);
+            return;
+        }
         doFilterInternal(typedRequest, response, filterChain);
     }
 
