@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,6 +25,7 @@ import org.springframework.security.web.servlet.util.matcher.PathPatternRequestM
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -34,13 +36,15 @@ public class PublicAuthenticationFilter extends NetgrifOncePerRequestFilter {
 
     private final AnonymousUserRefService anonymousUserRefService;
     private final AuthorityService authorityService;
+    private final SecurityConfigurationProperties securityConfigurationProperties;
 
     public PublicAuthenticationFilter(AnonymousUserRefService anonymousUserRefService,
                                       AuthorityService authorityService,
                                       SecurityConfigurationProperties securityConfigurationProperties) {
         this.anonymousUserRefService = anonymousUserRefService;
         this.authorityService = authorityService;
-        setRequestMatcher(Arrays.stream(securityConfigurationProperties.getServerPatterns()).map(PathPatternRequestMatcher::pathPattern).collect(Collectors.toSet()));
+        this.securityConfigurationProperties = securityConfigurationProperties;
+        setRequestMatcher(Arrays.stream(this.securityConfigurationProperties.getServerPatterns()).map(PathPatternRequestMatcher::pathPattern).collect(Collectors.toSet()));
     }
 
     @Override
@@ -66,7 +70,13 @@ public class PublicAuthenticationFilter extends NetgrifOncePerRequestFilter {
         log.debug("Loaded realm {} (publicAccess={})", realm.getName(), realm.isPublicAccess());
         if (!realm.isPublicAccess()) {
             log.debug("Public access disabled for realm {}; skipping anon auth", realm.getName());
-            filterChain.doFilter(request, response);
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+            response.getWriter().write("""
+            {"error":"forbidden","message":"Public access disabled for realm"}
+            """);
+            response.getWriter().flush();
             return;
         }
 
@@ -88,7 +98,7 @@ public class PublicAuthenticationFilter extends NetgrifOncePerRequestFilter {
             log.debug("Created anonymous user details for user: {}", userDetails.getUsername());
 
             AnonymousAuthenticationToken token = new AnonymousAuthenticationToken(
-                    "engine",
+                    securityConfigurationProperties.getWeb().getPublicWeb().getAnonymousUserPrincipalKey(),
                     userDetails,
                     userDetails.getAuthorities()
             );
@@ -96,7 +106,7 @@ public class PublicAuthenticationFilter extends NetgrifOncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(token);
             log.debug("Anonymous public auth succeeded for realm {}", realm.getName());
         } catch (Exception ex) {
-            log.debug("Anonymous public auth failed for realm {}: {}", realm.getName(), ex.getMessage(), ex);
+            log.warn("Anonymous public auth failed for realm {}: {}", realm.getName(), ex.getMessage(), ex);
         }
 
         filterChain.doFilter(request, response);

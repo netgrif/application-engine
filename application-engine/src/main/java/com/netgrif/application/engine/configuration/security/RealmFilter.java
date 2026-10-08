@@ -12,8 +12,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -28,8 +26,10 @@ import java.util.Optional;
 public class RealmFilter extends NetgrifOncePerRequestFilter {
 
     private final String REALM_ID_HEADER = "X-Realm-ID";
+
     private final String REALM_ID_BODY = "realmId";
-    private final String REALM_NAME_BODY = "realName";
+
+    private final String REALM_NAME_BODY = "realmName";
 
     private final RealmService realmService;
 
@@ -68,13 +68,6 @@ public class RealmFilter extends NetgrifOncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    @Bean
-    public FilterRegistrationBean<RealmFilter> realmFilterFilterRegistrationBean(RealmFilter filter) {
-        FilterRegistrationBean<RealmFilter> registration = new FilterRegistrationBean<>(filter);
-        registration.setEnabled(false);
-        return registration;
-    }
-
     /**
      * Finds realm by realm id in headers by {@link #REALM_ID_HEADER}
      * */
@@ -98,13 +91,13 @@ public class RealmFilter extends NetgrifOncePerRequestFilter {
         JsonNode realmIdNode = requestBodyJson.get(REALM_ID_BODY);
         Optional<Realm> realmOpt = Optional.empty();
 
-        if (isJsonNodeValueEmpty(realmIdNode)) {
+        if (hasJsonNodeValue(realmIdNode)) {
             realmOpt = realmService.getRealmById(String.valueOf(realmIdNode.textValue()));
         }
 
         if (realmOpt.isEmpty()) {
             JsonNode realmNameNode = requestBodyJson.get(REALM_NAME_BODY);
-            if (isJsonNodeValueEmpty(realmNameNode)) {
+            if (hasJsonNodeValue(realmNameNode)) {
                 realmOpt = realmService.getRealmByName(realmNameNode.textValue());
             }
         }
@@ -112,7 +105,7 @@ public class RealmFilter extends NetgrifOncePerRequestFilter {
         return realmOpt;
     }
 
-    private static boolean isJsonNodeValueEmpty(JsonNode node) {
+    private static boolean hasJsonNodeValue(JsonNode node) {
         return node != null && node.textValue() != null && !node.textValue().isBlank();
     }
 }

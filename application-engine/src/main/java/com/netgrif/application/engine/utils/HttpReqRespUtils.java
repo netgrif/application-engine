@@ -55,14 +55,26 @@ public class HttpReqRespUtils {
     }
 
     public static Realm extractRealmFromRequest(NetgrifHttpServletRequest request) {
-        return (Realm) request.getAdditionalParameter(HttpRequestParamConstants.REALM);
+        if (request == null) {
+            return null;
+        }
+        Object param = request.getAdditionalParameter(HttpRequestParamConstants.REALM);
+        return param instanceof Realm realm ? realm : null;
     }
 
     public static JsonNode extractBodyFromRequest(NetgrifHttpServletRequest request) {
-        return (JsonNode) request.getAdditionalParameter(HttpRequestParamConstants.REQUEST_BODY);
+        if (request == null) {
+            return null;
+        }
+        Object param = request.getAdditionalParameter(HttpRequestParamConstants.REQUEST_BODY);
+        return param instanceof JsonNode node ? node : null;
     }
 
     public static NetgrifAuthenticationToken extractAuthReqTokenFromRequest(NetgrifHttpServletRequest request) {
-        return (NetgrifAuthenticationToken) request.getAdditionalParameter(HttpRequestParamConstants.AUTH_REQ_TOKEN);
+        if (request == null) {
+            return null;
+        }
+        Object param = request.getAdditionalParameter(HttpRequestParamConstants.AUTH_REQ_TOKEN);
+        return param instanceof NetgrifAuthenticationToken token ? token : null;
     }
 }
