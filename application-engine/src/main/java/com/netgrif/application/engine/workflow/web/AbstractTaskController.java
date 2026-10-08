@@ -194,15 +194,6 @@ public abstract class AbstractTaskController {
         return PagedModel.of(tasks.stream().map(t -> new LocalisedTaskResource(new com.netgrif.application.engine.workflow.web.responsebodies.Task(t, locale))).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), tasks.getTotalElements()));
     }
 
-//    public PagedModel<LocalisedTaskResource> searchPublic(LoggedUser loggedUser, Pageable pageable, SingleTaskSearchRequestAsList searchBody, MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
-//        Page<Task> tasks = taskService.search(searchBody.getList(), pageable, loggedUser, locale, operation == MergeFilterOperation.AND);
-//        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PublicTaskController.class)
-//                .searchPublic(loggedUser, pageable, searchBody, operation, assembler, locale)).withRel("search");
-//        PagedModel<LocalisedTaskResource> resources = assembler.toModel(tasks, new TaskResourceAssembler(locale), selfLink);
-//        ResourceLinkAssembler.addLinks(resources, Task.class, selfLink.getRel().toString());
-//        return PagedModel.of(tasks.stream().map(t -> new LocalisedTaskResource(new com.netgrif.application.engine.workflow.web.responsebodies.Task(t, locale))).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), tasks.getTotalElements()));
-//    }
-
     public PagedModel<LocalisedTaskResource> searchElastic(Pageable pageable, SingleElasticTaskSearchRequestAsList searchBody, MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
         LoggedUser loggedUser = ActorTransformer.toLoggedUser(userService.getLoggedUser());
         Page<Task> tasks = searchService.search(searchBody.getList(), loggedUser, pageable, locale, operation == MergeFilterOperation.AND);

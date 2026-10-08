@@ -97,7 +97,7 @@ public class WorkflowController {
                     LocalisedEventOutcomeFactory.from(outcome, locale));
         } catch (Exception e) {
             log.error("Creating case failed:", e);
-            return EventOutcomeWithMessageResource.errorMessage("Creating case failed" + e.getMessage());
+            return EventOutcomeWithMessageResource.errorMessage("Creating case failed");
         }
     }
 
@@ -273,6 +273,6 @@ public class WorkflowController {
     private PagedModel<CaseResource> getCaseResources(Pageable pageable, PagedResourcesAssembler<Case> assembler, Page<Case> cases, Link selfLink) {
         PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
         ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel().toString());
-        return PagedModel.of(cases.stream().map(CaseResource::new).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), cases.getTotalElements()));
+        return resources;
     }
 }

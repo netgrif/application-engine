@@ -27,6 +27,8 @@ public interface ITaskAuthorizationService {
 
     boolean canCallCancel(AbstractUser user, String taskId) throws IllegalTaskStateException;
 
+    boolean canCallGetData(AbstractUser user, String taskId);
+
     boolean canCallSaveData(AbstractUser user, String taskId);
 
     boolean canCallSaveFile(AbstractUser user, String taskId);

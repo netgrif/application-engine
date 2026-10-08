@@ -78,7 +78,7 @@ public class TaskController extends AbstractTaskController {
     }
 
     @Override
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN')")
+    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS')")
     @Operation(summary = "Get tasks of the case", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = {"/case/{id}", "/public/case/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<TaskReference> getTasksOfCase(@PathVariable("id") String caseId, Locale locale) {
@@ -186,8 +186,10 @@ public class TaskController extends AbstractTaskController {
     }
 
     @Override
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS')")
-    @Operation(summary = "Get all task data", security = {@SecurityRequirement(name = "BasicAuth")})
+    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS') && @taskAuthorizationService.canCallGetData(@userService.getLoggedUser(), #taskId)")
+    @Operation(summary = "Get all task data",
+            description = "Caller must be able to view the task, or must be an ADMIN",
+            security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = {"/{id}/data", "/public/{id}/data"}, produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage> getData(@PathVariable("id") String taskId, Locale locale) {
         return super.getData(taskId, locale);
@@ -220,8 +222,10 @@ public class TaskController extends AbstractTaskController {
         return super.saveFile(taskId, multipartFile, dataBody, locale);
     }
 
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS')")
-    @Operation(summary = "Download task file field value", security = {@SecurityRequirement(name = "BasicAuth")})
+    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS') && @taskAuthorizationService.canCallGetData(@userService.getLoggedUser(), #taskId)")
+    @Operation(summary = "Download task file field value",
+            description = "Caller must be able to view the task, or must be an ADMIN",
+            security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = {"/{id}/file", "/public/{id}/file"}, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFile(@PathVariable("id") String taskId, @RequestParam("fieldId") String fieldId) throws FileNotFoundException {
         return super.getFile(taskId, fieldId);
@@ -253,8 +257,10 @@ public class TaskController extends AbstractTaskController {
         return super.saveFiles(taskId, multipartFiles, requestBody);
     }
 
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS')")
-    @Operation(summary = "Download one file from tasks file list field value", security = {@SecurityRequirement(name = "BasicAuth")})
+    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS') && @taskAuthorizationService.canCallGetData(@userService.getLoggedUser(), #taskId)")
+    @Operation(summary = "Download one file from tasks file list field value",
+            description = "Caller must be able to view the task, or must be an ADMIN",
+            security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = {"/{id}/file/named", "/public/{id}/file/named"}, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getNamedFile(@PathVariable("id") String taskId, @RequestParam("fieldId") String fieldId, @RequestParam("fileName") String fileName) throws FileNotFoundException {
         return super.getNamedFile(taskId, fieldId, fileName);
@@ -273,8 +279,10 @@ public class TaskController extends AbstractTaskController {
         return super.deleteNamedFile(requestBody.getParentTaskId(), requestBody.getFieldId(), requestBody.getFileName());
     }
 
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS')")
-    @Operation(summary = "Download preview for file field value", security = {@SecurityRequirement(name = "BasicAuth")})
+    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS') && @taskAuthorizationService.canCallGetData(@userService.getLoggedUser(), #taskId)")
+    @Operation(summary = "Download preview for file field value",
+            description = "Caller must be able to view the task, or must be an ADMIN",
+            security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = {"/{id}/file_preview", "/public/{id}/file_preview"}, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFilePreview(@PathVariable("id") String taskId, @RequestParam("fieldId") String fieldId) throws FileNotFoundException {
         return super.getFilePreview(taskId, fieldId);

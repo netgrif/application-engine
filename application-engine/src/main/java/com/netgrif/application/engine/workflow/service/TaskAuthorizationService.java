@@ -187,6 +187,30 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
     }
 
     @Override
+    public boolean canCallGetData(AbstractUser user, String taskId) {
+        // TODO: impersonation user.getSelfOrImpersonated().isAdmin()
+        if (user.isAdmin()) {
+            return true;
+        }
+
+        Task task = taskService.findById(taskId);
+        // TODO: impersonation
+        Boolean userPerm = userHasUserListPermission(user, task, RolePermission.VIEW);
+        if (userPerm != null) {
+            return userPerm;
+        }
+
+        // TODO: impersonation
+        Boolean rolePerm = userHasAtLeastOneRolePermission(user, task, RolePermission.VIEW);
+        if (rolePerm != null) {
+            return rolePerm;
+        }
+
+        // TODO: impersonation
+        return isAssignee(user, task);
+    }
+
+    @Override
     public boolean canCallSaveData(AbstractUser user, String taskId) {
         // TODO: impersonation user.getSelfOrImpersonated().isAdmin()
         return user.isAdmin() || isAssignee(user, taskId);

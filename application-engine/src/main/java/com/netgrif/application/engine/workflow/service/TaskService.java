@@ -1018,11 +1018,8 @@ public class TaskService implements ITaskService {
 
     private void setUser(Task task) {
         if (task.getUserId() != null && task.getAssignee().isAnonymous()) {
-            Optional<AnonymousUserRef> anonymousUserRefOptional = anonymousUserRefService.getRef(task.getAssignee().getRealmId());
-            if (anonymousUserRefOptional.isEmpty()) {
-                throw new IllegalArgumentException("Anonymous user with id " + task.getAssignee().getId() + " does not exist");
-            }
-            AnonymousUser anonymousUser = new AnonymousUser(anonymousUserRefOptional.get(), authorityService.getOrCreate(Authority.anonymous));
+            AnonymousUserRef anonymousUserRef = anonymousUserRefService.getOrCreateRef(task.getAssignee().getRealmId());
+            AnonymousUser anonymousUser = new AnonymousUser(anonymousUserRef, authorityService.getOrCreate(Authority.anonymous));
             task.setUser(anonymousUser);
             return;
         }
