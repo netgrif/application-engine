@@ -24,21 +24,20 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
 @ActiveProfiles({"test"})
 @SpringBootTest
 class DefaultLoggedUserFactoryTest {
 
-    @Autowired
+    @Mock
     private GroupService groupService;
 
-    @Autowired
+    @Mock
     private ProcessRoleService processRoleService;
 
-    @Autowired
+    @Mock
     private AuthorityService authorityService;
 
-    @Autowired
     private DefaultLoggedUserFactory factory;
 
     static class TestAuthority extends Authority {

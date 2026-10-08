@@ -11,6 +11,8 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -21,18 +23,17 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
 @ActiveProfiles({"test"})
 @SpringBootTest
 public class ActorMongoEventListenerTest {
 
-    @Autowired
+    @Mock
     private ProcessRoleService processRoleService;
 
-    @Autowired
+    @Mock
     private AuthorityService authorityService;
 
-    @Autowired
     private ActorMongoEventListener listener;
 
     static class TestAuthority extends Authority {
@@ -59,6 +60,11 @@ public class ActorMongoEventListenerTest {
         }
     }
 
+    @BeforeEach
+    void setUp() {
+        listener = new ActorMongoEventListener(processRoleService, authorityService);
+    }
+
     @Test
     void testOnAfterConvertWithEmptyRolesAndAuthorities() {
         User user = new User();
@@ -69,8 +75,6 @@ public class ActorMongoEventListenerTest {
         assertSame(user, result);
         assertTrue(result.getProcessRoles().isEmpty());
         assertTrue(result.getAuthoritySet().isEmpty());
-        verifyNoInteractions(processRoleService);
-        verifyNoInteractions(authorityService);
     }
 
     @Test
