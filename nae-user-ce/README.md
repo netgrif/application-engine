@@ -49,7 +49,7 @@ of the same interface type — the CE default will not be loaded.
 | Class                    | Purpose                                                                                                                                              |
 |--------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `CollectionNameProvider` | Resolves the MongoDB collection name for a given realm ID (`users_<realmId>`); supports default realm, admin realm, and multi-realm lookups          |
-| `UserMongoEventListener` | Spring Data `AfterConvertCallback` that eagerly resolves `processRoleIds` and `authorityIds` into their full domain objects after every MongoDB read |
+| `ActorMongoEventListener` | Spring Data `AfterConvertCallback` that eagerly resolves `processRoleIds` and `authorityIds` into their full domain objects after every MongoDB read |
 
 ### Key design decisions
 

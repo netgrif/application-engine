@@ -2,6 +2,7 @@ package com.netgrif.application.engine.petrinet.web
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl
+import com.netgrif.application.engine.adapter.spring.auth.domain.User
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
@@ -33,6 +34,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -98,7 +100,7 @@ class PetriNetControllerTest {
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
 
-        def simpleUser = importHelper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Role", lastName: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
+        def simpleUser = importHelper.createUser(new User(firstName: "Role", lastName: "User", username: USER_EMAIL, email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
 //                [] as Group[],
                 [] as ProcessRole[])
@@ -106,7 +108,7 @@ class PetriNetControllerTest {
         userAuth = new UsernamePasswordAuthenticationToken(ActorTransformer.toLoggedUser(simpleUser), "password",  [auths.get("user")] as List<AuthorityImpl>)
         userAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
-        def adminUser = importHelper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Admin", lastName: "User", email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
+        def adminUser = importHelper.createUser(new User(firstName: "Admin", lastName: "User", username: ADMIN_EMAIL, email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("admin")] as Authority[],
 //                [] as Group[],
                 [] as ProcessRole[])

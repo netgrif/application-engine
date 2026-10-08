@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.MockService;
+import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.auth.service.AuthorityService;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
@@ -88,6 +89,7 @@ public class TaskServiceTest {
         taskRepository.deleteAll();
         realmRunner.run(null);
         userRunner.run(null);
+        superCreator.run(null);
 
         petriNetService.importPetriNet(ImportPetriNetParams.with()
                 .xmlFile(new FileInputStream("src/test/resources/prikladFM.xml"))
@@ -122,6 +124,7 @@ public class TaskServiceTest {
         user.setPassword("password");
         user.setLastName("surname");
         user.setEmail("email@email.com");
+        user.setUsername("email@email.com");
         user.setState(UserState.ACTIVE);
         user = (User) userService.saveUser(user, null);
 

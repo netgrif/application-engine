@@ -8,7 +8,14 @@ import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.DataField;
+import com.netgrif.application.engine.objects.workflow.domain.Task;
+import com.netgrif.application.engine.objects.workflow.domain.menu.Menu;
 import com.netgrif.application.engine.objects.workflow.domain.menu.MenuAndFilters;
+import com.netgrif.application.engine.objects.workflow.domain.menu.MenuEntry;
+import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
+import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService;
+import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
+import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -22,8 +29,8 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 class MenuImportExportServiceTest {
 
@@ -100,6 +107,107 @@ class MenuImportExportServiceTest {
         String xml = Files.readString(target);
         assertTrue(xml.contains("<?xml"));
         assertTrue(xml.contains("menusWithFilters"));
+    }
+
+    @Test
+    void importMenuSkipsReplacingMenuWhenFilterMappingIsMissing() throws Exception {
+        IFilterImportExportService filterImportExportService = mock(IFilterImportExportService.class);
+        IWorkflowService workflowService = mock(IWorkflowService.class);
+        ITaskService taskService = mock(ITaskService.class);
+        IDataService dataService = mock(IDataService.class);
+
+        MenuImportExportService service = spy(new MenuImportExportService());
+        ReflectionTestUtils.setField(service, "filterImportExportService", filterImportExportService);
+        ReflectionTestUtils.setField(service, "workflowService", workflowService);
+        ReflectionTestUtils.setField(service, "taskService", taskService);
+        ReflectionTestUtils.setField(service, "dataService", dataService);
+
+        MenuAndFilters menuAndFilters = new MenuAndFilters();
+        Menu menu = new Menu();
+        menu.setMenuIdentifier("nav-menu");
+        MenuEntry entry1 = new MenuEntry();
+        entry1.setEntryName("Entry 1");
+        entry1.setFilterCaseId("filter-case-1");
+        MenuEntry entry2 = new MenuEntry();
+        entry2.setEntryName("Entry 2");
+        entry2.setFilterCaseId("filter-case-2");
+        menu.setMenuEntries(List.of(entry1, entry2));
+        menuAndFilters.getMenuList().setMenus(List.of(menu));
+
+        FileFieldValue ffv = new FileFieldValue();
+        doReturn(menuAndFilters).when(service).loadFromXML(ffv);
+
+        when(filterImportExportService.importFilters(any())).thenReturn(Map.of("filter-case-1", "task-1"));
+
+        Case existingCase = mock(Case.class);
+        when(existingCase.getStringId()).thenReturn("existing-case-id");
+        when(existingCase.getDataSet()).thenReturn(Map.of("menu_identifier", new DataField("nav-menu")));
+
+        Task groupNavTask = mock(Task.class);
+        when(taskService.searchOne(any())).thenReturn(groupNavTask);
+        Task importedFilterTask = mock(Task.class);
+        when(importedFilterTask.getCaseId()).thenReturn("filter-case-id");
+        when(taskService.findOne("task-1")).thenReturn(importedFilterTask);
+        Case filterCase = mock(Case.class);
+        when(workflowService.findOne("filter-case-id")).thenReturn(filterCase);
+
+        List<String> result = service.importMenu(List.of(existingCase), ffv, "parent-group-id");
+
+        assertTrue(result.isEmpty());
+        verify(workflowService, never()).findOne("existing-case-id");
+        verify(service, never()).createMenuItemCase(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void importMenuReplacesMenuWhenAllFilterMappingsArePresent() throws Exception {
+        IFilterImportExportService filterImportExportService = mock(IFilterImportExportService.class);
+        IWorkflowService workflowService = mock(IWorkflowService.class);
+        ITaskService taskService = mock(ITaskService.class);
+        IDataService dataService = mock(IDataService.class);
+
+        MenuImportExportService service = spy(new MenuImportExportService());
+        ReflectionTestUtils.setField(service, "filterImportExportService", filterImportExportService);
+        ReflectionTestUtils.setField(service, "workflowService", workflowService);
+        ReflectionTestUtils.setField(service, "taskService", taskService);
+        ReflectionTestUtils.setField(service, "dataService", dataService);
+
+        MenuAndFilters menuAndFilters = new MenuAndFilters();
+        Menu menu = new Menu();
+        menu.setMenuIdentifier("nav-menu");
+        MenuEntry entry1 = new MenuEntry();
+        entry1.setEntryName("Entry 1");
+        entry1.setFilterCaseId("filter-case-1");
+        menu.setMenuEntries(List.of(entry1));
+        menuAndFilters.getMenuList().setMenus(List.of(menu));
+
+        FileFieldValue ffv = new FileFieldValue();
+        doReturn(menuAndFilters).when(service).loadFromXML(ffv);
+
+        when(filterImportExportService.importFilters(any())).thenReturn(Map.of("filter-case-1", "task-1"));
+
+        Case existingCase = mock(Case.class);
+        when(existingCase.getStringId()).thenReturn("existing-case-id");
+        when(existingCase.getDataSet()).thenReturn(Map.of("menu_identifier", new DataField("nav-menu")));
+        when(existingCase.getFieldValue("remove_option")).thenReturn(0);
+        when(workflowService.findOne("existing-case-id")).thenReturn(existingCase);
+
+        Task groupNavTask = mock(Task.class);
+        Task removeViewTask = mock(Task.class);
+        when(taskService.searchOne(any())).thenReturn(removeViewTask).thenReturn(groupNavTask);
+
+        Task importedFilterTask = mock(Task.class);
+        when(importedFilterTask.getCaseId()).thenReturn("filter-case-id");
+        when(taskService.findOne("task-1")).thenReturn(importedFilterTask);
+        Case filterCase = mock(Case.class);
+        when(workflowService.findOne("filter-case-id")).thenReturn(filterCase);
+
+        doReturn("new-case-id,filter-case-id,true").when(service).createMenuItemCase(any(), eq(entry1), eq("nav-menu"), eq("parent-group-id"), eq("task-1"));
+
+        List<String> result = service.importMenu(List.of(existingCase), ffv, "parent-group-id");
+
+        assertEquals(List.of("new-case-id,filter-case-id,true"), result);
+        verify(workflowService).findOne("existing-case-id");
+        verify(service).createMenuItemCase(any(), eq(entry1), eq("nav-menu"), eq("parent-group-id"), eq("task-1"));
     }
 
     private Case menuCase(String id, String defaultName) {

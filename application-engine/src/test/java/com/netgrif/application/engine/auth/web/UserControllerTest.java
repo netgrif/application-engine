@@ -6,7 +6,7 @@ import com.netgrif.application.engine.auth.web.requestbodies.PreferencesRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.UserCreateRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.UserSearchRequestBody;
 import com.netgrif.application.engine.auth.web.responsebodies.PreferencesResource;
-import com.netgrif.application.engine.auth.web.responsebodies.User;
+import com.netgrif.application.engine.auth.web.responsebodies.UserDto;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
@@ -103,14 +103,14 @@ class UserControllerTest {
     @Test
     void createUserReturnsCreatedUserWhenRealmExistsAndUsernameIsFree() {
         AbstractUser domainUser = domainUser("john");
-        User responseUser = new User(domainUser);
+        UserDto responseUser = new UserDto(domainUser);
         UserCreateRequest request = createRequest("john");
         when(realmService.getRealmById("realm")).thenReturn(Optional.of(realm("realm")));
         when(userService.findUserByUsername("john", "realm")).thenReturn(Optional.empty());
         when(userService.createUser("john", "john@example.com", "John", "User", "secret", "realm")).thenReturn(domainUser);
         when(userFactory.getUser(domainUser, Locale.ENGLISH)).thenReturn(responseUser);
 
-        ResponseEntity<User> response = controller.createUser("realm", request, Locale.ENGLISH);
+        ResponseEntity<UserDto> response = controller.createUser("realm", request, Locale.ENGLISH);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertSame(responseUser, response.getBody());
@@ -133,13 +133,13 @@ class UserControllerTest {
     @Test
     void getAllUsersTransformsUsersWhenRealmExists() {
         AbstractUser domainUser = domainUser("john");
-        User responseUser = new User(domainUser);
+        UserDto responseUser = new UserDto(domainUser);
         Pageable pageable = PageRequest.of(0, 10);
         when(realmService.getRealmById("realm")).thenReturn(Optional.of(realm("realm")));
         when(userService.findAllUsers("realm", pageable)).thenReturn(new PageImpl<>(List.of(domainUser), pageable, 1));
         when(userFactory.getUser(domainUser, Locale.ENGLISH)).thenReturn(responseUser);
 
-        ResponseEntity<org.springframework.data.domain.Page<User>> response = controller.getAllUsers("realm", pageable, Locale.ENGLISH);
+        ResponseEntity<org.springframework.data.domain.Page<UserDto>> response = controller.getAllUsers("realm", pageable, Locale.ENGLISH);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(1, response.getBody().getTotalElements());
@@ -151,14 +151,14 @@ class UserControllerTest {
     @Test
     void getLoggedUserHandlesSuccessMissingAndBadIds() {
         AbstractUser domainUser = domainUser("john");
-        User responseUser = new User(domainUser);
+        UserDto responseUser = new UserDto(domainUser);
         when(authentication.getPrincipal()).thenReturn(loggedUser);
         when(loggedUser.getStringId()).thenReturn("john-id");
         when(loggedUser.getRealmId()).thenReturn("realm");
         when(userService.findById("john-id", "realm")).thenReturn(domainUser);
         when(userFactory.getUser(domainUser, Locale.ENGLISH)).thenReturn(responseUser);
 
-        ResponseEntity<User> ok = controller.getLoggedUser(authentication, Locale.ENGLISH);
+        ResponseEntity<UserDto> ok = controller.getLoggedUser(authentication, Locale.ENGLISH);
 
         assertEquals(HttpStatus.OK, ok.getStatusCode());
         assertSame(responseUser, ok.getBody());
@@ -176,7 +176,7 @@ class UserControllerTest {
     @Test
     void searchMapsRoleStringsToProcessResourceIds() {
         AbstractUser domainUser = domainUser("john");
-        User responseUser = new User(domainUser);
+        UserDto responseUser = new UserDto(domainUser);
         Pageable pageable = PageRequest.of(0, 10);
         String roleId = new ProcessResourceId().toString();
         String negativeRoleId = new ProcessResourceId().toString();
@@ -189,7 +189,7 @@ class UserControllerTest {
                 .thenReturn(new PageImpl<>(List.of(domainUser), pageable, 1));
         when(userFactory.getUser(domainUser, Locale.ENGLISH)).thenReturn(responseUser);
 
-        ResponseEntity<org.springframework.data.domain.Page<User>> response = controller.search(query, pageable, authentication, Locale.ENGLISH);
+        ResponseEntity<org.springframework.data.domain.Page<UserDto>> response = controller.search(query, pageable, authentication, Locale.ENGLISH);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertSame(responseUser, response.getBody().getContent().getFirst());
@@ -198,7 +198,7 @@ class UserControllerTest {
     @Test
     void getUserAllowsAdminOrSelfAndRejectsForeignOrInvalidIds() {
         AbstractUser domainUser = domainUser("john");
-        User responseUser = new User(domainUser);
+        UserDto responseUser = new UserDto(domainUser);
         when(userService.getLoggedUserFromContext()).thenReturn(loggedUser);
         when(loggedUser.isAdmin()).thenReturn(false);
         when(loggedUser.getId()).thenReturn(new ObjectId("64b000000000000000000001"));
@@ -209,7 +209,7 @@ class UserControllerTest {
         when(loggedUser.isAdmin()).thenReturn(true);
         when(userService.findById("64b000000000000000000001", "realm")).thenReturn(domainUser);
         when(userFactory.getUser(domainUser, Locale.ENGLISH)).thenReturn(responseUser);
-        ResponseEntity<User> admin = controller.getUser("realm", "64b000000000000000000001", Locale.ENGLISH);
+        ResponseEntity<UserDto> admin = controller.getUser("realm", "64b000000000000000000001", Locale.ENGLISH);
         assertEquals(HttpStatus.OK, admin.getStatusCode());
         assertSame(responseUser, admin.getBody());
 

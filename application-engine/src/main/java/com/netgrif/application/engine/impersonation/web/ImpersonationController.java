@@ -57,9 +57,9 @@ public class ImpersonationController {
     @Autowired
     protected ObjectFactory<UserResourceAssembler> userResourceAssemblerProvider;
 
-    protected UserResourceAssembler getUserResourceAssembler(Locale locale, boolean small, String selfRel) {
+    protected UserResourceAssembler getUserResourceAssembler(Locale locale) {
         UserResourceAssembler result = userResourceAssemblerProvider.getObject();
-        result.initialize(locale, small, selfRel);
+        result.initialize(locale);
         return result;
     }
 
@@ -70,7 +70,7 @@ public class ImpersonationController {
         Page<AbstractUser> page = impersonationAuthorizationService.getConfiguredImpersonationUsers(request.getQuery(), loggedUser, pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ImpersonationController.class)
                 .getImpersonationUserOptions(request, pageable, assembler, auth, locale)).withRel("all");
-        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, false, "all"), selfLink);
+        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale), selfLink);
         ResourceLinkAssembler.addLinks(resources, AbstractUser.class, selfLink.getRel().toString());
         return resources;
     }
