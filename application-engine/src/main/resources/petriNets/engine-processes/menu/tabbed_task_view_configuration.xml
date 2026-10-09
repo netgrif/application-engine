@@ -274,6 +274,28 @@
         </options>
         <init>sort</init>
     </data>
+    <data type="text" immediate="true">
+        <id>headers_sort_mode_active</id>
+        <title name="headers_sort_mode_active">Active columns for sorting</title>
+        <desc name="headers_sort_mode_active_desc">Example: "meta-title,meta-caseTitle"</desc>
+        <action trigger="set">
+            sortModeActive: f.this;
+
+            String trimmed = sortModeActive.value?.replaceAll("\\s","")
+            if (sortModeActive.value != trimmed) {
+                change sortModeActive value { trimmed }
+            }
+        </action>
+    </data>
+    <data type="enumeration_map" immediate="true">
+        <id>headers_sort_mode_direction</id>
+        <title name="headers_sort_mode_direction">Default sort direction</title>
+        <options>
+            <option key="asc" name="ascending">Ascending</option>
+            <option key="desc" name="descending">Descending</option>
+        </options>
+        <init>desc</init>
+    </data>
     <data type="enumeration_map">
         <id>headers_options_holder</id>
         <title/>
@@ -342,6 +364,11 @@
         <i18nString name="view_header">Zobrazenie úloh</i18nString>
         <i18nString name="item_settings_general">Všeobecné</i18nString>
         <i18nString name="remove_filter">Vymazať filter</i18nString>
+        <i18nString name="headers_sort_mode_active">Aktívne stĺpce pre zoradenie</i18nString>
+        <i18nString name="headers_sort_mode_active_desc">Napríklad: "meta-title,meta-caseTitle"</i18nString>
+        <i18nString name="headers_sort_mode_direction">Predvolený smer zoradenia</i18nString>
+        <i18nString name="ascending">Vzostupne</i18nString>
+        <i18nString name="descending">Zostupne</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="filter_autocomplete_selection">Neue Filter auswählen</i18nString>
@@ -368,6 +395,11 @@
         <i18nString name="item_settings">Menüeintrageinstellungen</i18nString>
         <i18nString name="view_header">Aufgabenansicht</i18nString>
         <i18nString name="remove_filter">Filter entfernen</i18nString>
+        <i18nString name="headers_sort_mode_active">Aktive Spalten zum Sortieren</i18nString>
+        <i18nString name="headers_sort_mode_active_desc">Beispiel: "meta-title,meta-caseTitle"</i18nString>
+        <i18nString name="headers_sort_mode_direction">Standard-Sortierrichtung</i18nString>
+        <i18nString name="ascending">Aufsteigend</i18nString>
+        <i18nString name="descending">Absteigend</i18nString>
     </i18n>
 
     <transition>
@@ -671,6 +703,37 @@
                     <y>1</y>
                     <rows>1</rows>
                     <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>headers_sort_mode_active</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>headers_sort_mode_direction</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>4</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
                     <offset>0</offset>
                     <template>material</template>
                     <appearance>outline</appearance>
