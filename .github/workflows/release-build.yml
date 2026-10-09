@@ -115,7 +115,7 @@ jobs:
           server-password: MAVEN_PASSWORD
 
       - name: Publish package
-        run: mvn -DskipTests=true --batch-mode -P ossrh-publish -Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }} deploy
+        run: mvn deploy -DskipTests=true -B -P ossrh-publish -Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
