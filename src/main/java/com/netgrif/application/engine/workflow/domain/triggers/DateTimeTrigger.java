@@ -1,6 +1,8 @@
 package com.netgrif.application.engine.workflow.domain.triggers;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeParseException;
 
 /**
@@ -21,7 +23,13 @@ public class DateTimeTrigger extends TimeTrigger {
      */
     public DateTimeTrigger(String timeString) throws DateTimeParseException {
         super(timeString);
-        startDate = LocalDateTime.parse(timeString);
+        try {
+            startDate = LocalDateTime.parse(timeString);
+        } catch (DateTimeParseException e) {
+            startDate = OffsetDateTime.parse(timeString)
+                    .atZoneSameInstant(ZoneId.systemDefault())
+                    .toLocalDateTime();
+        }
     }
 
     @Override
