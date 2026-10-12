@@ -389,6 +389,7 @@
 					if (editIsAssigned) {
 						cancelTask("edit")
 					}
+					Frontend.readOnlyBuilder()
 					]]>
 				</action>
 			</actions>
