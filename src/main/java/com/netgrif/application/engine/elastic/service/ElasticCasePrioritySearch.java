@@ -10,7 +10,6 @@ import java.util.Map;
 @Service
 public class ElasticCasePrioritySearch implements IElasticCasePrioritySearch {
 
-
     @Autowired
     protected ElasticCaseSearchConfiguration elasticCaseSearchConfiguration;
 

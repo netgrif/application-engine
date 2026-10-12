@@ -389,6 +389,11 @@
         <title name="case_inherit_allowed_nets">Inherit allowed nets?</title>
         <init>true</init>
     </data>
+    <data type="stringCollection">
+        <id>case_fulltext_fields</id>
+        <title name="case_fulltext_fields">Full-text fields</title>
+        <desc name="case_fulltext_fields_desc">Fields to consider in a full-text search</desc>
+    </data>
 
     <!-- I18NS -->
     <i18n locale="sk">
@@ -440,6 +445,8 @@
         <i18nString name="case_headers_sort_mode_active">Aktívny stĺpec pre zoradenie</i18nString>
         <i18nString name="case_headers_sort_mode_active_desc">Napríklad: meta-title</i18nString>
         <i18nString name="model_title">Konfigurácia zobrazenia prípadov</i18nString>
+        <i18nString name="case_fulltext_fields">Full-text polia</i18nString>
+        <i18nString name="case_fulltext_fields_desc">Polia, ktoré sa použijú pre full-text vyhľadávanie</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="create_case_button_title">Schaltflächentitel "Neuer Fall"</i18nString>
@@ -490,6 +497,8 @@
         <i18nString name="case_headers_sort_mode_active">Aktive Spalte zum Sortieren</i18nString>
         <i18nString name="case_headers_sort_mode_active_desc">Beispiel: meta-title</i18nString>
         <i18nString name="model_title">Konfiguration der Fallansicht</i18nString>
+        <i18nString name="case_fulltext_fields">Volltextfelder</i18nString>
+        <i18nString name="case_fulltext_fields_desc">Bei der Volltextsuche zu berücksichtigende Felder</i18nString>
     </i18n>
 
     <transition>
@@ -563,7 +572,7 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>case_show_more_menu</id>
+                <id>case_fulltext_fields</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
@@ -577,7 +586,7 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>case_allow_export</id>
+                <id>case_show_more_menu</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
@@ -587,7 +596,7 @@
                     <rows>1</rows>
                     <cols>1</cols>
                     <template>material</template>
-                    <appearance>standard</appearance>
+                    <appearance>outline</appearance>
                 </layout>
             </dataRef>
             <dataRef>
@@ -675,13 +684,27 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>advanced_content_form</id>
+                <id>case_allow_export</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
                 <layout>
                     <x>0</x>
                     <y>3</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>standard</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>advanced_content_form</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>4</y>
                     <rows>1</rows>
                     <cols>3</cols>
                     <template>material</template>
@@ -1513,6 +1536,20 @@
                 <layout>
                     <x>0</x>
                     <y>25</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_fulltext_fields</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>26</y>
                     <rows>1</rows>
                     <cols>1</cols>
                     <template>material</template>
