@@ -12,7 +12,6 @@ import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGener
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate;
 import com.netgrif.application.engine.pfql.service.QueryLangEvaluator;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -20,10 +19,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 
 @Configuration
-@RequiredArgsConstructor
 public class PrototypesConfiguration {
-
-    private final IUserService userService;
 
     @Bean("importer")
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -70,7 +66,7 @@ public class PrototypesConfiguration {
     @Bean("queryLangEvaluator")
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     @ConditionalOnMissingBean(QueryLangEvaluator.class)
-    public QueryLangEvaluator queryLangEvaluator() {
+    public QueryLangEvaluator queryLangEvaluator(IUserService userService) {
         return new QueryLangEvaluator(userService);
     }
 }
