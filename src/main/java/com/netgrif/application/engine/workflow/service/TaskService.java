@@ -619,15 +619,19 @@ public class TaskService implements ITaskService {
         }
     }
 
-    protected void scheduleTaskExecution(Task task, LocalDateTime time, Case useCase) {
-        log.info("[" + useCase.getStringId() + "]: Task " + task.getTitle() + " scheduled to run at " + time.toString());
+    protected void scheduleTaskExecution(Task task, TimeTrigger trigger, Case useCase) {
+        Date runAt = trigger.getStartInstant() != null
+                ? Date.from(trigger.getStartInstant())
+                : DateUtils.localDateTimeToDate(trigger.getStartDate());
+        log.info("[{}]: Task {} scheduled to run at {}", useCase.getStringId(), task.getTitle(), runAt);
         scheduler.schedule(() -> {
             try {
                 executeTransition(task, useCase);
             } catch (Exception e) {
-                log.info("[" + useCase.getStringId() + "]: Scheduled task [" + task.getTitle() + "] of case [" + useCase.getTitle() + "] could not be executed: " + e);
+                log.info("[{}]: Scheduled task [{}] of case [{}] could not be executed:", useCase.getStringId(),
+                        task.getTitle(), useCase.getTitle(), e);
             }
-        }, DateUtils.localDateTimeToDate(time));
+        }, runAt);
     }
 
     @Override
@@ -854,7 +858,7 @@ public class TaskService implements ITaskService {
 
             if (taskTrigger instanceof TimeTrigger) {
                 TimeTrigger timeTrigger = (TimeTrigger) taskTrigger;
-                scheduleTaskExecution(task, timeTrigger.getStartDate(), useCase);
+                scheduleTaskExecution(task, timeTrigger, useCase);
             }
         }
         ProcessRole defaultRole = processRoleService.defaultRole();
