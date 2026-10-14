@@ -33,7 +33,7 @@ There are three core concepts in the authority system:
 |----------------------|---------------------------------------------------------------------------------------------------------|
 | `AuthorizingObject`  | An enum value describing *what* is being protected (e.g. `PROCESS_UPLOAD`).                              |
 | `Authority`          | A persisted entity (stored in MongoDB) created from an authorizing object. It implements Spring Security's `GrantedAuthority`. |
-| `@Authorize`         | An annotation placed on a method or a class that requires a user to hold a given authority and/or satisfy an expression. |
+| `@Authorize`         | An annotation placed on a method that requires a user to hold a given authority and/or satisfy an expression. |
 
 At application startup, an `Authority` entity is created for each `AuthorizingObject`
 value (and for every custom authorizing object). Users are then granted a set of
