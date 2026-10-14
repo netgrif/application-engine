@@ -26,7 +26,9 @@ public class DateTimeTrigger extends TimeTrigger {
         try {
             startDate = LocalDateTime.parse(timeString);
         } catch (DateTimeParseException e) {
-            startDate = OffsetDateTime.parse(timeString)
+            OffsetDateTime offsetDateTime = OffsetDateTime.parse(timeString);
+            startInstant = offsetDateTime.toInstant();
+            startDate = offsetDateTime
                     .atZoneSameInstant(ZoneId.systemDefault())
                     .toLocalDateTime();
         }
