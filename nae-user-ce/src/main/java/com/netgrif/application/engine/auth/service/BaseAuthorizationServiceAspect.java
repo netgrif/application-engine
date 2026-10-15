@@ -4,7 +4,9 @@ package com.netgrif.application.engine.auth.service;
 import com.netgrif.application.engine.adapter.spring.utils.NaeReflectionUtils;
 import com.netgrif.application.engine.objects.annotations.Authorizations;
 import com.netgrif.application.engine.objects.annotations.Authorize;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -21,7 +23,11 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.expression.ExpressionUtils;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Arrays;
 import java.util.List;
@@ -57,6 +63,11 @@ public class BaseAuthorizationServiceAspect {
      * */
     @Around(value = "@annotation(authorizations)", argNames = "joinPoint,authorizations")
     protected final Object authorize(ProceedingJoinPoint joinPoint, Authorizations authorizations) throws Throwable {
+        if (!isHttpRequest()) {
+            LoggedUser loggedSystem = ActorTransformer.toLoggedUser(userService.getSystem());
+            UsernamePasswordAuthenticationToken
+            SecurityContextHolder.getContext().setAuthentication();
+        }
         boolean result = false;
         if (authorizations.value() != null) {
             for (Authorize authorize : authorizations.value()) {
@@ -136,4 +147,7 @@ public class BaseAuthorizationServiceAspect {
         }
     }
 
+    public static boolean isHttpRequest() {
+        return RequestContextHolder.getRequestAttributes() instanceof ServletRequestAttributes;
+    }
 }

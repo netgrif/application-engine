@@ -529,6 +529,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "ROLE_ASSIGN_TO_USER")
     public AbstractUser addRole(AbstractUser user, ProcessResourceId roleStringId) {
         ProcessRole role = processRoleService.findById(roleStringId);
         user.addProcessRole(role);
@@ -547,12 +549,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "ROLE_ASSIGN_TO_USER")
     public AbstractUser removeRoles(AbstractUser user, Collection<ProcessRole> processRoles) {
         processRoles.forEach(user::removeProcessRole);
         return saveUser(user);
     }
 
     @Override
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "ROLE_ASSIGN_TO_USER")
     public AbstractUser removeRole(AbstractUser user, ProcessRole role) {
         user.removeProcessRole(role);
         return saveUser(user);

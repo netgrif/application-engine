@@ -1163,51 +1163,59 @@ class ActionDelegate extends DelegateExpando {
         refs.find { it.transitionId == transitionId }.stringId
     }
 
-    @Authorize(authority = ["ROLE_ASSIGN_TO_USER", "ADMIN"])
+    @Authorize(authority = ["ADMIN"])
+    @Authorize(authority = ["ROLE_ASSIGN_TO_USER"])
     AbstractUser assignRole(String roleMongoId, AbstractUser user = userService.loggedUser) {
         AbstractUser actualUser = userService.addRole(user, roleMongoId)
         return actualUser
     }
 
-    @Authorize(authority = ["ROLE_ASSIGN_TO_USER", "ADMIN"])
+    @Authorize(authority = ["ADMIN"])
+    @Authorize(authority = ["ROLE_ASSIGN_TO_USER"])
     AbstractUser assignRole(String roleId, String netId, AbstractUser user = userService.loggedUser, Pageable pageable = Pageable.unpaged()) {
         List<PetriNet> nets = petriNetService.getByIdentifier(netId, pageable).content
         nets.forEach({ net -> user = assignRole(roleId, net, user) })
         return user
     }
 
-    @Authorize(authority = ["ROLE_ASSIGN_TO_USER", "ADMIN"])
+    @Authorize(authority = ["ADMIN"])
+    @Authorize(authority = ["ROLE_ASSIGN_TO_USER"])
     AbstractUser assignRole(String roleId, PetriNet net, AbstractUser user = userService.loggedUser) {
         AbstractUser actualUser = userService.addRole(user, net.roles.values().find { role -> role.importId == roleId }.stringId)
         return actualUser
     }
 
-    @Authorize(authority = ["ROLE_ASSIGN_TO_USER", "ADMIN"])
+    @Authorize(authority = ["ADMIN"])
+    @Authorize(authority = ["ROLE_ASSIGN_TO_USER"])
     AbstractUser assignRole(String roleId, String netId, Version version, AbstractUser user = userService.loggedUser) {
         PetriNet net = petriNetService.getPetriNet(netId, version)
         return assignRole(roleId, net, user)
     }
 
-    @Authorize(authority = ["ROLE_ASSIGN_TO_USER", "ADMIN"])
+    @Authorize(authority = ["ADMIN"])
+    @Authorize(authority = ["ROLE_ASSIGN_TO_USER"])
     AbstractUser removeRole(String roleMongoId, AbstractUser user = userService.loggedUser) {
         AbstractUser actualUser = userService.removeRole(user, roleMongoId)
         return actualUser
     }
 
-    @Authorize(authority = ["ROLE_ASSIGN_TO_USER", "ADMIN"])
+    @Authorize(authority = ["ADMIN"])
+    @Authorize(authority = ["ROLE_ASSIGN_TO_USER"])
     AbstractUser removeRole(String roleId, String netId, AbstractUser user = userService.loggedUser, Pageable pageable = Pageable.unpaged()) {
         List<PetriNet> nets = petriNetService.getByIdentifier(netId, pageable).content
         nets.forEach({ net -> user = removeRole(roleId, net, user) })
         return user
     }
 
-    @Authorize(authority = ["ROLE_ASSIGN_TO_USER", "ADMIN"])
+    @Authorize(authority = ["ADMIN"])
+    @Authorize(authority = ["ROLE_ASSIGN_TO_USER"])
     AbstractUser removeRole(String roleId, PetriNet net, AbstractUser user = userService.loggedUser) {
         AbstractUser actualUser = userService.removeRole(user, net.roles.values().find { role -> role.importId == roleId }.stringId)
         return actualUser
     }
 
-    @Authorize(authority = ["ROLE_ASSIGN_TO_USER", "ADMIN"])
+    @Authorize(authority = ["ADMIN"])
+    @Authorize(authority = ["ROLE_ASSIGN_TO_USER"])
     AbstractUser removeRole(String roleId, String netId, Version version, AbstractUser user = userService.loggedUser) {
         PetriNet net = petriNetService.getPetriNet(netId, version)
         return removeRole(roleId, net, user)
