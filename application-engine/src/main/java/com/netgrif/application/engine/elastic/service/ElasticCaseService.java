@@ -15,7 +15,6 @@ import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
 import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
-import com.netgrif.application.engine.elastic.service.executors.Executor;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCasePrioritySearch;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
@@ -57,7 +56,6 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
     protected final ElasticCaseRepository repository;
     protected final ElasticsearchTemplate template;
-    protected final Executor executors;
     protected DataConfigurationProperties.ElasticsearchProperties elasticProperties;
     protected IPetriNetService petriNetService;
     protected IWorkflowService workflowService;
@@ -68,7 +66,6 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
     public ElasticCaseService(ElasticCaseRepository repository,
                               ElasticsearchTemplate template,
-                              Executor executors,
                               DataConfigurationProperties.ElasticsearchProperties elasticProperties,
                               @Lazy IPetriNetService petriNetService,
                               @Lazy IWorkflowService workflowService,
@@ -77,7 +74,6 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
                               ElasticsearchClient elasticsearchClient) {
         this.repository = repository;
         this.template = template;
-        this.executors = executors;
         this.elasticProperties = elasticProperties;
         this.petriNetService = petriNetService;
         this.workflowService = workflowService;

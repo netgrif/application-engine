@@ -2,42 +2,35 @@ package com.netgrif.application.engine.auth.service;
 
 
 import com.netgrif.application.engine.adapter.spring.utils.NaeReflectionUtils;
+import com.netgrif.application.engine.auth.context.CallOriginResolver;
 import com.netgrif.application.engine.objects.annotations.Authorizations;
 import com.netgrif.application.engine.objects.annotations.Authorize;
-import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.expression.BeanFactoryResolver;
-import org.springframework.core.DefaultParameterNameDiscoverer;
-import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.expression.EvaluationException;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.expression.ExpressionUtils;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-
 /**
- * The aspect service for authorization system.
- * */
+ * Aspect service providing method-level authorization checks via {@link Authorize} and {@link Authorizations} annotations.
+ * It intercepts annotated method executions, evaluates SpEL expressions within the execution context,
+ * and verifies authority requirements against the currently authenticated user.
+ */
 @Slf4j
 @Aspect
 @Service
@@ -49,24 +42,38 @@ public class BaseAuthorizationServiceAspect {
 
     private final BeanFactoryResolver beanResolver;
 
+    private final CallOriginResolver callOriginResolver;
+
+    /**
+     * Creates a new instance of {@link BaseAuthorizationServiceAspect}.
+     *
+     * @param applicationContext the Spring application context used to resolve beans in SpEL expressions
+     * @param userService        the service used to retrieve the currently authenticated user
+     * @param callOriginResolver resolver to determine if the call originates from a web request
+     */
     public BaseAuthorizationServiceAspect(ApplicationContext applicationContext,
-                                          UserService userService) {
+                                          UserService userService,
+                                          CallOriginResolver callOriginResolver) {
         this.userService = userService;
         parser = new SpelExpressionParser();
         beanResolver = new BeanFactoryResolver(applicationContext);
+        this.callOriginResolver = callOriginResolver;
     }
 
     /**
-     * The advice that handles incoming authorization requests from join points defined with @annotation(authorization)
-     * @param joinPoint the incoming method invocation join point
-     * @param authorizations the incoming annotation with authorization parameters
-     * */
+     * Advice that handles incoming authorization requests from join points annotated with {@link Authorizations}.
+     * Authorization succeeds if at least one of the contained {@link Authorize} annotations evaluates to true.
+     *
+     * @param joinPoint      the incoming method invocation join point
+     * @param authorizations the annotation containing multiple authorization rules
+     * @return the result of the method execution
+     * @throws Throwable            if the underlying method throws an exception
+     * @throws AccessDeniedException if the user does not satisfy the authorization rules
+     */
     @Around(value = "@annotation(authorizations)", argNames = "joinPoint,authorizations")
     protected final Object authorize(ProceedingJoinPoint joinPoint, Authorizations authorizations) throws Throwable {
-        if (!isHttpRequest()) {
-            LoggedUser loggedSystem = ActorTransformer.toLoggedUser(userService.getSystem());
-            UsernamePasswordAuthenticationToken
-            SecurityContextHolder.getContext().setAuthentication();
+        if (!callOriginResolver.isRequest()) {
+            return joinPoint.proceed();
         }
         boolean result = false;
         if (authorizations.value() != null) {
@@ -82,12 +89,19 @@ public class BaseAuthorizationServiceAspect {
     }
 
     /**
-     * The advice that handles incoming authorization requests from join points defined with @annotation(authorization)
+     * Advice that handles incoming authorization requests from join points annotated with {@link Authorize}.
+     *
      * @param joinPoint the incoming method invocation join point
-     * @param authorize the incoming annotation with authorization parameter
-     * */
+     * @param authorize the authorization rule annotation
+     * @return the result of the method execution
+     * @throws Throwable            if the underlying method throws an exception
+     * @throws AccessDeniedException if the user does not satisfy the authorization rule
+     */
     @Around(value = "@annotation(authorize)", argNames = "joinPoint,authorize")
     protected final Object authorize(ProceedingJoinPoint joinPoint, Authorize authorize) throws Throwable {
+        if (!callOriginResolver.isRequest()) {
+            return joinPoint.proceed();
+        }
         boolean result = false;
         if (authorize != null) {
             result = isAllowedByExpression(joinPoint, authorize.expression()) && hasAnyAuthority(authorize.authority());
@@ -100,10 +114,11 @@ public class BaseAuthorizationServiceAspect {
     }
 
     /**
-     * Checks whether the currently logged user has all the input authorizing objects.
-     * @param authorizingObject to be checked for user
-     * @return boolean if user has all the authorizing objects.
-     * */
+     * Checks whether the currently logged-in user possesses all specified authorities.
+     *
+     * @param authorizingObject array of required authorities
+     * @return {@code true} if the user has all specified authorities or if the array is empty/null, {@code false} otherwise
+     */
     public final boolean hasAnyAuthority(String[] authorizingObject) {
         if (authorizingObject == null || authorizingObject.length == 0 || Arrays.stream(authorizingObject).allMatch(String::isEmpty))
             return true;
@@ -112,14 +127,13 @@ public class BaseAuthorizationServiceAspect {
     }
 
     /**
-     * Parser and evaluator function for Spring-EL expression. It creates parser for SpEL expression, context for it,
-     * and evaluates the authorization SpEL expression. It resolves the arguments of invoked method and sets as
-     * variables into the evaluation context, because  in the SpEL expression there can be method arguments as variables
-     * alongside beans.
-     * @param joinPoint the incoming method invocation join point
-     * @param expression the SpEL expression
-     * @return the evaluated value, whether the SpEL expression returns true or not
-     * */
+     * Parses and evaluates a SpEL expression within the context of the invoked method.
+     * Resolves method arguments and registers them as variables in the evaluation context alongside Spring beans.
+     *
+     * @param joinPoint  the incoming method invocation join point
+     * @param expression the SpEL expression to evaluate
+     * @return {@code true} if the expression evaluates to true or is empty/null, {@code false} otherwise
+     */
     protected boolean isAllowedByExpression(ProceedingJoinPoint joinPoint, String expression) {
         if (expression == null || expression.isEmpty()) {
             return true;
@@ -145,9 +159,5 @@ public class BaseAuthorizationServiceAspect {
             log.warn("Failed to parse expression '{}'.", expression);
             return false;
         }
-    }
-
-    public static boolean isHttpRequest() {
-        return RequestContextHolder.getRequestAttributes() instanceof ServletRequestAttributes;
     }
 }

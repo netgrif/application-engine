@@ -2,6 +2,7 @@ package com.netgrif.application.engine.auth
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.adapter.spring.auth.domain.User
+import com.netgrif.application.engine.auth.context.OriginFilter
 import com.netgrif.application.engine.auth.service.GroupService
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser
@@ -129,6 +130,7 @@ class WorkflowAuthorizationServiceTest {
         mvc = MockMvcBuilders
                 .webAppContextSetup(wac)
                 .apply(springSecurity())
+                .addFilters(new OriginFilter())
                 .build()
 
         ImportPetriNetEventOutcome net = petriNetService.importPetriNet(ImportPetriNetParams.with()

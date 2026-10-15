@@ -2,6 +2,7 @@ package com.netgrif.application.engine.petrinet.domain.roles
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.adapter.spring.auth.domain.User
+import com.netgrif.application.engine.auth.context.OriginFilter
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
@@ -88,6 +89,7 @@ class ProcessRoleTest {
         mvc = MockMvcBuilders
                 .webAppContextSetup(wac)
                 .apply(springSecurity())
+                .addFilters(new OriginFilter())
                 .build()
 
         def net = petriNetService.importPetriNet(new ImportPetriNetParams(new FileInputStream("src/test/resources/rolref_view.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))

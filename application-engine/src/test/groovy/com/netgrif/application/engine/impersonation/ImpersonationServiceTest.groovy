@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.impersonation
 
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.auth.context.OriginFilter
 import com.netgrif.application.engine.auth.service.AuthorityService
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
@@ -123,7 +124,7 @@ class ImpersonationServiceTest {
         testHelper.truncateDbs()
 
         SessionRepositoryFilter<?> filter = wac.getBean(SessionRepositoryFilter.class);
-        mvc = MockMvcBuilders.webAppContextSetup(wac).addFilters(filter).apply(springSecurity()).build()
+        mvc = MockMvcBuilders.webAppContextSetup(wac).addFilters(filter, new OriginFilter()).apply(springSecurity()).build()
 
         testNet = helper.createNet("impersonation_test.xml").get()
         def authority = authorityService.getOrCreate(Authority.user)

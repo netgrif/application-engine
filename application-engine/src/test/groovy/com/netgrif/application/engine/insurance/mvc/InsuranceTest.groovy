@@ -4,6 +4,7 @@ import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.adapter.spring.auth.domain.User
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
+import com.netgrif.application.engine.auth.context.OriginFilter
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
@@ -130,6 +131,7 @@ class InsuranceTest {
         mvc = MockMvcBuilders
                 .webAppContextSetup(wac)
                 .apply(springSecurity())
+                .addFilters(new OriginFilter())
                 .build()
 
         def net = petriNetService.importPetriNet(new ImportPetriNetParams(new FileInputStream("src/test/resources/insurance_portal_demo_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))

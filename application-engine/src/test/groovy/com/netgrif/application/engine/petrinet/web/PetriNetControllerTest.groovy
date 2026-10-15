@@ -2,6 +2,7 @@ package com.netgrif.application.engine.petrinet.web
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl
+import com.netgrif.application.engine.auth.context.OriginFilter
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
@@ -94,6 +95,7 @@ class PetriNetControllerTest {
         mvc = MockMvcBuilders
                 .webAppContextSetup(wac)
                 .apply(springSecurity())
+                .addFilters(new OriginFilter())
                 .build()
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
