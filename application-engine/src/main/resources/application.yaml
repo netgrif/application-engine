@@ -86,8 +86,8 @@ netgrif:
         expiration: 900000
         algorithm: RSA
         private-key: file:src/main/resources/certificates/private.der
-      server-patterns: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/api/public/**,/v3/api-docs/public,/manage/health
-      anonymous-exceptions: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/manage/health
+      server-patterns: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/api/public/**,/v3/api-docs/public,/manage/health,/manage/health/liveness,/manage/health/readiness
+      anonymous-exceptions: /api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/manage/health,/manage/health/liveness,/manage/health/readiness
       providers: NetgrifBasicAuthenticationProvider
     swagger:
       enabled: false
