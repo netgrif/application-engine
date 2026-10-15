@@ -195,6 +195,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "USER_CREATE")
     public AbstractUser createUser(AbstractUser user, String realmId) {
         log.info("Creating user [{}] in realm [{}]", user.getUsername(), realmId);
         setPassword(user, user.getPassword());
@@ -220,6 +222,8 @@ public class UserServiceImpl implements UserService {
 
     // TODO JOFO: auth methods no longer exists ... use credentials?
     @Override
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "USER_CREATE")
     public User createUserFromThirdParty(String username, String email, String firstName, String lastName, String realmId, String authMethod) {
         log.info("Creating user [{}] from third-party auth [{}] in realm [{}] without password", username, authMethod, realmId);
         User user = initializeNewUser(username, email, firstName, lastName, "N/A", realmId);
@@ -358,6 +362,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "USER_DELETE")
     public void deleteUser(AbstractUser user) {
         log.warn("Deleting user [{}]", user.getUsername());
         String collectionName = collectionNameProvider.getCollectionNameForRealm(user.getRealmId());
@@ -472,6 +478,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "AUTHORITY_ASSIGN_TO_USER")
     public AbstractUser assignAuthority(String userId, String realmId, String authorityId) {
         AbstractUser user = findById(userId, realmId);
         Authority authority = authorityService.getOne(authorityId);
