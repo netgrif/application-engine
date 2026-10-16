@@ -2,6 +2,7 @@ package com.netgrif.application.engine.elastic
 
 import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.auth.context.OriginFilter
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
@@ -102,6 +103,7 @@ class ElasticSearchTest {
         mvc = MockMvcBuilders
                 .webAppContextSetup(wac)
                 .apply(springSecurity())
+                .addFilters(new OriginFilter())
                 .build()
         testHelper.truncateDbs()
 

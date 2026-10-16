@@ -72,6 +72,15 @@ public interface UserService {
      */
     Optional<AbstractUser> findUserByUsername(String username, String realmName);
 
+    /**
+     * Finds a user by email within a specific realm.
+     *
+     * @param email the email address to search for
+     * @param realmId the id of the realm
+     * @return an Optional containing the user if found, otherwise empty
+     */
+    Optional<AbstractUser> findUserByEmail(String email, String realmId);
+
     Page<AbstractUser> findAllUsersByQuery(Query query, String realmName, Pageable pageable);
 
     /**

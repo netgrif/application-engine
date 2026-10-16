@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.auth
 
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.auth.context.OriginFilter
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties
 import com.netgrif.application.engine.objects.auth.domain.Authority
@@ -59,6 +60,7 @@ class LoginAttemptsTest {
         mvc = MockMvcBuilders
                 .webAppContextSetup(wac)
                 .apply(springSecurity())
+                .addFilters(new OriginFilter())
                 .build()
 
         auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])

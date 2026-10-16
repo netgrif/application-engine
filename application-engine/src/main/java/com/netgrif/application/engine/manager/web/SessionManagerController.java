@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.manager.web;
 
+import com.netgrif.application.engine.objects.annotations.Authorize;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.manager.web.body.request.LogoutRequest;
@@ -33,7 +34,7 @@ public class SessionManagerController {
     @Autowired
     private ISessionManagerService sessionManagerService;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @Authorize(authority = "ADMIN")
     @Operation(summary = "Get All logged users",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -47,7 +48,7 @@ public class SessionManagerController {
         return new AllLoggedUsersResponse(loggedUsers);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @Authorize(authority = "ADMIN")
     @Operation(summary = "Logout current user",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -62,7 +63,7 @@ public class SessionManagerController {
         return new MessageLogoutResponse(true);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @Authorize(authority = "ADMIN")
     @Operation(summary = "Logout all user",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "BasicAuth")})

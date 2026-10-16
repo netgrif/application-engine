@@ -5,6 +5,7 @@ import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRol
 import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QTask
+import com.netgrif.application.engine.auth.service.AuthorityService
 import com.netgrif.application.engine.auth.service.GroupService
 import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl
 import com.netgrif.application.engine.auth.service.UserService
@@ -29,8 +30,12 @@ import com.netgrif.application.engine.integration.modules.ModuleHolder
 import com.netgrif.application.engine.mail.domain.MailDraft
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
 import com.netgrif.application.engine.mail.interfaces.IMailService
+import com.netgrif.application.engine.objects.annotations.Authorize
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
+import com.netgrif.application.engine.objects.auth.domain.Authority
+import com.netgrif.application.engine.objects.auth.dto.AuthoritySearchDto
+import com.netgrif.application.engine.objects.auth.dto.GroupSearchDto
 import com.netgrif.application.engine.menu.services.interfaces.DashboardItemService
 import com.netgrif.application.engine.menu.services.interfaces.DashboardManagementService
 import com.netgrif.application.engine.menu.services.interfaces.IMenuItemService
@@ -156,6 +161,9 @@ class ActionDelegate extends DelegateExpando {
 
     @Autowired
     GroupService groupService
+
+    @Autowired
+    AuthorityService authorityService
 
     @Autowired
     ProcessRoleService processRoleService
@@ -1155,43 +1163,59 @@ class ActionDelegate extends DelegateExpando {
         refs.find { it.transitionId == transitionId }.stringId
     }
 
+    @Authorize(authority = ["ADMIN"])
+    @Authorize(authority = ["ROLE_ASSIGN_TO_USER"])
     AbstractUser assignRole(String roleMongoId, AbstractUser user = userService.loggedUser) {
         AbstractUser actualUser = userService.addRole(user, roleMongoId)
         return actualUser
     }
 
+    @Authorize(authority = ["ADMIN"])
+    @Authorize(authority = ["ROLE_ASSIGN_TO_USER"])
     AbstractUser assignRole(String roleId, String netId, AbstractUser user = userService.loggedUser, Pageable pageable = Pageable.unpaged()) {
         List<PetriNet> nets = petriNetService.getByIdentifier(netId, pageable).content
         nets.forEach({ net -> user = assignRole(roleId, net, user) })
         return user
     }
 
+    @Authorize(authority = ["ADMIN"])
+    @Authorize(authority = ["ROLE_ASSIGN_TO_USER"])
     AbstractUser assignRole(String roleId, PetriNet net, AbstractUser user = userService.loggedUser) {
         AbstractUser actualUser = userService.addRole(user, net.roles.values().find { role -> role.importId == roleId }.stringId)
         return actualUser
     }
 
+    @Authorize(authority = ["ADMIN"])
+    @Authorize(authority = ["ROLE_ASSIGN_TO_USER"])
     AbstractUser assignRole(String roleId, String netId, Version version, AbstractUser user = userService.loggedUser) {
         PetriNet net = petriNetService.getPetriNet(netId, version)
         return assignRole(roleId, net, user)
     }
 
+    @Authorize(authority = ["ADMIN"])
+    @Authorize(authority = ["ROLE_ASSIGN_TO_USER"])
     AbstractUser removeRole(String roleMongoId, AbstractUser user = userService.loggedUser) {
         AbstractUser actualUser = userService.removeRole(user, roleMongoId)
         return actualUser
     }
 
+    @Authorize(authority = ["ADMIN"])
+    @Authorize(authority = ["ROLE_ASSIGN_TO_USER"])
     AbstractUser removeRole(String roleId, String netId, AbstractUser user = userService.loggedUser, Pageable pageable = Pageable.unpaged()) {
         List<PetriNet> nets = petriNetService.getByIdentifier(netId, pageable).content
         nets.forEach({ net -> user = removeRole(roleId, net, user) })
         return user
     }
 
+    @Authorize(authority = ["ADMIN"])
+    @Authorize(authority = ["ROLE_ASSIGN_TO_USER"])
     AbstractUser removeRole(String roleId, PetriNet net, AbstractUser user = userService.loggedUser) {
         AbstractUser actualUser = userService.removeRole(user, net.roles.values().find { role -> role.importId == roleId }.stringId)
         return actualUser
     }
 
+    @Authorize(authority = ["ADMIN"])
+    @Authorize(authority = ["ROLE_ASSIGN_TO_USER"])
     AbstractUser removeRole(String roleId, String netId, Version version, AbstractUser user = userService.loggedUser) {
         PetriNet net = petriNetService.getPetriNet(netId, version)
         return removeRole(roleId, net, user)
@@ -1414,10 +1438,16 @@ class ActionDelegate extends DelegateExpando {
             changeUserByEmail(email, "email", cl)
         },
          name   : { cl ->
-             changeUserByEmail(email, "name", cl)
+             changeUserByEmail(email, "firstName", cl)
+         },
+         firstName   : { cl ->
+             changeUserByEmail(email, "firstName", cl)
          },
          surname: { cl ->
-             changeUserByEmail(email, "surname", cl)
+             changeUserByEmail(email, "lastName", cl)
+         },
+         lastName   : { cl ->
+             changeUserByEmail(email, "lastName", cl)
          },
          tel    : { cl ->
              changeUserByEmail(email, "tel", cl)
@@ -1430,10 +1460,16 @@ class ActionDelegate extends DelegateExpando {
             changeUser(id, "email", cl)
         },
          name   : { cl ->
-             changeUser(id, "name", cl)
+             changeUser(id, "firstName", cl)
+         },
+         firstName   : { cl ->
+             changeUser(id, "firstName", cl)
          },
          surname: { cl ->
-             changeUser(id, "surname", cl)
+             changeUser(id, "lastName", cl)
+         },
+         lastName   : { cl ->
+             changeUser(id, "lastName", cl)
          },
          tel    : { cl ->
              changeUser(id, "tel", cl)
@@ -1446,10 +1482,16 @@ class ActionDelegate extends DelegateExpando {
             changeUser(user, "email", cl)
         },
          name   : { cl ->
-             changeUser(user, "name", cl)
+             changeUser(user, "firstName", cl)
+         },
+         firstName   : { cl ->
+             changeUser(user, "firstName", cl)
          },
          surname: { cl ->
-             changeUser(user, "surname", cl)
+             changeUser(user, "lastName", cl)
+         },
+         lastName   : { cl ->
+             changeUser(user, "lastName", cl)
          },
          tel    : { cl ->
              changeUser(user, "tel", cl)
@@ -1458,7 +1500,7 @@ class ActionDelegate extends DelegateExpando {
     }
 
     def changeUserByEmail(String email, String attribute, def cl) {
-        Optional<AbstractUser> userOptional = userService.findUserByUsername(email, null)
+        Optional<AbstractUser> userOptional = userService.findUserByEmail(email, null)
         if (!userOptional.isPresent()) {
             log.error("Cannot find user with email [" + email + "]")
             return
@@ -1472,6 +1514,9 @@ class ActionDelegate extends DelegateExpando {
         changeUser(user, attribute, cl)
     }
 
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "USER_EDIT_ALL")
+    @Authorize(authority = "USER_EDIT_SELF", expression = "@userService.getLoggedUser().username.equals(#arg0.username)")
     def changeUser(AbstractUser user, String attribute, def cl) {
         if (user == null) {
             log.error("Cannot find user.")
@@ -3054,5 +3099,128 @@ class ActionDelegate extends DelegateExpando {
         StorageField<?> storageField = (StorageField<?>) field
         IStorageService storageService = storageResolverService.resolve(storageField.storageType)
         return storageService.getPath(aCase.stringId, fileFieldId, fileName)
+    }
+
+    /**
+     * Returns page of all authorities.
+     *
+     * @param pageable page configuration, by default the whole first backend page is returned
+     * @return page of {@link Authority} objects
+     */
+    Page<Authority> findAllAuthorities(Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize())) {
+        return authorityService.findAll(pageable)
+    }
+
+    /**
+     * Returns authority of given name. If the authority does not exist, it is created.
+     *
+     * @param name name of the authority
+     * @return existing or newly created {@link Authority}
+     */
+    Authority getOrCreateAuthority(String name) {
+        return authorityService.getOrCreate(name)
+    }
+
+    /**
+     * Returns authority by its database id.
+     *
+     * @param id id of the authority
+     * @return found {@link Authority}
+     */
+    Authority getAuthority(String id) {
+        return authorityService.getOne(id)
+    }
+
+    /**
+     * Returns authority of given name. Throws an exception if such authority does not exist.
+     *
+     * @param name name of the authority
+     * @return found {@link Authority}
+     */
+    Authority getAuthorityByName(String name) {
+        return authorityService.findByName(name)
+    }
+
+    /**
+     * Returns authority of given name or null if such authority does not exist.
+     *
+     * @param name name of the authority
+     * @return found {@link Authority} or null
+     */
+    Authority findAuthorityByName(String name) {
+        Optional<Authority> authority = authorityService.findOptionalByName(name)
+        if (authority.isEmpty()) {
+            log.warn("Cannot find authority with name [" + name + "]")
+            return null
+        }
+        return authority.get()
+    }
+
+    /**
+     * Returns authorities of given ids.
+     *
+     * @param ids ids of the authorities
+     * @param pageable page configuration, by default the whole first backend page is returned
+     * @return list of found {@link Authority} objects
+     */
+    List<Authority> findAuthoritiesByIds(Collection<String> ids, Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize())) {
+        if (ids == null || ids.isEmpty()) {
+            return []
+        }
+        return authorityService.findAllByIds(ids, pageable).content
+    }
+
+    /**
+     * Returns authorities of given scope. Scope contains authorities of the same name prefix, f.e. <code>"PROCESS*"</code>
+     * returns authorities PROCESS_UPLOAD, PROCESS_DELETE etc. Scope <code>"*"</code> returns every authority.
+     *
+     * @param scope scope of the authorities
+     * @return list of found {@link Authority} objects
+     */
+    List<Authority> findAuthoritiesByScope(String scope) {
+        return authorityService.findByScope(scope)
+    }
+
+    /**
+     * Searches authorities by full text query on the authority name.
+     *
+     * @param fullText text to be searched for, null or empty text returns all authorities
+     * @param pageable page configuration, by default the whole first backend page is returned
+     * @return list of found {@link Authority} objects
+     */
+    List<Authority> searchAuthorities(String fullText, Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize())) {
+        AuthoritySearchDto searchDto = new AuthoritySearchDto()
+        searchDto.setFullText(fullText)
+        return authorityService.search(searchDto, pageable).content
+    }
+
+    /**
+     * Deletes authority of given name. Nothing happens if such authority does not exist.
+     *
+     * @param name name of the authority
+     */
+    void deleteAuthority(String name) {
+        authorityService.delete(name)
+    }
+
+    /**
+     * @return set of default authorities of a user
+     */
+    Set<Authority> defaultUserAuthorities() {
+        return authorityService.getDefaultUserAuthorities()
+    }
+
+    /**
+     * @return set of default authorities of an anonymous user
+     */
+    Set<Authority> defaultAnonymousAuthorities() {
+        return authorityService.getDefaultAnonymousAuthorities()
+    }
+
+    /**
+     * @return set of default authorities of an admin
+     */
+    Set<Authority> defaultAdminAuthorities() {
+        return authorityService.getDefaultAdminAuthorities()
     }
 }

@@ -40,27 +40,10 @@ public class ElasticServiceConfiguration {
 
     @Bean
     @Primary
-    public Executor executor() {
-        return new Executor(elasticsearchProperties.getExecutors().getSize(), elasticsearchProperties.getExecutors().getTimeout());
-    }
-
-    @Bean
-    public Executor reindexingTaskCaseExecutor() {
-        return new Executor(elasticsearchProperties.getReindexExecutor().getSize(), elasticsearchProperties.getReindexExecutor().getTimeout());
-    }
-
-    @Bean
-    public Executor reindexingTaskTaskExecutor() {
-        return new Executor(elasticsearchProperties.getReindexExecutor().getSize(), elasticsearchProperties.getReindexExecutor().getTimeout());
-    }
-
-    @Bean
-    @Primary
     public IElasticCaseService elasticCaseService() {
         return new ElasticCaseService(
                 caseRepository,
                 elasticsearchTemplate,
-                executor(),
                 elasticsearchProperties,
                 petriNetService,
                 workflowService,
@@ -81,7 +64,6 @@ public class ElasticServiceConfiguration {
         return new ElasticCaseService(
                 caseRepository,
                 elasticsearchTemplate,
-                reindexingTaskCaseExecutor(),
                 elasticsearchProperties,
                 petriNetService,
                 workflowService,

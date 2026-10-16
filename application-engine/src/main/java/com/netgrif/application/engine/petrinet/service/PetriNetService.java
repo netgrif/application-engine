@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.petrinet.service;
 
+import com.netgrif.application.engine.objects.annotations.Authorize;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.configuration.properties.CacheConfigurationProperties;
 import com.netgrif.application.engine.files.minio.StorageConfigurationProperties;
@@ -178,6 +179,8 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     @Transactional
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "PROCESS_UPLOAD")
     public ImportPetriNetEventOutcome importPetriNet(ImportPetriNetParams importPetriNetParams) throws IOException,
             MissingPetriNetMetaDataException, MissingIconKeyException {
         validateAttributes(importPetriNetParams);
@@ -438,6 +441,8 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "PROCESS_DOWNLOAD")
     public FileSystemResource getFile(String netId, String title) {
         if (title == null || title.isEmpty()) {
             Query query = Query.query(Criteria.where("_id").is(new ObjectId(netId)));
@@ -629,11 +634,15 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     @Transactional
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "PROCESS_DELETE")
     public void deletePetriNet(DeletePetriNetParams deletePetriNetParams) {
         doDeletePetriNet(deletePetriNetParams, false);
     }
 
     @Override
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "PROCESS_DELETE")
     public void forceDeletePetriNet(DeletePetriNetParams deletePetriNetParams) {
         doDeletePetriNet(deletePetriNetParams, true);
     }

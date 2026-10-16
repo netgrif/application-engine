@@ -369,7 +369,6 @@ class ElasticCaseServiceTest {
         ElasticCaseService service = new ElasticCaseService(
                 repository,
                 template,
-                mock(Executor.class),
                 properties,
                 petriNetService,
                 workflowService,
