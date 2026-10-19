@@ -245,7 +245,7 @@ placesComparison: places SPACE numberComparison # placesBasic
                 | places SPACE inRangeNumberComparison # placesRange
                 | places SPACE nullComparison # placesNull
                 ;
-tasksStateComparison: tasksState SPACE (NOT SPACE?)? op=EQ SPACE state=(ENABLED | DISABLED) ;
+tasksStateComparison: tasksState SPACE (NOT SPACE?)? op=(EQ | NEQ) SPACE state=(ENABLED | DISABLED) ;
 tasksUserIdComparison: tasksUserId SPACE stringComparison # tasksUserIdBasic
                      | tasksUserId SPACE inListStringComparison # tasksUserIdList
                      | tasksUserId SPACE nullComparison # tasksUserIdNull

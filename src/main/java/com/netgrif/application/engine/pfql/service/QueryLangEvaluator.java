@@ -1489,16 +1489,16 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitTasksStateComparison(QueryLangParser.TasksStateComparisonContext ctx) {
-        // todo implement task states
-//        String taskId = ctx.tasksState().taskId.getText();
-//        Token op = ctx.op;
-//        checkOp(ComparisonType.STRING, op);
-//        boolean not = ctx.NOT() != null;
-//        State state = ctx.state.getType() == QueryLangParser.ENABLED ? State.ENABLED : State.DISABLED;
-//
-//        setMongoQuery(ctx, null);
-//        setElasticQuery(ctx, buildElasticQuery("tasks." + taskId + ".state", op.getType(), state.toString(), not));
-//        this.searchWithElastic = true;
+        String transId = ctx.tasksState().taskId.getText();
+        Token op = ctx.op;
+        checkOp(ComparisonType.STRING, op);
+        boolean not = ctx.NOT() != null;
+        boolean isEnabled = ctx.state.getType() == QueryLangParser.ENABLED;
+        boolean taskIsExecutable = isEnabled != not;
+
+        setMongoQuery(ctx, null);
+        setElasticQuery(ctx, buildElasticQuery("taskIds", op.getType(), transId, !taskIsExecutable));
+        this.searchWithElastic = true;
     }
 
     @Override
