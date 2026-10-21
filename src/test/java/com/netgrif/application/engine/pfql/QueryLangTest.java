@@ -149,6 +149,18 @@ public class QueryLangTest {
 
         cases = searchService.search("cases: processIdentifier eq 'query_test' and data.text_0.value eq 'x44'*");
         assertEquals(1, ((Page<Case>) cases).getTotalElements());
+
+        cases = searchService.search("cases: processIdentifier eq 'query_test' and tasks.t1.state eq enabled");
+        assertEquals(10, ((Page<Case>) cases).getTotalElements());
+
+        cases = searchService.search("cases: processIdentifier eq 'query_test' and tasks.t1.state eq disabled");
+        assertEquals(0, ((Page<Case>) cases).getTotalElements());
+
+        cases = searchService.search("cases: processIdentifier eq 'query_test' and tasks.t1.state neq disabled");
+        assertEquals(10, ((Page<Case>) cases).getTotalElements());
+
+        cases = searchService.search("cases: processIdentifier eq 'query_test' and tasks.t1.state not eq disabled");
+        assertEquals(10, ((Page<Case>) cases).getTotalElements());
     }
 
     @Test
@@ -1146,13 +1158,12 @@ public class QueryLangTest {
         checkNumberComparisonElastic("case", "places.p1.marking", "places.p1.marking");
 
         // task state comparison
-//        TODO: fix
-//        actual = evaluateQuery("case: tasks.t1.state eq enabled").getFullElasticQuery();
-//        expected = String.format("tasks.t1.state:%s", State.ENABLED);
-//        assertEquals(expected, actual);
-//        actual = evaluateQuery("case: tasks.t1.state eq disabled").getFullElasticQuery();
-//        expected = String.format("tasks.t1.state:%s", State.DISABLED);
-//        assertEquals(expected, actual);
+        actual = evaluateQuery("case: tasks.t1.state eq enabled").getFullElasticQuery();
+        expected = "taskIds:t1";
+        assertEquals(expected, actual);
+        actual = evaluateQuery("case: tasks.t1.state eq disabled").getFullElasticQuery();
+        expected = "NOT taskIds:t1";
+        assertEquals(expected, actual);
 
         // task userId comparison
         actual = evaluateQuery("case: tasks.t1.userId eq 'test'").getFullElasticQuery();
