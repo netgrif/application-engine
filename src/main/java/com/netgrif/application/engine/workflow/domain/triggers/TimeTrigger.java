@@ -3,6 +3,7 @@ package com.netgrif.application.engine.workflow.domain.triggers;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 public abstract class TimeTrigger extends Trigger {
@@ -10,6 +11,10 @@ public abstract class TimeTrigger extends Trigger {
     @Getter
     @Setter
     protected LocalDateTime startDate;
+
+    @Getter
+    @Setter
+    protected Instant startInstant;
 
     @Getter
     protected String timeString;
