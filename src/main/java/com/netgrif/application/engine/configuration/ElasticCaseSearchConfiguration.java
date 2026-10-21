@@ -12,10 +12,10 @@ import java.util.Map;
 public class ElasticCaseSearchConfiguration {
 
     private Map<String, Float> fullTextFieldMap = Map.of(
-            "title", 2f,
+            "title.keyword", 2f,
             "authorName", 1f,
             "authorEmail", 1f,
-            "visualId", 2f
+            "visualId.keyword", 2f
     );
 
 }
