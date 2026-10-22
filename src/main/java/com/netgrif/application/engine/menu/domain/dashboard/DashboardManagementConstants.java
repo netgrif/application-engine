@@ -17,4 +17,5 @@ public class DashboardManagementConstants {
     public static final String FIELD_LOGOUT_DASHBOARD = "logout_dashboard_toolbar";
     public static final String FIELD_ITEMS_ORDER = "items_order";
     public static final String FIELD_ADD_NEW_ITEM = "add_new_item";
+    public static final String FIELD_TOOLBAR_COLOR = "toolbar_color";
 }

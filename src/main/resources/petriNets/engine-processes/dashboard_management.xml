@@ -72,6 +72,11 @@
         <desc name="dashboard_logo_desc">Dashboard logo to be displayed in application dashboard</desc>
         <init>assets/img/netgrif_full_white.svg</init>
     </data>
+    <data type="text" immediate="true">
+        <id>toolbar_color</id>
+        <title name="toolbar_color">Toolbar color</title>
+        <desc name="toolbar_color_desc">Dashboard toolbar color</desc>
+    </data>
     <data type="enumeration_map" immediate="true">
         <id>dashboard_item_list</id>
         <title name="dashboard_item_list">Dashboard items</title>
@@ -368,6 +373,8 @@
         <i18nString name="dashboard_name_desc">Názov panelu, ktorý bude zobrazený v panely aplikácie</i18nString>
         <i18nString name="dashboard_logo">Logo panelu</i18nString>
         <i18nString name="dashboard_logo_desc">Logo panelu, ktoré bude zobrazené v panely aplikácie</i18nString>
+        <i18nString name="toolbar_color">Farba vrchného panelu</i18nString>
+        <i18nString name="toolbar_color_desc">Farba vrchného panelu dashboardu</i18nString>
         <i18nString name="dashboard_item_list">Položky panelu</i18nString>
         <i18nString name="dashboard_item_list_desc">Zoznam položiek panalu, ktoré budú zobrazené v panely aplikácie</i18nString>
         <i18nString name="existing_menu_items">Existujúce položky panelu</i18nString>
@@ -398,6 +405,8 @@
         <i18nString name="dashboard_name_desc">Name des Dashboards, der im Dashboard der Anwendung angezeigt werden soll</i18nString>
         <i18nString name="dashboard_logo">Logo für das Armaturenbrett</i18nString>
         <i18nString name="dashboard_logo_desc">Dashboard-Logo, das im Dashboard der Anwendung angezeigt werden soll</i18nString>
+        <i18nString name="toolbar_color">Farbe der Symbolleiste</i18nString>
+        <i18nString name="toolbar_color_desc">Farbe der Dashboard-Symbolleiste</i18nString>
         <i18nString name="dashboard_item_list">Dashboard-Elemente</i18nString>
         <i18nString name="dashboard_item_list_desc">Liste der Dashboard-Elemente, die im Dashboard der Anwendung angezeigt werden sollen</i18nString>
         <i18nString name="existing_menu_items">Vorhandene Dashboard-Elemente</i18nString>
@@ -463,8 +472,8 @@
                     <behavior>editable</behavior>
                 </logic>
                 <layout>
-                    <x>0</x>
-                    <y>1</y>
+					<x>2</x>
+					<y>0</y>
                     <rows>1</rows>
                     <cols>2</cols>
                     <template>material</template>
@@ -677,6 +686,20 @@
                     <y>8</y>
                     <rows>1</rows>
                     <cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>toolbar_color</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
                     <template>material</template>
                     <appearance>outline</appearance>
                 </layout>
