@@ -130,6 +130,11 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
     @Override
     public Page<Case> search(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
+        return search(requests, user, pageable, locale, isIntersection, null);
+    }
+
+    @Override
+    public Page<Case> search(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection, Collection<String> dataFieldIds) {
         if (requests == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
@@ -144,7 +149,8 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         if (query != null) {
             SearchHits<ElasticCase> hits = template.search(query, ElasticCase.class, IndexCoordinates.of(elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX)));
             Page<ElasticCase> indexedCases = (Page) SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
-            casePage = workflowService.findAllById(indexedCases.get().map(ElasticCase::getId).collect(Collectors.toList()));
+            List<String> ids = indexedCases.get().map(ElasticCase::getId).collect(Collectors.toList());
+            casePage = dataFieldIds == null ? workflowService.findAllById(ids) : workflowService.findAllByIdProjected(ids, dataFieldIds);
             total = indexedCases.getTotalElements();
             log.debug("Found [{}] total elements of page [{}]", casePage.size(), pageable.getPageNumber());
         } else {

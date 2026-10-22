@@ -127,6 +127,14 @@ public abstract class Case implements Serializable {
     @Setter
     private Map<String, String> tags;
 
+    /**
+     * Transient marker. {@code true} when this case was loaded with only a subset of its {@code dataSet} entries.
+     * Such a case is read-only and must never be saved.
+     */
+    @Setter
+    @JsonIgnore
+    private boolean partiallyLoaded = false;
+
     protected Case() {
         activePlaces = new HashMap<>();
         dataSet = new LinkedHashMap<>();
