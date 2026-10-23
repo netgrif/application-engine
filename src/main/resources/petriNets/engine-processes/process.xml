@@ -618,7 +618,7 @@
 			<dataRef>
 				<id>xml_text</id>
 				<logic>
-					<behavior>hidden</behavior>
+					<behavior>editable</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -1010,20 +1010,6 @@
 					<x>0</x>
 					<y>0</y>
 					<rows>1</rows>
-					<cols>4</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>xml_text</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>1</y>
-					<rows>2</rows>
 					<cols>4</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
