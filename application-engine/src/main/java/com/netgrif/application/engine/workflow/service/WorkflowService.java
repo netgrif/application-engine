@@ -202,6 +202,15 @@ public class WorkflowService implements IWorkflowService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public Case findOneProjected(String caseId, Collection<String> dataFieldIds, boolean includeImmediateFields, boolean setPetriNet) {
+        List<Case> loaded = loadProjected(List.of(caseId), net -> dataFieldIds, includeImmediateFields, setPetriNet);
+        if (loaded.isEmpty()) {
+            throw new IllegalArgumentException("Could not find Case with id [" + caseId + "]");
+        }
+        return loaded.getFirst();
+    }
+
     /**
      * Loads a PARTIAL, READ-ONLY case with only the requested {@code dataSet} entries. Must never be saved.
      * <p>
@@ -212,11 +221,15 @@ public class WorkflowService implements IWorkflowService {
      */
     @Override
     public Case findOneProjected(String caseId, Collection<String> dataFieldIds) {
-        List<Case> loaded = loadProjected(List.of(caseId), dataFieldIds);
-        if (loaded.isEmpty()) {
-            throw new IllegalArgumentException("Could not find Case with id [" + caseId + "]");
+        return findOneProjected(caseId, dataFieldIds, true, true);
+    }
+
+    @Override
+    public List<Case> findAllByIdProjected(List<String> caseIds, Collection<String> dataFieldIds, boolean includeImmediateFields, boolean setPetriNet) {
+        if (caseIds == null || caseIds.isEmpty()) {
+            return new ArrayList<>();
         }
-        return loaded.getFirst();
+        return loadProjected(caseIds, net -> dataFieldIds, includeImmediateFields, setPetriNet);
     }
 
     /**
@@ -226,31 +239,40 @@ public class WorkflowService implements IWorkflowService {
      */
     @Override
     public List<Case> findAllByIdProjected(List<String> caseIds, Collection<String> dataFieldIds) {
-        if (caseIds == null || caseIds.isEmpty()) {
-            return new ArrayList<>();
-        }
-        return loadProjected(caseIds, dataFieldIds);
+        return findAllByIdProjected(caseIds, dataFieldIds, true, true);
     }
 
     private List<Case> loadProjected(List<String> caseIds, Collection<String> dataFieldIds) {
-        return loadProjected(caseIds, net -> dataFieldIds);
+        return loadProjected(caseIds, net -> dataFieldIds, true, true);
     }
 
     private List<Case> loadProjected(List<String> caseIds, Function<PetriNet, Collection<String>> keyResolver) {
+        return loadProjected(caseIds, keyResolver, true, true);
+    }
+
+    private List<Case> loadProjected(List<String> caseIds, Function<PetriNet, Collection<String>> keyResolver, boolean includeImmediateFields, boolean setPetriNet) {
         List<ObjectId> objectIds = caseIds.stream().map(this::extractObjectId).distinct().collect(Collectors.toList());
 
-        //TODO AI: This step is unnecessary as it loads all cases by IDS without datafields, should be replaced with a simple "count by IDS" method.
-        List<Case> cases = repository.findAllProjectedByObjectIds(objectIds, CaseProjection.ofDataFields(null));
+        Collection<String> initialKeys = null;
+        try {
+            initialKeys = keyResolver.apply(null);
+        } catch (Exception ignored) {
+            // keyResolver requires a non-null PetriNet instance
+        }
+
+        CaseProjection initialProjection = CaseProjection.ofDataFields(initialKeys);
+        List<Case> cases = repository.findAllProjectedByObjectIds(objectIds, initialProjection);
         if (cases.isEmpty()) {
             return new ArrayList<>();
         }
 
         Map<ObjectId, PetriNet> nets = new HashMap<>();
         Set<String> required = new LinkedHashSet<>();
-        CaseProjection requested = CaseProjection.ofDataFields(null);
+        CaseProjection requested = initialProjection;
         for (Case aCase : cases) {
-            //TODO AI: This has to be optional base on incoming request parameter to add immediate fields or not. Default is to add.
-            required.addAll(aCase.getImmediateDataFields());
+            if (includeImmediateFields) {
+                required.addAll(aCase.getImmediateDataFields());
+            }
             PetriNet net = nets.computeIfAbsent(aCase.getPetriNetObjectId(), petriNetService::get);
             if (net == null) {
                 continue;
@@ -265,9 +287,10 @@ public class WorkflowService implements IWorkflowService {
             requested = requested.withAdditionalKeys(forNet.dataSetKeys());
         }
 
-        CaseProjection projection = requested.withAdditionalKeys(required);
-        if (!projection.dataSetKeys().isEmpty()) {
-            cases = repository.findAllProjectedByObjectIds(objectIds, projection);
+        CaseProjection finalProjection = requested.withAdditionalKeys(required);
+        // Only execute a second query if additional keys were required that were not in the initial projection
+        if (!initialProjection.dataSetKeys().containsAll(finalProjection.dataSetKeys())) {
+            cases = repository.findAllProjectedByObjectIds(objectIds, finalProjection);
         }
 
         Map<String, Case> caseMap = cases.stream().collect(Collectors.toMap(Case::getStringId, c -> c, (a, b) -> a));
@@ -277,10 +300,13 @@ public class WorkflowService implements IWorkflowService {
             if (aCase == null) {
                 continue;
             }
-            //TODO AI: This has to be optional to setPetriNet or leave petriNet empty. Default is to set.
-            setPetriNet(aCase);
+            if (setPetriNet) {
+                setPetriNet(aCase);
+            }
             decryptDataSet(aCase);
-            setImmediateDataFieldsReadOnly(aCase);
+            if (includeImmediateFields) {
+                setImmediateDataFieldsReadOnly(aCase);
+            }
             aCase.setPartiallyLoaded(true);
             result.add(aCase);
         }
@@ -294,11 +320,17 @@ public class WorkflowService implements IWorkflowService {
      */
     @Override
     public Case findOneProjected(String caseId, Function<PetriNet, Collection<String>> dataFieldResolver) {
-        List<Case> loaded = loadProjected(List.of(caseId), dataFieldResolver);
+        List<Case> loaded = loadProjected(List.of(caseId), dataFieldResolver, true, true);
         if (loaded.isEmpty()) {
             throw new IllegalArgumentException("Could not find Case with id [" + caseId + "]");
         }
         return loaded.getFirst();
+    }
+
+    @Override
+    public Page<Case> getAllProjected(Pageable pageable, Collection<String> dataFieldIds, boolean includeImmediateFields, boolean setPetriNet) {
+        Page<Case> staticPage = repository.findAllProjected(pageable, CaseProjection.ofDataFields(null));
+        return hydrateProjectedPage(staticPage, pageable, dataFieldIds, includeImmediateFields, setPetriNet);
     }
 
     /**
@@ -307,11 +339,12 @@ public class WorkflowService implements IWorkflowService {
      */
     @Override
     public Page<Case> getAllProjected(Pageable pageable, Collection<String> dataFieldIds) {
-        //TODO AI: I find these kind of duplicated call for cases in several places. Is it possible to avoid the initial case search without data? Wouldn't be this less effective as the original non-projected single calls?
-        Page<Case> staticPage = repository.findAllProjected(pageable, CaseProjection.ofDataFields(null));
-        //TODO AI: this is duplicated code, should be extracted to a separate method.
+        return getAllProjected(pageable, dataFieldIds, true, true);
+    }
+
+    private Page<Case> hydrateProjectedPage(Page<Case> staticPage, Pageable pageable, Collection<String> dataFieldIds, boolean includeImmediateFields, boolean setPetriNet) {
         List<String> ids = staticPage.getContent().stream().map(Case::getStringId).collect(Collectors.toList());
-        List<Case> hydrated = ids.isEmpty() ? new ArrayList<>() : loadProjected(ids, dataFieldIds);
+        List<Case> hydrated = ids.isEmpty() ? new ArrayList<>() : loadProjected(ids, net -> dataFieldIds, includeImmediateFields, setPetriNet);
         return new PageImpl<>(hydrated, pageable, staticPage.getTotalElements());
     }
 
@@ -324,7 +357,7 @@ public class WorkflowService implements IWorkflowService {
         if (!partialCase.isPartiallyLoaded()) {
             throw new IllegalArgumentException("Case [" + partialCase.getStringId() + "] is not partially loaded, use save");
         }
-        //TODO AI: why is it necessary to set PetriNet on savePartial? PetriNet is transien and will not be persisted inside case
+        // Setting PetriNet is needed for encryption metadata lookup in encryptDataSet
         if (partialCase.getPetriNet() == null) {
             setPetriNet(partialCase);
         }
@@ -698,9 +731,7 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public Page<Case> searchProjected(Predicate predicate, Pageable pageable, Collection<String> dataFieldIds) {
         Page<Case> staticPage = repository.findAllProjected(predicate, pageable, CaseProjection.ofDataFields(null));
-        List<String> ids = staticPage.getContent().stream().map(Case::getStringId).collect(Collectors.toList());
-        List<Case> hydrated = ids.isEmpty() ? new ArrayList<>() : loadProjected(ids, dataFieldIds);
-        return new PageImpl<>(hydrated, pageable, staticPage.getTotalElements());
+        return hydrateProjectedPage(staticPage, pageable, dataFieldIds, true, true);
     }
 
     @Override
@@ -748,26 +779,6 @@ public class WorkflowService implements IWorkflowService {
                 });
         return anyDataFieldChanged.get();
     }
-
-//    @Deprecated
-//    public List<Field> getData(String caseId) {
-//        ObjectId objectId = extractObjectId(caseId);
-//        Optional<Case> optionalUseCase = repository.findByIdObjectId(objectId);
-//        if (!optionalUseCase.isPresent())
-//            throw new IllegalArgumentException("Could not find case with id [" + caseId + "]");
-//        Case useCase = optionalUseCase.get();
-//        List<Field> fields = new ArrayList<>();
-//        useCase.getDataSet().forEach((id, dataField) -> {
-//            if (dataField.isDisplayable() || useCase.getPetriNet().isDisplayableInAnyTransition(id)) {
-//                Field field = fieldFactory.buildFieldWithoutValidation(useCase, id, null);
-//                field.setBehavior(dataField.applyOnlyVisibleBehavior());
-//                fields.add(field);
-//            }
-//        });
-//
-//        LongStream.range(0L, fields.size()).forEach(l -> fields.get((int) l).setOrder(l));
-//        return fields;
-//    }
 
     private void setImmediateDataFieldsReadOnly(Case useCase) {
         List<Field<?>> immediateData = new ArrayList<>();

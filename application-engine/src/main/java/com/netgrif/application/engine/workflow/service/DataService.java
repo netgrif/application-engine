@@ -214,7 +214,9 @@ public class DataService implements IDataService {
 
         if (!useCase.isPartiallyLoaded()) {
             workflowService.save(useCase);
-        } else if (eventsEnabled && hasGetEvents(useCase.getPetriNet(), transition)) { //TODO AI: why this check is necessary? Wouldn't be good to just have else? In that case hasGetEvents is unnecessary function
+        } else if (eventsEnabled && hasGetEvents(useCase.getPetriNet(), transition)) {
+            // Only persist when GET event actions actually executed and could have mutated data fields.
+            // This prevents costly database writes and Elasticsearch re-indexing on read-only requests.
             workflowService.savePartial(useCase);
         }
 

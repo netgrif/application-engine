@@ -33,6 +33,19 @@ public interface IWorkflowService {
      * (plus automatically required ones: immediate data fields and fields referenced by arcs).
      * The result must never be saved; {@link #save(Case)} throws {@link IllegalStateException} for it.
      *
+     * @param caseId                 composite case id
+     * @param dataFieldIds           ids of the data fields to load
+     * @param includeImmediateFields whether to automatically resolve and load immediate data fields
+     * @param setPetriNet            whether to resolve and initialize the case's PetriNet model
+     * @return the partially loaded case
+     */
+    Case findOneProjected(String caseId, Collection<String> dataFieldIds, boolean includeImmediateFields, boolean setPetriNet);
+
+    /**
+     * Loads a PARTIAL, READ-ONLY case containing all static fields and only the requested {@code dataSet} entries
+     * (plus automatically required ones: immediate data fields and fields referenced by arcs).
+     * The result must never be saved; {@link #save(Case)} throws {@link IllegalStateException} for it.
+     *
      * @param caseId       composite case id
      * @param dataFieldIds ids of the data fields to load
      * @return the partially loaded case
@@ -51,6 +64,17 @@ public interface IWorkflowService {
     Case findOneProjected(String caseId, java.util.function.Function<PetriNet, Collection<String>> dataFieldResolver);
 
     /**
+     * Same as {@link #findOneProjected(String, Collection, boolean, boolean)} for many ids.
+     *
+     * @param caseIds                composite case ids
+     * @param dataFieldIds           ids of the data fields to load
+     * @param includeImmediateFields whether to automatically resolve and load immediate data fields
+     * @param setPetriNet            whether to resolve and initialize the case's PetriNet model
+     * @return partially loaded cases
+     */
+    List<Case> findAllByIdProjected(List<String> caseIds, Collection<String> dataFieldIds, boolean includeImmediateFields, boolean setPetriNet);
+
+    /**
      * Same as {@link #findOneProjected(String, Collection)} for many ids. The result is PARTIAL and READ-ONLY, preserves
      * the order of the input ids and skips unknown ids.
      *
@@ -59,6 +83,17 @@ public interface IWorkflowService {
      * @return partially loaded cases
      */
     List<Case> findAllByIdProjected(List<String> caseIds, Collection<String> dataFieldIds);
+
+    /**
+     * Loads a page of PARTIAL, READ-ONLY cases with only the requested {@code dataSet} entries.
+     *
+     * @param pageable               paging and sorting
+     * @param dataFieldIds           ids of the data fields to load
+     * @param includeImmediateFields whether to automatically resolve and load immediate data fields
+     * @param setPetriNet            whether to resolve and initialize the case's PetriNet model
+     * @return page of partially loaded cases
+     */
+    Page<Case> getAllProjected(Pageable pageable, Collection<String> dataFieldIds, boolean includeImmediateFields, boolean setPetriNet);
 
     /**
      * Loads a page of PARTIAL, READ-ONLY cases with only the requested {@code dataSet} entries (plus automatically
