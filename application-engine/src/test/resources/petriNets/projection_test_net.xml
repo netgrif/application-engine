@@ -181,7 +181,7 @@
         <id>ref_embedded_task</id>
         <title>Embedded Task Reference</title>
         <inits>
-            <init>t2_choices</init>
+            <init>t_embedded_task</init>
         </inits>
     </data>
     <data type="filter">
@@ -528,6 +528,38 @@
                 <id>actor_assignee</id>
                 <logic>
                     <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+
+    <!-- Transition: Independent Embedded Task (Outside Process Flow) -->
+    <transition>
+        <id>t_embedded_task</id>
+        <x>100</x>
+        <y>300</y>
+        <cols>2</cols>
+        <label>Embedded Standalone Task</label>
+        <assignPolicy>auto</assignPolicy>
+        <roleRef>
+            <id>tester</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>dg_embedded_task</id>
+            <title>Embedded Form Data</title>
+            <dataRef>
+                <id>txt_simple</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>num_standard</id>
+                <logic>
+                    <behavior>editable</behavior>
                 </logic>
             </dataRef>
         </dataGroup>

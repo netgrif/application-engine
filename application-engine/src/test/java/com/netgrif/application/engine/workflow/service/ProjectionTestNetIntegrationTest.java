@@ -310,4 +310,49 @@ public class ProjectionTestNetIntegrationTest {
         assertEquals(1, allProjected.getTotalElements());
         assertTrue(allProjected.getContent().get(0).isPartiallyLoaded());
     }
+
+    @Test
+    @DisplayName("Independent embedded task transition resolves ref_embedded_task and remains valid across flow executions")
+    void testEmbeddedTaskRefWithIndependentTransition() throws Exception {
+        Case testCase = createTestCase("Embedded Task Ref Test");
+        assertNotNull(testCase);
+
+        // Check that ref_embedded_task was initialized to the task ID of t_embedded_task
+        Task embeddedTask = findTaskByTransition(testCase.getStringId(), "t_embedded_task");
+        assertNotNull(embeddedTask, "Task for independent transition t_embedded_task should be created on case creation");
+
+        Case reloaded = workflowService.findOne(testCase.getStringId());
+        List<String> taskRefValues = (List<String>) reloaded.getDataSet().get("ref_embedded_task").getValue();
+        assertNotNull(taskRefValues);
+        assertEquals(1, taskRefValues.size());
+        assertEquals(embeddedTask.getStringId(), taskRefValues.get(0));
+
+        // Finish t1_basic
+        Task t1Task = findTaskByTransition(testCase.getStringId(), "t1_basic");
+        assertNotNull(t1Task);
+        taskService.assignTask(com.netgrif.application.engine.workflow.params.TaskParams.with().task(t1Task).user(superCreator.getLoggedSuper()).build());
+        taskService.finishTask(com.netgrif.application.engine.workflow.params.TaskParams.with().task(t1Task).user(superCreator.getLoggedSuper()).build());
+
+        // t4_actors_references is now enabled from p_mid
+        Task t4Task = findTaskByTransition(testCase.getStringId(), "t4_actors_references");
+        assertNotNull(t4Task, "Task t4_actors_references should be enabled after t1_basic completes");
+
+        // Verify that getData / getDataGroups for t4_actors_references resolves without error
+        var t4Outcome = taskController.getData(t4Task.getStringId(), Locale.ENGLISH);
+        assertNotNull(t4Outcome);
+        assertNull(t4Outcome.getContent().getError(), "t4_actors_references must resolve data without error");
+
+        var t4Groups = dataService.getDataGroups(t4Task.getStringId(), Locale.ENGLISH);
+        assertNotNull(t4Groups);
+        assertFalse(t4Groups.getData().isEmpty());
+    }
+
+    private Task findTaskByTransition(String caseId, String transitionId) {
+        Case c = workflowService.findOne(caseId);
+        return c.getTasks().stream()
+                .map(ref -> taskService.findOne(ref.getTask()))
+                .filter(t -> transitionId.equals(t.getTransitionId()))
+                .findFirst()
+                .orElse(null);
+    }
 }
