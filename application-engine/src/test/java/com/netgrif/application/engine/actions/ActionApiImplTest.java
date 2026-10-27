@@ -122,6 +122,47 @@ class ActionApiImplTest {
     }
 
     @Test
+    void projectedCaseOperationsAndPartialSaveViaActionApi() {
+        importAllDataNet();
+
+        CreateCaseEventOutcome created = actionApi.createCaseByIdentifier(
+                PROCESS_IDENTIFIER,
+                "Projected API case",
+                "green",
+                superUserPrincipal,
+                Map.of("source", "action-api-test")
+        );
+
+        String caseId = created.getCase().getStringId();
+        Case projectedCase = actionApi.findCase(caseId, List.of("text"));
+        assertNotNull(projectedCase);
+        assertTrue(projectedCase.isPartiallyLoaded());
+        assertTrue(projectedCase.getDataSet().containsKey("text"));
+
+        List<Case> projectedList = actionApi.findCases(List.of(caseId), List.of("text"));
+        assertEquals(1, projectedList.size());
+        assertTrue(projectedList.get(0).isPartiallyLoaded());
+
+        projectedCase.setTitle("Updated Projected Case Title");
+        Case savedPartial = actionApi.savePartial(projectedCase);
+        assertNotNull(savedPartial);
+        assertEquals("Updated Projected Case Title", savedPartial.getTitle());
+
+        Case refreshed = actionApi.findCase(caseId);
+        assertEquals("Updated Projected Case Title", refreshed.getTitle());
+
+        com.netgrif.application.engine.objects.workflow.domain.QCase qCase = new com.netgrif.application.engine.objects.workflow.domain.QCase("case");
+        org.springframework.data.domain.Page<Case> searched = actionApi.searchCases(
+                PROCESS_IDENTIFIER,
+                qCase.title.eq("Updated Projected Case Title"),
+                org.springframework.data.domain.PageRequest.of(0, 10),
+                List.of("text")
+        );
+        assertEquals(1, searched.getTotalElements());
+        assertTrue(searched.getContent().get(0).isPartiallyLoaded());
+    }
+
+    @Test
     void getSystemUserDtoMatchesSystemUser() {
         AuthPrincipalDto systemUserDto = actionApi.getSystemUserDto();
 

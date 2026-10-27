@@ -10,6 +10,7 @@ import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.dto.AuthPrincipalDto;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
 import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
@@ -178,18 +179,24 @@ class ActionApiImplUnitTest {
         Page<Case> cases = Page.empty(pageable);
         Page<Task> tasks = Page.empty(pageable);
         when(workflowService.search(predicate, pageable)).thenReturn(cases);
+        when(workflowService.searchProjected(predicate, pageable, List.of("field1"))).thenReturn(cases);
         when(taskService.search(predicate, pageable)).thenReturn(tasks);
 
         assertSame(cases, actionApi.searchCases("process", predicate, pageable));
+        assertSame(cases, actionApi.searchCases("process", predicate, pageable, List.of("field1")));
+        assertSame(cases, actionApi.searchCases("process", predicate, pageable, List.of("field1"), Map.of()));
         assertSame(tasks, actionApi.searchTasks("process", predicate, pageable));
 
         when(userService.findUserByUsername("john", "realm")).thenReturn(Optional.of(user));
         when(elasticCaseService.search(anyList(), any(), eq(pageable), any(Locale.class), eq(true))).thenReturn(cases);
+        when(elasticCaseService.search(anyList(), any(), eq(pageable), any(Locale.class), eq(true), eq(List.of("field1")))).thenReturn(cases);
         when(elasticTaskService.search(anyList(), any(), eq(pageable), any(Locale.class), eq(false))).thenReturn(tasks);
         when(elasticCaseService.count(anyList(), any(), any(Locale.class), eq(true))).thenReturn(7L);
         when(elasticTaskService.count(anyList(), any(), any(Locale.class), eq(false))).thenReturn(3L);
 
         assertSame(cases, actionApi.searchCases(List.of("case query"), principal, pageable, true));
+        assertSame(cases, actionApi.searchCases(List.of("case query"), principal, pageable, true, List.of("field1")));
+        assertSame(cases, actionApi.searchCases(List.of("case query"), principal, pageable, true, List.of("field1"), Map.of()));
         assertSame(tasks, actionApi.searchTasks(List.of("task query"), principal, pageable, false));
         assertEquals(7L, actionApi.countCases(List.of("case query"), principal, true));
         assertEquals(3L, actionApi.countTasks(List.of("task query"), principal, false, Map.of()));
@@ -197,9 +204,40 @@ class ActionApiImplUnitTest {
         ArgumentCaptor<List<CaseSearchRequest>> caseRequests = ArgumentCaptor.forClass(List.class);
         ArgumentCaptor<List<ElasticTaskSearchRequest>> taskRequests = ArgumentCaptor.forClass(List.class);
         verify(elasticCaseService).search(caseRequests.capture(), any(), eq(pageable), any(Locale.class), eq(true));
+        verify(elasticCaseService, org.mockito.Mockito.times(2)).search(anyList(), any(), eq(pageable), any(Locale.class), eq(true), eq(List.of("field1")));
         verify(elasticTaskService).search(taskRequests.capture(), any(), eq(pageable), any(Locale.class), eq(false));
         assertEquals("case query", caseRequests.getValue().getFirst().query);
         assertEquals("task query", taskRequests.getValue().getFirst().query);
+    }
+
+    @Test
+    void delegatesProjectedCaseOperationsAndSavePartial() {
+        Case partialCase = new com.netgrif.application.engine.adapter.spring.workflow.domain.Case();
+        partialCase.set_id(new ProcessResourceId("process", new org.bson.types.ObjectId()));
+        List<Case> casesList = List.of(partialCase);
+        when(workflowService.findOneProjected("case-1", List.of("text"))).thenReturn(partialCase);
+        when(workflowService.findOneProjected("case-1", List.of("text"), false, false)).thenReturn(partialCase);
+        when(workflowService.findAllById(List.of("case-1"))).thenReturn(casesList);
+        when(workflowService.findAllByIdProjected(List.of("case-1"), List.of("text"))).thenReturn(casesList);
+        when(workflowService.findAllByIdProjected(List.of("case-1"), List.of("text"), false, false)).thenReturn(casesList);
+        when(workflowService.savePartial(partialCase)).thenReturn(partialCase);
+
+        assertSame(partialCase, actionApi.findCase("case-1", List.of("text")));
+        assertSame(partialCase, actionApi.findCase("case-1", List.of("text"), false, false));
+        assertSame(casesList, actionApi.findCases(List.of("case-1")));
+        assertSame(casesList, actionApi.findCases(List.of("case-1"), List.of("text")));
+        assertSame(casesList, actionApi.findCases(List.of("case-1"), List.of("text"), false, false));
+        assertSame(partialCase, actionApi.savePartialCase(partialCase));
+        assertSame(partialCase, actionApi.savePartialCase(partialCase, Map.of("key", "val")));
+        assertSame(partialCase, actionApi.savePartial(partialCase));
+        assertSame(partialCase, actionApi.savePartial(partialCase, Map.of("key", "val")));
+
+        verify(workflowService).findOneProjected("case-1", List.of("text"));
+        verify(workflowService).findOneProjected("case-1", List.of("text"), false, false);
+        verify(workflowService).findAllById(List.of("case-1"));
+        verify(workflowService).findAllByIdProjected(List.of("case-1"), List.of("text"));
+        verify(workflowService).findAllByIdProjected(List.of("case-1"), List.of("text"), false, false);
+        verify(workflowService, org.mockito.Mockito.times(4)).savePartial(partialCase);
     }
 
     @Test

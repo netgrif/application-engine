@@ -125,8 +125,18 @@ public class ActionApiImpl implements ActionApi {
     }
 
     @Override
+    public Page<Case> searchCases(String processIdentifier, Predicate predicate, Pageable pageable, Collection<String> dataFieldIds) {
+        return searchCases(processIdentifier, predicate, pageable, dataFieldIds, new HashMap<>());
+    }
+
+    @Override
     public Page<Case> searchCases(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection) {
         return searchCases(elasticStringQueries, authPrincipalDto, pageable, isIntersection, new HashMap<>());
+    }
+
+    @Override
+    public Page<Case> searchCases(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection, Collection<String> dataFieldIds) {
+        return searchCases(elasticStringQueries, authPrincipalDto, pageable, isIntersection, dataFieldIds, new HashMap<>());
     }
 
     @Override
@@ -141,6 +151,12 @@ public class ActionApiImpl implements ActionApi {
     }
 
     @Override
+    public Page<Case> searchCases(String processIdentifier, Predicate predicate, Pageable pageable, Collection<String> dataFieldIds, Map<String, String> params) {
+        log.debug("Searching cases for process identifier [{}] with predicate [{}], pageable [{}], dataFieldIds [{}]", processIdentifier, predicate, pageable, dataFieldIds);
+        return dataFieldIds == null ? workflowService.search(predicate, pageable) : workflowService.searchProjected(predicate, pageable, dataFieldIds);
+    }
+
+    @Override
     public Page<Case> searchCases(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection, Map<String, String> params) {
         log.debug("Searching cases for elastic queries [{}] with auth principal [{}], pageable [{}], intersect [{}]", elasticStringQueries, authPrincipalDto, pageable, isIntersection);
         boolean intersect = Boolean.TRUE.equals(isIntersection);
@@ -149,6 +165,17 @@ public class ActionApiImpl implements ActionApi {
         Locale locale = LocaleContextHolder.getLocale();
         log.trace("Searching cases for elastic queries [{}] with auth principal [{}], pageable [{}], intersect [{}], locale [{}]", elasticStringQueries, authPrincipalDto, pageable, isIntersection, locale);
         return elasticCaseService.search(caseSearchRequests, loggedUser, pageable, locale, intersect);
+    }
+
+    @Override
+    public Page<Case> searchCases(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection, Collection<String> dataFieldIds, Map<String, String> params) {
+        log.debug("Searching cases for elastic queries [{}] with auth principal [{}], pageable [{}], intersect [{}], dataFieldIds [{}]", elasticStringQueries, authPrincipalDto, pageable, isIntersection, dataFieldIds);
+        boolean intersect = Boolean.TRUE.equals(isIntersection);
+        List<CaseSearchRequest> caseSearchRequests = elasticStringQueries.stream().map(query -> CaseSearchRequest.builder().query(query).build()).toList();
+        LoggedUser loggedUser = ActorTransformer.toLoggedUser(resolveAbstractUser(authPrincipalDto));
+        Locale locale = LocaleContextHolder.getLocale();
+        log.trace("Searching cases for elastic queries [{}] with auth principal [{}], pageable [{}], intersect [{}], locale [{}], dataFieldIds [{}]", elasticStringQueries, authPrincipalDto, pageable, isIntersection, locale, dataFieldIds);
+        return elasticCaseService.search(caseSearchRequests, loggedUser, pageable, locale, intersect, dataFieldIds);
     }
 
     @Override
@@ -263,6 +290,57 @@ public class ActionApiImpl implements ActionApi {
     public Case findCase(String caseId) {
         log.debug("Finding case with id [{}]", caseId);
         return workflowService.findOne(caseId);
+    }
+
+    @Override
+    public Case findCase(String caseId, Collection<String> dataFieldIds) {
+        log.debug("Finding case with id [{}] and data fields [{}]", caseId, dataFieldIds);
+        return dataFieldIds == null ? workflowService.findOne(caseId) : workflowService.findOneProjected(caseId, dataFieldIds);
+    }
+
+    @Override
+    public Case findCase(String caseId, Collection<String> dataFieldIds, boolean includeImmediateFields, boolean setPetriNet) {
+        log.debug("Finding case with id [{}] and data fields [{}], includeImmediateFields [{}], setPetriNet [{}]", caseId, dataFieldIds, includeImmediateFields, setPetriNet);
+        return dataFieldIds == null ? workflowService.findOne(caseId) : workflowService.findOneProjected(caseId, dataFieldIds, includeImmediateFields, setPetriNet);
+    }
+
+    @Override
+    public List<Case> findCases(List<String> caseIds) {
+        log.debug("Finding cases with ids [{}]", caseIds);
+        return workflowService.findAllById(caseIds);
+    }
+
+    @Override
+    public List<Case> findCases(List<String> caseIds, Collection<String> dataFieldIds) {
+        log.debug("Finding cases with ids [{}] and data fields [{}]", caseIds, dataFieldIds);
+        return dataFieldIds == null ? workflowService.findAllById(caseIds) : workflowService.findAllByIdProjected(caseIds, dataFieldIds);
+    }
+
+    @Override
+    public List<Case> findCases(List<String> caseIds, Collection<String> dataFieldIds, boolean includeImmediateFields, boolean setPetriNet) {
+        log.debug("Finding cases with ids [{}] and data fields [{}], includeImmediateFields [{}], setPetriNet [{}]", caseIds, dataFieldIds, includeImmediateFields, setPetriNet);
+        return dataFieldIds == null ? workflowService.findAllById(caseIds) : workflowService.findAllByIdProjected(caseIds, dataFieldIds, includeImmediateFields, setPetriNet);
+    }
+
+    @Override
+    public Case savePartialCase(Case partialCase) {
+        return savePartialCase(partialCase, new HashMap<>());
+    }
+
+    @Override
+    public Case savePartialCase(Case partialCase, Map<String, String> params) {
+        log.debug("Saving partial case with id [{}] and params [{}]", partialCase != null && partialCase.get_id() != null ? partialCase.getStringId() : null, params);
+        return workflowService.savePartial(partialCase);
+    }
+
+    @Override
+    public Case savePartial(Case partialCase) {
+        return savePartialCase(partialCase);
+    }
+
+    @Override
+    public Case savePartial(Case partialCase, Map<String, String> params) {
+        return savePartialCase(partialCase, params);
     }
 
     @Override

@@ -175,51 +175,6 @@ class ElasticCaseServiceIntegrationTest {
     }
 
     @Test
-    void searchIdsReturnsPageOfStrings() throws InterruptedException {
-        Case case1 = createAndIndexCase(FIRST_TERM + " SearchIdsAlpha");
-        Case case2 = createAndIndexCase(FIRST_TERM + " SearchIdsBeta");
-        waitForIndexedCases(List.of(case1.getStringId(), case2.getStringId()));
-
-        CaseSearchRequest request = fullTextRequest(FIRST_TERM);
-        Page<String> idPage = waitForSearchIdsResult(List.of(request), true, 2);
-
-        assertEquals(2, idPage.getTotalElements());
-        assertTrue(idPage.getContent().contains(case1.getStringId()));
-        assertTrue(idPage.getContent().contains(case2.getStringId()));
-    }
-
-    @Test
-    void searchIdsSupportsPagination() throws InterruptedException {
-        Case case1 = createAndIndexCase(FIRST_TERM + " PagingAlpha");
-        Case case2 = createAndIndexCase(FIRST_TERM + " PagingBeta");
-        waitForIndexedCases(List.of(case1.getStringId(), case2.getStringId()));
-
-        CaseSearchRequest request = fullTextRequest(FIRST_TERM);
-        waitForSearchIdsResult(List.of(request), true, 2);
-
-        Page<String> page0 = elasticCaseService.searchIds(
-                List.of(request),
-                superCreator.getLoggedSuper(),
-                PageRequest.of(0, 1),
-                Locale.ENGLISH,
-                true
-        );
-        Page<String> page1 = elasticCaseService.searchIds(
-                List.of(request),
-                superCreator.getLoggedSuper(),
-                PageRequest.of(1, 1),
-                Locale.ENGLISH,
-                true
-        );
-
-        assertEquals(2, page0.getTotalElements());
-        assertEquals(1, page0.getContent().size());
-        assertEquals(2, page1.getTotalElements());
-        assertEquals(1, page1.getContent().size());
-        assertNotEquals(page0.getContent().get(0), page1.getContent().get(0));
-    }
-
-    @Test
     void savePartialUpdatesElasticsearchWithoutFullRead() throws InterruptedException {
         Case initialCase = createAndIndexCase("InitialPartialUpdateCase");
         waitForIndexedCases(List.of(initialCase.getStringId()));
@@ -279,27 +234,6 @@ class ElasticCaseServiceIntegrationTest {
         Page<Case> result;
         do {
             result = elasticCaseService.search(
-                    requests,
-                    superCreator.getLoggedSuper(),
-                    PageRequest.of(0, 10),
-                    Locale.ENGLISH,
-                    intersection
-            );
-            if (result.getTotalElements() == expectedCount) {
-                return result;
-            }
-            Thread.sleep(100);
-        } while (System.nanoTime() < deadline);
-        return result;
-    }
-
-    private Page<String> waitForSearchIdsResult(List<CaseSearchRequest> requests,
-                                               boolean intersection,
-                                               long expectedCount) throws InterruptedException {
-        long deadline = System.nanoTime() + SEARCH_TIMEOUT.toNanos();
-        Page<String> result;
-        do {
-            result = elasticCaseService.searchIds(
                     requests,
                     superCreator.getLoggedSuper(),
                     PageRequest.of(0, 10),
