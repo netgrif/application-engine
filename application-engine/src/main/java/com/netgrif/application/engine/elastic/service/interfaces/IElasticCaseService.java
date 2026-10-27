@@ -19,6 +19,11 @@ public interface IElasticCaseService {
 
     void indexNow(ElasticCase useCase);
 
+    @Async
+    void update(ElasticCase useCase);
+
+    void updateNow(ElasticCase useCase);
+
     Page<Case> search(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection);
 
     /**

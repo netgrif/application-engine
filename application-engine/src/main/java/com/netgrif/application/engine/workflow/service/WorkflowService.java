@@ -350,7 +350,7 @@ public class WorkflowService implements IWorkflowService {
 
     /**
      * Persists a PARTIAL case using Mongo {@code $set} updates (see {@code CaseProjectionRepository#updatePartial}).
-     * The case stays partial and read-only with respect to {@code save}; Elasticsearch is re-indexed from a full read.
+     * The case stays partial and read-only with respect to {@code save}; Elasticsearch is partially updated.
      */
     @Override
     public Case savePartial(Case partialCase) {
@@ -365,10 +365,10 @@ public class WorkflowService implements IWorkflowService {
         if (!repository.updatePartial(partialCase)) {
             throw new IllegalArgumentException("Could not find Case with id [" + partialCase.getStringId() + "]");
         }
+        decryptDataSet(partialCase);
         try {
-            Case full = findOne(partialCase.getStringId());
-            setImmediateDataFields(full);
-            elasticCaseService.indexNow(this.caseMappingService.transform(full));
+            setImmediateDataFieldsReadOnly(partialCase);
+            elasticCaseService.updateNow(this.caseMappingService.transform(partialCase));
         } catch (Exception e) {
             log.error("Indexing failed [{}]", partialCase.getStringId(), e);
         }

@@ -27,8 +27,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.client.elc.NativeQuery;
+import org.springframework.data.elasticsearch.core.SearchHit;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.TotalHitsRelation;
 import org.springframework.data.elasticsearch.core.convert.ElasticsearchConverter;
 import org.springframework.data.elasticsearch.core.document.Document;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
+import org.springframework.data.elasticsearch.core.query.SourceFilter;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.HashMap;
@@ -260,8 +266,15 @@ class ElasticCaseServiceTest {
         doAnswer(ignored -> new BoolQuery.Builder()).when(service)
                 .buildSingleQuery(any(CaseSearchRequest.class), same(user), eq(Locale.ENGLISH));
 
-        assertNotNull(service.buildQuery(requests, user, pageable, Locale.ENGLISH, true));
-        assertNotNull(service.buildQuery(requests, user, pageable, Locale.ENGLISH, false));
+        NativeQuery intersectionQuery = service.buildQuery(requests, user, pageable, Locale.ENGLISH, true);
+        NativeQuery unionQuery = service.buildQuery(requests, user, pageable, Locale.ENGLISH, false);
+
+        assertNotNull(intersectionQuery);
+        assertNotNull(unionQuery);
+
+        SourceFilter sourceFilter = intersectionQuery.getSourceFilter();
+        assertNotNull(sourceFilter);
+        assertEquals(List.of("id"), List.of(sourceFilter.getIncludes()));
     }
 
     @Test
@@ -281,14 +294,92 @@ class ElasticCaseServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         doReturn(null).when(service).buildQuery(anyList(), same(user), any(Pageable.class), eq(Locale.ENGLISH), eq(true));
 
+        Page<String> idsResult = service.searchIds(List.of(new CaseSearchRequest()), user, pageable, Locale.ENGLISH, true);
         Page<Case> result = service.search(List.of(new CaseSearchRequest()), user, pageable, Locale.ENGLISH, true);
 
+        assertTrue(idsResult.isEmpty());
         assertTrue(result.isEmpty());
         assertEquals(0, service.count(List.of(new CaseSearchRequest()), user, Locale.ENGLISH, true));
+        assertThrows(IllegalArgumentException.class,
+                () -> service.searchIds(null, user, pageable, Locale.ENGLISH, true));
         assertThrows(IllegalArgumentException.class,
                 () -> service.search(null, user, pageable, Locale.ENGLISH, true));
         assertThrows(IllegalArgumentException.class,
                 () -> service.count(null, user, Locale.ENGLISH, true));
+    }
+
+    @Test
+    void searchIdsReturnsPageOfStringsWhenHitsFound() {
+        Fixture fixture = fixture(List.of("title"));
+        LoggedUser user = loggedUser();
+        Pageable pageable = PageRequest.of(0, 10);
+
+        SearchHit<com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase> hit1 =
+                new SearchHit<>("case-index", "case-1", null, 1.0f, null, null, null, null, null, null, null);
+        SearchHit<com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase> hit2 =
+                new SearchHit<>("case-index", "case-2", null, 1.0f, null, null, null, null, null, null, null);
+        SearchHits<com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase> searchHits = mock(SearchHits.class);
+        when(searchHits.getSearchHits()).thenReturn(List.of(hit1, hit2));
+        when(searchHits.getTotalHits()).thenReturn(2L);
+        when(searchHits.getTotalHitsRelation()).thenReturn(TotalHitsRelation.EQUAL_TO);
+
+        when(fixture.template().search(any(NativeQuery.class), eq(com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase.class), any(IndexCoordinates.class)))
+                .thenReturn(searchHits);
+
+        Page<String> result = fixture.service().searchIds(List.of(new CaseSearchRequest()), user, pageable, Locale.ENGLISH, true);
+
+        assertEquals(2, result.getTotalElements());
+        assertEquals(List.of("case-1", "case-2"), result.getContent());
+    }
+
+    @Test
+    void searchIdsReturnsEmptyPageWhenNoHitsFound() {
+        Fixture fixture = fixture(List.of("title"));
+        LoggedUser user = loggedUser();
+        Pageable pageable = PageRequest.of(0, 10);
+
+        SearchHits<com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase> searchHits = mock(SearchHits.class);
+        when(searchHits.getSearchHits()).thenReturn(List.of());
+        when(searchHits.getTotalHits()).thenReturn(0L);
+        when(searchHits.getTotalHitsRelation()).thenReturn(TotalHitsRelation.EQUAL_TO);
+
+        when(fixture.template().search(any(NativeQuery.class), eq(com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase.class), any(IndexCoordinates.class)))
+                .thenReturn(searchHits);
+
+        Page<String> result = fixture.service().searchIds(List.of(new CaseSearchRequest()), user, pageable, Locale.ENGLISH, true);
+
+        assertEquals(0, result.getTotalElements());
+        assertTrue(result.getContent().isEmpty());
+    }
+
+    @Test
+    void searchResolvesCasesFromMongoUsingSearchIds() {
+        Fixture fixture = fixture(List.of("title"));
+        LoggedUser user = loggedUser();
+        Pageable pageable = PageRequest.of(0, 10);
+
+        SearchHit<com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase> hit1 =
+                new SearchHit<>("case-index", "case-1", null, 1.0f, null, null, null, null, null, null, null);
+        SearchHits<com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase> searchHits = mock(SearchHits.class);
+        when(searchHits.getSearchHits()).thenReturn(List.of(hit1));
+        when(searchHits.getTotalHits()).thenReturn(1L);
+        when(searchHits.getTotalHitsRelation()).thenReturn(TotalHitsRelation.EQUAL_TO);
+
+        when(fixture.template().search(any(NativeQuery.class), eq(com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase.class), any(IndexCoordinates.class)))
+                .thenReturn(searchHits);
+
+        Case caseEntity = mock(Case.class);
+        when(caseEntity.getStringId()).thenReturn("case-1");
+        when(fixture.workflowService().findAllById(List.of("case-1"))).thenReturn(List.of(caseEntity));
+        when(fixture.workflowService().findAllByIdProjected(List.of("case-1"), List.of("field1"))).thenReturn(List.of(caseEntity));
+
+        Page<Case> fullResult = fixture.service().search(List.of(new CaseSearchRequest()), user, pageable, Locale.ENGLISH, true);
+        assertEquals(1, fullResult.getTotalElements());
+        assertEquals(List.of(caseEntity), fullResult.getContent());
+
+        Page<Case> projectedResult = fixture.service().search(List.of(new CaseSearchRequest()), user, pageable, Locale.ENGLISH, true, List.of("field1"));
+        assertEquals(1, projectedResult.getTotalElements());
+        assertEquals(List.of(caseEntity), projectedResult.getContent());
     }
 
     @Test
@@ -308,6 +399,8 @@ class ElasticCaseServiceTest {
         fixture.service().remove("case-1");
         fixture.service().index(useCase);
         fixture.service().indexNow(useCase);
+        fixture.service().update(useCase);
+        fixture.service().updateNow(useCase);
         ReflectionTestUtils.invokeMethod(fixture.service(), "stopQueues");
 
         ArgumentCaptor<BulkOperationWrapper> deleteOperation = ArgumentCaptor.forClass(BulkOperationWrapper.class);
@@ -316,9 +409,13 @@ class ElasticCaseServiceTest {
         assertEquals("case-1", deleteOperation.getValue().getOperation().delete().id());
 
         ArgumentCaptor<BulkOperationWrapper> indexOperations = ArgumentCaptor.forClass(BulkOperationWrapper.class);
-        verify(indexQueue, times(2)).push(indexOperations.capture());
-        assertTrue(indexOperations.getAllValues().stream()
-                .allMatch(operation -> "case-index".equals(operation.getOperation().index().index())));
+        verify(indexQueue, times(4)).push(indexOperations.capture());
+        assertEquals(2, indexOperations.getAllValues().stream()
+                .filter(operation -> operation.getOperation().isIndex() && "case-index".equals(operation.getOperation().index().index()))
+                .count());
+        assertEquals(2, indexOperations.getAllValues().stream()
+                .filter(operation -> operation.getOperation().isUpdate() && "case-index".equals(operation.getOperation().update().index()))
+                .count());
         verify(indexQueue).shutdown();
         verify(deleteQueue).shutdown();
     }

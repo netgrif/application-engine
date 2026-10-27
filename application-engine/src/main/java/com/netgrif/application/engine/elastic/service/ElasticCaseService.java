@@ -35,10 +35,13 @@ import org.springframework.data.domain.*;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
+import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHitSupport;
 import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.SearchPage;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.*;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -128,6 +131,21 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         index(useCase);
     }
 
+    @Async
+    @Override
+    public void update(ElasticCase useCase) {
+        caseElasticIndexQueueManager.push(BulkOperationWrapper.builder()
+                .operation(createUpdateOperation(useCase))
+                .publishableEvent(new IndexCaseEvent(useCase))
+                .build());
+        log.debug("[{}]: Case \"{}\" queued for partial update", useCase.getId(), useCase.getTitle());
+    }
+
+    @Override
+    public void updateNow(ElasticCase useCase) {
+        update(useCase);
+    }
+
     @Override
     public Page<Case> search(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
         return search(requests, user, pageable, locale, isIntersection, null);
@@ -197,7 +215,8 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
         NativeQueryBuilder builder = new NativeQueryBuilder()
                 .withQuery(query.build()._toQuery())
-                .withPageable(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()));
+                .withPageable(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()))
+                .withSourceFilter(new FetchSourceFilterBuilder().withIncludes("id").build());
 
         for (org.springframework.data.domain.Sort.Order o : pageable.getSort()) {
             builder.withSort(s -> s.field(f -> f
@@ -560,6 +579,16 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
                 .index(elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX))
                 .id(useCase.getId())
                 .document(template.getElasticsearchConverter().mapObject(useCase))));
+    }
+
+    private BulkOperation createUpdateOperation(ElasticCase useCase) {
+        return BulkOperation.of(op -> op.update(u -> u
+                .index(elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX))
+                .id(useCase.getId())
+                .action(a -> a
+                        .doc(template.getElasticsearchConverter().mapObject(useCase))
+                        .docAsUpsert(true)
+                )));
     }
 
     private List<String> normalizeFullTextSearch(String fullText) {

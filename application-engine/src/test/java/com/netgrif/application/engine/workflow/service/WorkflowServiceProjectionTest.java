@@ -196,4 +196,21 @@ class WorkflowServiceProjectionTest {
         assertEquals(1, pagedProjected.getTotalElements());
         assertTrue(pagedProjected.getContent().get(0).isPartiallyLoaded());
     }
+
+    @Test
+    void getDataWithEventsLoadsEntireDataSet() {
+        PetriNet actionsNet = importHelper.createNet("data_actions_test.xml").orElseThrow();
+        Case actionCase = workflowService.createCase(CreateCaseParams.with()
+                .process(actionsNet)
+                .title("Actions Case")
+                .color("green")
+                .author(superCreator.getLoggedSuper())
+                .build()).getCase();
+        String taskId = actionCase.getTasks().iterator().next().getTask();
+        var outcome = dataService.getData(taskId);
+        assertNotNull(outcome);
+        assertTrue(outcome.getCase().isPartiallyLoaded());
+        assertTrue(outcome.getCase().getDataSet().containsKey("control_field"));
+        assertTrue(outcome.getCase().getDataSet().containsKey("text_field"));
+    }
 }

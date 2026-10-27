@@ -38,7 +38,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
         Field<?> netField = useCase.getField(fieldId);
         com.netgrif.application.engine.objects.workflow.domain.DataField caseField = useCase.getDataField(fieldId);
 
-        if (caseField.getValue() == null) {
+        if (caseField == null || caseField.getValue() == null) {
             return Optional.empty();
         } else if (netField instanceof EnumerationMapField) {
             return this.transformEnumerationMapField(caseField, (EnumerationMapField) netField);

@@ -1336,15 +1336,21 @@ public class DataService implements IDataService {
     }
 
     private Collection<String> resolveGetDataKeys(PetriNet net, Task task) {
-        Transition transition = net.getTransition(task.getTransitionId());
-        if (transition == null) {
+        if (net == null || task == null) {
             return Collections.emptySet();
+        }
+        Transition transition = net.getTransition(task.getTransitionId());
+        if (transition == null || transition.getDataSet() == null) {
+            return Collections.emptySet();
+        }
+        if (hasGetEvents(net, transition)) {
+            return net.getDataSet() != null ? net.getDataSet().keySet() : Collections.emptySet();
         }
         return transition.getDataSet().keySet();
     }
 
     private boolean hasGetEvents(PetriNet net, Transition transition) {
-        if (transition == null) {
+        if (net == null || transition == null || transition.getDataSet() == null || net.getDataSet() == null) {
             return false;
         }
         return transition.getDataSet().entrySet().stream().anyMatch(entry -> {
