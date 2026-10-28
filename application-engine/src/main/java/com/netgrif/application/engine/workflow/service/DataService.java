@@ -1205,7 +1205,7 @@ public class DataService implements IDataService {
     }
 
     private String getFieldTypeFromNode(ObjectNode node) {
-        return node.get("type").asText();
+        return node.get("type") != null ? node.get("type").asText() : "default";
     }
 
     private Map<String, Object> parseFilterMetadataValue(ObjectNode node, String fieldType) {

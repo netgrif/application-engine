@@ -184,6 +184,17 @@ class ActionApiImplTest {
         assertEquals("AuthPrincipalDto cannot be null.", exception.getMessage());
     }
 
+    @Test
+    void importCaseReaderPluginTestPetriNet() {
+        Optional<PetriNet> netOptional = importHelper.createNet("case_reader_plugin_test.xml");
+        assertTrue(netOptional.isPresent());
+        PetriNet net = netOptional.get();
+        assertEquals("case_reader_plugin_test", net.getIdentifier());
+        assertNotNull(net.getTransitions().get("t_main"));
+        assertNotNull(net.getTransitions().get("helper_task"));
+        assertEquals(21 * 2 + 3, net.getDataSet().size());
+    }
+
     private PetriNet importAllDataNet() {
         Optional<PetriNet> net = importHelper.createNet("all_data.xml");
         assertTrue(net.isPresent());

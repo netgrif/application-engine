@@ -165,8 +165,8 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         List<Case> casePage;
         long total;
         if (query != null) {
-            SearchHits<ElasticCase> hits = template.search(query, ElasticCase.class, IndexCoordinates.of(elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX)));
-            Page<ElasticCase> indexedCases = (Page) SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
+            SearchHits<com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase> hits = template.search(query, com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase.class, IndexCoordinates.of(elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX)));
+            Page<com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase> indexedCases = (Page) SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
             List<String> ids = indexedCases.get().map(ElasticCase::getId).collect(Collectors.toList());
             casePage = dataFieldIds == null ? workflowService.findAllById(ids) : workflowService.findAllByIdProjected(ids, dataFieldIds);
             total = indexedCases.getTotalElements();
