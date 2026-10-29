@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.adapter.spring.utils;
 
 import com.netgrif.application.engine.adapter.spring.utils.exceptions.AmbiguousMethodCallException;
+import org.apache.commons.lang3.ClassUtils;
 import org.springframework.aop.framework.AopProxyUtils;
 
 import java.lang.reflect.Method;
@@ -80,6 +81,28 @@ public final class NaeReflectionUtils {
             return findMethodWithSuperClassParams(bean, methodToExecute, requestParamTypes, e);
         }
     }
+    
+    /**
+     * Determines whether two arrays of parameter types match, considering primitive types
+     * and their corresponding wrapper classes as equivalent.
+     *
+     * @param methodParamTypes the parameter types of the method to check
+     * @param paramTypes       the requested parameter types to compare against
+     * @return {@code true} if both arrays have equal length and matching types (exact or primitive/wrapper equivalent), {@code false} otherwise
+     */
+    public static boolean isExactOrWrapperMatch(Class<?>[] methodParamTypes, Class<?>[] paramTypes) {
+        if (methodParamTypes.length != paramTypes.length) {
+            return false;
+        }
+        for (int i = 0; i < methodParamTypes.length; i++) {
+            Class<?> mType = methodParamTypes[i] != null ? ClassUtils.primitiveToWrapper(methodParamTypes[i]) : null;
+            Class<?> pType = paramTypes[i] != null ? ClassUtils.primitiveToWrapper(paramTypes[i]) : null;
+            if (!Objects.equals(mType, pType)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     /**
      * Attempts to find a method on the target class of the given bean using superclass parameter types when an exact match is not found.
@@ -117,6 +140,10 @@ public final class NaeReflectionUtils {
                 break;
             } else if (paramsLen == 0 || paramsLen != requestParamsLen) {
                 continue;
+            }
+
+            if (NaeReflectionUtils.isExactOrWrapperMatch(paramTypes, requestParamTypes)) {
+                return method;
             }
 
             for (int i = 0; i < requestParamTypes.length; ++i) {

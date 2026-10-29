@@ -103,6 +103,13 @@ public class Case extends com.netgrif.application.engine.objects.workflow.domain
     }
 
     @Override
+    @Transient
+    @JsonIgnore
+    public boolean isPartiallyLoaded() {
+        return super.isPartiallyLoaded();
+    }
+
+    @Override
     public ActorRef getAuthor() {
         return super.getAuthor();
     }

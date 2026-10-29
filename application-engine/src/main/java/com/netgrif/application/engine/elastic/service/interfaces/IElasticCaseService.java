@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
@@ -18,7 +19,19 @@ public interface IElasticCaseService {
 
     void indexNow(ElasticCase useCase);
 
+    @Async
+    void update(ElasticCase useCase);
+
+    void updateNow(ElasticCase useCase);
+
     Page<Case> search(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection);
+
+    /**
+     * Same as {@link #search(List, LoggedUser, Pageable, Locale, Boolean)}, but Mongo hydration loads only the given
+     * {@code dataSet} entries (plus automatically required ones). Returned cases are PARTIAL and READ-ONLY; persist
+     * changes with {@code IWorkflowService#savePartial}. A {@code null} {@code dataFieldIds} loads full cases.
+     */
+    Page<Case> search(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection, Collection<String> dataFieldIds);
 
     long count(List<CaseSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection);
 
