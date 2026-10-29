@@ -110,12 +110,15 @@ public class DashboardItemServiceImpl implements DashboardItemService {
 
     /**
      * Assigns the task, sets the data one batch after another (in the given order) and finishes the task.
-     * If a step fails, the task is cancelled so the case is not left with an assigned task.
+     * If a step fails, the values the batches touched are restored in the still assigned task, in the same
+     * batch order, and the task is cancelled. An existing item thus keeps its data and its active state
+     * (assigning the task deactivates it, cancelling does not bring it back).
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected Case setDataWithExecute(Case useCase, String transId, List<Map<String, Map<String, Object>>> dataSetBatches) throws TransitionNotExecutableException {
         AbstractUser loggedUser = userService.getLoggedOrSystem();
         String taskId = MenuItemUtils.findTaskIdInCase(useCase, transId);
+        List<Map<String, Map<String, Object>>> rollbackBatches = buildRollbackBatches(useCase, dataSetBatches);
         Task task = taskService.findOne(taskId);
         task = taskService.assignTask(TaskParams.with()
                 .task(task)
@@ -130,8 +133,46 @@ public class DashboardItemServiceImpl implements DashboardItemService {
                     .user(loggedUser)
                     .build()).getCase();
         } catch (RuntimeException | TransitionNotExecutableException e) {
+            restoreQuietly(task, rollbackBatches);
             cancelQuietly(task, loggedUser);
             throw e;
+        }
+    }
+
+    /**
+     * Reads the current values of the fields the batches are going to write, in the same type and batch order.
+     * Empty for an item that has no id yet: a case that is still being created has nothing to go back to.
+     */
+    private List<Map<String, Map<String, Object>>> buildRollbackBatches(Case useCase, List<Map<String, Map<String, Object>>> dataSetBatches) {
+        Case current = workflowService.findOne(useCase.getStringId());
+        Object currentId = current.getDataSet().get(DashboardItemConstants.FIELD_ID) == null ? null
+                : current.getDataSet().get(DashboardItemConstants.FIELD_ID).getValue();
+        if (currentId == null || currentId.toString().isEmpty()) {
+            return List.of();
+        }
+        List<Map<String, Map<String, Object>>> rollback = new ArrayList<>();
+        for (Map<String, Map<String, Object>> batch : dataSetBatches) {
+            Map<String, Map<String, Object>> restore = new LinkedHashMap<>();
+            batch.forEach((fieldId, entry) -> {
+                Map<String, Object> restoreEntry = new LinkedHashMap<>();
+                restoreEntry.put("type", entry.get("type"));
+                restoreEntry.put("value", current.getDataSet().get(fieldId) == null ? null : current.getDataSet().get(fieldId).getValue());
+                restore.put(fieldId, restoreEntry);
+            });
+            rollback.add(restore);
+        }
+        return rollback;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private void restoreQuietly(Task task, List<Map<String, Map<String, Object>>> rollbackBatches) {
+        try {
+            Task assigned = taskService.findOne(task.getStringId());
+            for (Map<String, Map<String, Object>> batch : rollbackBatches) {
+                assigned = dataService.setData(assigned, ImportHelper.populateDataset((Map) batch)).getTask();
+            }
+        } catch (RuntimeException e) {
+            log.warn("Could not restore the data of task {} after a failed dashboard item update", task.getStringId(), e);
         }
     }
 
