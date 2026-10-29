@@ -29,8 +29,15 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
 
     protected void populateDataSet(ElasticCase transformedCase, Case useCase) {
         for (String id : useCase.getImmediateDataFields()) {
-            Optional<DataField> parsedValue = this.transformDataField(id, useCase);
-            parsedValue.ifPresent(dataField -> transformedCase.getDataSet().put(id, dataField));
+            if (useCase.isPartiallyLoaded()) {
+                if (useCase.getDataSet() != null && useCase.getDataSet().containsKey(id)) {
+                    Optional<DataField> parsedValue = this.transformDataField(id, useCase);
+                    transformedCase.getDataSet().put(id, parsedValue.orElse(null));
+                }
+            } else {
+                Optional<DataField> parsedValue = this.transformDataField(id, useCase);
+                parsedValue.ifPresent(dataField -> transformedCase.getDataSet().put(id, dataField));
+            }
         }
     }
 
