@@ -26,13 +26,13 @@ public class LocalisedTaskResource extends EntityModel<Task> {
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
                 .getOne(task.getStringId(), null)).withSelfRel());
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
-                .assign((Authentication) null, task.getStringId(), null)).withRel("assign"));
+                .assign(task.getStringId(), null)).withRel("assign"));
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
-                .delegate((Authentication) null, task.getStringId(), null, null)).withRel("delegate"));
+                .delegate(task.getStringId(), null, null)).withRel("delegate"));
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
-                .finish((Authentication) null, task.getStringId(), null)).withRel("finish"));
+                .finish(task.getStringId(), null)).withRel("finish"));
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
-                .cancel((Authentication) null, task.getStringId(), null)).withRel("cancel"));
+                .cancel(task.getStringId(), null)).withRel("cancel"));
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
                 .getData(task.getStringId(), null)).withRel("data"));
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
