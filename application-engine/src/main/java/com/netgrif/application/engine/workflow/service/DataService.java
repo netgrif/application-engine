@@ -1262,17 +1262,7 @@ public class DataService implements IDataService {
                 .addModule(module)
                 .build();
 
-        Map<String, I18nString> optionsMapped = mapper.convertValue(
-                optionsNode,
-                new TypeReference<Map<String, I18nString>>() {
-                }
-        );
-
-        if (optionsMapped == null) {
-            return null;
-        }
-
-        return optionsMapped;
+        return mapper.convertValue(optionsNode, new TypeReference<>() {});
     }
 
     private void setDataFieldOptions(Map<String, I18nString> options, DataField dataField, ChangedField changedField, String fieldType) {
