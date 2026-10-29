@@ -10,6 +10,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.elastic.domain.BulkOperationWrapper;
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.elastic.service.model.FullTextField;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticCase;
@@ -68,6 +69,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     protected ApplicationEventPublisher publisher;
     protected ElasticQueueManager caseElasticIndexQueueManager;
     protected ElasticQueueManager caseElasticDeleteQueueManager;
+    protected IElasticCaseMappingService caseMappingService;
 
     public ElasticCaseService(ElasticCaseRepository repository,
                               ElasticsearchTemplate template,
@@ -78,6 +80,19 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
                               IElasticCasePrioritySearch elasticCasePrioritySearch,
                               ApplicationEventPublisher publisher,
                               ElasticsearchClient elasticsearchClient) {
+        this(repository, template, executors, elasticProperties, petriNetService, workflowService, elasticCasePrioritySearch, publisher, elasticsearchClient, null);
+    }
+
+    public ElasticCaseService(ElasticCaseRepository repository,
+                              ElasticsearchTemplate template,
+                              Executor executors,
+                              DataConfigurationProperties.ElasticsearchProperties elasticProperties,
+                              @Lazy IPetriNetService petriNetService,
+                              @Lazy IWorkflowService workflowService,
+                              IElasticCasePrioritySearch elasticCasePrioritySearch,
+                              ApplicationEventPublisher publisher,
+                              ElasticsearchClient elasticsearchClient,
+                              @Lazy IElasticCaseMappingService caseMappingService) {
         this.repository = repository;
         this.template = template;
         this.executors = executors;
@@ -88,7 +103,11 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         this.publisher = publisher;
         this.caseElasticIndexQueueManager = new ElasticQueueManager(elasticProperties, elasticsearchClient, publisher);
         this.caseElasticDeleteQueueManager = new ElasticQueueManager(elasticProperties, elasticsearchClient, publisher);
+        this.caseMappingService = caseMappingService;
+    }
 
+    public void setCaseMappingService(IElasticCaseMappingService caseMappingService) {
+        this.caseMappingService = caseMappingService;
     }
 
     @PreDestroy
@@ -134,6 +153,16 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     @Async
     @Override
     public void update(ElasticCase useCase) {
+        if (!repository.existsById(useCase.getId())) {
+            log.debug("[{}]: Case \"{}\" not found in index for update, queueing full-case index", useCase.getId(), useCase.getTitle());
+            if (this.workflowService != null && this.caseMappingService != null) {
+                Case fullCase = this.workflowService.findOne(useCase.getId());
+                if (fullCase != null) {
+                    index(this.caseMappingService.transform(fullCase));
+                    return;
+                }
+            }
+        }
         caseElasticIndexQueueManager.push(BulkOperationWrapper.builder()
                 .operation(createUpdateOperation(useCase))
                 .publishableEvent(new IndexCaseEvent(useCase))
@@ -587,7 +616,6 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
                 .id(useCase.getId())
                 .action(a -> a
                         .doc(template.getElasticsearchConverter().mapObject(useCase))
-                        .docAsUpsert(true)
                 )));
     }
 

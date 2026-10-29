@@ -8,6 +8,7 @@ import com.netgrif.application.engine.configuration.properties.DataConfiguration
 import com.netgrif.application.engine.elastic.domain.BulkOperationWrapper;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
 import com.netgrif.application.engine.elastic.service.executors.Executor;
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCasePrioritySearch;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
@@ -293,8 +294,10 @@ class ElasticCaseServiceTest {
         LoggedUser user = loggedUser();
         Pageable pageable = PageRequest.of(0, 10);
 
+        com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase elasticCaseHit = new com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase();
+        elasticCaseHit.setId("case-1");
         SearchHit<com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase> hit1 =
-                new SearchHit<>("case-index", "case-1", null, 1.0f, null, null, null, null, null, null, null);
+                new SearchHit<>("case-index", "case-1", null, 1.0f, null, null, null, null, null, null, elasticCaseHit);
         SearchHits<com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase> searchHits = mock(SearchHits.class);
         when(searchHits.getSearchHits()).thenReturn(List.of(hit1));
         when(searchHits.getTotalHits()).thenReturn(1L);
@@ -327,6 +330,7 @@ class ElasticCaseServiceTest {
         ElasticCase useCase = mock(ElasticCase.class);
         when(useCase.getId()).thenReturn("case-1");
         when(fixture.repository().findById("case-1")).thenReturn(Optional.empty());
+        when(fixture.repository().existsById("case-1")).thenReturn(true);
         ElasticsearchConverter converter = mock(ElasticsearchConverter.class);
         when(fixture.template().getElasticsearchConverter()).thenReturn(converter);
         when(converter.mapObject(useCase)).thenReturn(Document.from(new HashMap<>()));
@@ -353,6 +357,41 @@ class ElasticCaseServiceTest {
                 .count());
         verify(indexQueue).shutdown();
         verify(deleteQueue).shutdown();
+    }
+
+    @Test
+    void updateWhenCaseNotInElasticsearchQueuesFullIndex() {
+        Fixture fixture = fixture(List.of("title"));
+        ElasticQueueManager indexQueue = mock(ElasticQueueManager.class);
+        fixture.service().caseElasticIndexQueueManager = indexQueue;
+        ElasticCase useCase = mock(ElasticCase.class);
+        when(useCase.getId()).thenReturn("case-1");
+        when(useCase.getTitle()).thenReturn("Test Case");
+        when(fixture.repository().existsById("case-1")).thenReturn(false);
+        when(fixture.repository().findById("case-1")).thenReturn(Optional.empty());
+
+        Case fullCase = mock(Case.class);
+        when(fixture.workflowService().findOne("case-1")).thenReturn(fullCase);
+
+        ElasticCase fullElasticCase = mock(ElasticCase.class);
+        when(fullElasticCase.getId()).thenReturn("case-1");
+        when(fullElasticCase.getTitle()).thenReturn("Test Case");
+        when(fixture.caseMappingService().transform(fullCase)).thenReturn(fullElasticCase);
+
+        ElasticsearchConverter converter = mock(ElasticsearchConverter.class);
+        when(fixture.template().getElasticsearchConverter()).thenReturn(converter);
+        when(converter.mapObject(fullElasticCase)).thenReturn(Document.from(new HashMap<>()));
+
+        fixture.service().update(useCase);
+
+        ArgumentCaptor<BulkOperationWrapper> indexOperations = ArgumentCaptor.forClass(BulkOperationWrapper.class);
+        verify(indexQueue, times(1)).push(indexOperations.capture());
+        assertEquals(1, indexOperations.getAllValues().stream()
+                .filter(operation -> operation.getOperation().isIndex() && "case-index".equals(operation.getOperation().index().index()))
+                .count());
+        assertEquals(0, indexOperations.getAllValues().stream()
+                .filter(operation -> operation.getOperation().isUpdate())
+                .count());
     }
 
     private void assertTermQuery(BoolQuery termQuery, String expectedValue, float firstBoost, float secondBoost) {
@@ -395,6 +434,7 @@ class ElasticCaseServiceTest {
         ElasticsearchTemplate template = mock(ElasticsearchTemplate.class);
         IPetriNetService petriNetService = mock(IPetriNetService.class);
         IWorkflowService workflowService = mock(IWorkflowService.class);
+        IElasticCaseMappingService caseMappingService = mock(IElasticCaseMappingService.class);
         DataConfigurationProperties.ElasticsearchProperties properties = new DataConfigurationProperties.ElasticsearchProperties();
         properties.setIndex(Map.of(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX, "case-index"));
 
@@ -407,9 +447,10 @@ class ElasticCaseServiceTest {
                 workflowService,
                 prioritySearch,
                 mock(ApplicationEventPublisher.class),
-                mock(ElasticsearchClient.class)
+                mock(ElasticsearchClient.class),
+                caseMappingService
         );
-        return new Fixture(service, repository, template, petriNetService, workflowService);
+        return new Fixture(service, repository, template, petriNetService, workflowService, caseMappingService);
     }
 
     private LoggedUser loggedUser() {
@@ -425,6 +466,7 @@ class ElasticCaseServiceTest {
                            ElasticCaseRepository repository,
                            ElasticsearchTemplate template,
                            IPetriNetService petriNetService,
-                           IWorkflowService workflowService) {
+                           IWorkflowService workflowService,
+                           IElasticCaseMappingService caseMappingService) {
     }
 }
