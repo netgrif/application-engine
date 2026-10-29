@@ -8,9 +8,6 @@ import com.netgrif.application.engine.menu.services.interfaces.DashboardItemServ
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
-import com.netgrif.application.engine.objects.common.ResourceNotFoundException;
-import com.netgrif.application.engine.objects.common.ResourceNotFoundExceptionCode;
-import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.objects.utils.MenuItemUtils;
 import com.netgrif.application.engine.objects.workflow.domain.Case;
@@ -31,9 +28,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -74,7 +69,7 @@ public class DashboardItemServiceImpl implements DashboardItemService {
                 .author(loggedUser)
                 .build()).getCase();
         ToDataSetOutcome outcome = body.toDataSet();
-        itemCase = setDataWithExecute(itemCase, DashboardItemConstants.TASK_CONFIGURE, outcome.getDataSet());
+        itemCase = setDataWithExecute(itemCase, DashboardItemConstants.TASK_CONFIGURE, splitToPhases(outcome.getDataSet()));
         return itemCase;
     }
 
@@ -91,7 +86,7 @@ public class DashboardItemServiceImpl implements DashboardItemService {
     public Case update(Case itemCase, DashboardItemBody body) throws TransitionNotExecutableException {
         MenuItemUtils.sanitize(body.getId());
         ToDataSetOutcome outcome = body.toDataSet();
-        itemCase = setDataWithExecute(itemCase, DashboardItemConstants.TASK_CONFIGURE, outcome.getDataSet());
+        itemCase = setDataWithExecute(itemCase, DashboardItemConstants.TASK_CONFIGURE, splitToPhases(outcome.getDataSet()));
         return itemCase;
     }
 
@@ -113,20 +108,111 @@ public class DashboardItemServiceImpl implements DashboardItemService {
         return dataService.setData(taskId, ImportHelper.populateDataset((Map) dataSet)).getCase();
     }
 
+    /**
+     * Assigns the task, sets the data one batch after another (in the given order) and finishes the task.
+     * If a step fails, the values the batches touched are restored in the still assigned task, in the same
+     * batch order, and the task is cancelled. An existing item thus keeps its data and its active state
+     * (assigning the task deactivates it, cancelling does not bring it back).
+     */
     @SuppressWarnings({"unchecked", "rawtypes"})
-    protected Case setDataWithExecute(Case useCase, String transId, Map<String, Map<String, Object>> dataSet) throws TransitionNotExecutableException {
+    protected Case setDataWithExecute(Case useCase, String transId, List<Map<String, Map<String, Object>>> dataSetBatches) throws TransitionNotExecutableException {
         AbstractUser loggedUser = userService.getLoggedOrSystem();
         String taskId = MenuItemUtils.findTaskIdInCase(useCase, transId);
+        List<Map<String, Map<String, Object>>> rollbackBatches = buildRollbackBatches(useCase, dataSetBatches);
         Task task = taskService.findOne(taskId);
         task = taskService.assignTask(TaskParams.with()
                 .task(task)
                 .user(loggedUser)
                 .build()).getTask();
-        task = dataService.setData(task, ImportHelper.populateDataset((Map) dataSet)).getTask();
-        return taskService.finishTask(TaskParams.with()
-                .task(task)
-                .user(loggedUser)
-                .build()).getCase();
+        try {
+            for (Map<String, Map<String, Object>> batch : dataSetBatches) {
+                task = dataService.setData(task, ImportHelper.populateDataset((Map) batch)).getTask();
+            }
+            return taskService.finishTask(TaskParams.with()
+                    .task(task)
+                    .user(loggedUser)
+                    .build()).getCase();
+        } catch (RuntimeException | TransitionNotExecutableException e) {
+            restoreQuietly(task, rollbackBatches);
+            cancelQuietly(task, loggedUser);
+            throw e;
+        }
+    }
+
+    /**
+     * Reads the current values of the fields the batches are going to write, in the same type and batch order.
+     * Empty for an item that has no id yet: a case that is still being created has nothing to go back to.
+     */
+    private List<Map<String, Map<String, Object>>> buildRollbackBatches(Case useCase, List<Map<String, Map<String, Object>>> dataSetBatches) {
+        Case current = workflowService.findOne(useCase.getStringId());
+        Object currentId = current.getDataSet().get(DashboardItemConstants.FIELD_ID) == null ? null
+                : current.getDataSet().get(DashboardItemConstants.FIELD_ID).getValue();
+        if (currentId == null || currentId.toString().isEmpty()) {
+            return List.of();
+        }
+        List<Map<String, Map<String, Object>>> rollback = new ArrayList<>();
+        for (Map<String, Map<String, Object>> batch : dataSetBatches) {
+            Map<String, Map<String, Object>> restore = new LinkedHashMap<>();
+            batch.forEach((fieldId, entry) -> {
+                Map<String, Object> restoreEntry = new LinkedHashMap<>();
+                restoreEntry.put("type", entry.get("type"));
+                restoreEntry.put("value", current.getDataSet().get(fieldId) == null ? null : current.getDataSet().get(fieldId).getValue());
+                restore.put(fieldId, restoreEntry);
+            });
+            rollback.add(restore);
+        }
+        return rollback;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private void restoreQuietly(Task task, List<Map<String, Map<String, Object>>> rollbackBatches) {
+        try {
+            Task assigned = taskService.findOne(task.getStringId());
+            for (Map<String, Map<String, Object>> batch : rollbackBatches) {
+                assigned = dataService.setData(assigned, ImportHelper.populateDataset((Map) batch)).getTask();
+            }
+        } catch (RuntimeException e) {
+            log.warn("Could not restore the data of task {} after a failed dashboard item update", task.getStringId(), e);
+        }
+    }
+
+    private void cancelQuietly(Task task, AbstractUser user) {
+        try {
+            taskService.cancelTask(TaskParams.with()
+                    .task(taskService.findOne(task.getStringId()))
+                    .user(user)
+                    .build());
+        } catch (RuntimeException e) {
+            log.warn("Could not cancel task {} after a failed dashboard item update", task.getStringId(), e);
+        }
+    }
+
+    /**
+     * Splits the data set into the steps a user takes in the configuration form. Set events of the
+     * dashboard_item process reset the icon and name whenever the target (is_internal, menu item), the
+     * inherit flags or external_icon change, so the values of the last step must be written after them.
+     * The order inside a phase matters too (is_internal clears external_url), hence ordered lists.
+     */
+    private List<Map<String, Map<String, Object>>> splitToPhases(Map<String, Map<String, Object>> dataSet) {
+        List<List<String>> phases = List.of(
+                List.of(DashboardItemConstants.FIELD_ID, DashboardItemConstants.FIELD_IS_INTERNAL,
+                        DashboardItemConstants.FIELD_EXTERNAL_URL),
+                List.of(DashboardItemConstants.FIELD_MENU_ITEM_LIST),
+                List.of(DashboardItemConstants.FIELD_INHERIT_ICON, DashboardItemConstants.FIELD_INHERIT_NAME),
+                List.of(DashboardItemConstants.FIELD_EXTERNAL_ICON));
+        List<Map<String, Map<String, Object>>> batches = new ArrayList<>();
+        Map<String, Map<String, Object>> rest = new LinkedHashMap<>(dataSet);
+        for (List<String> phase : phases) {
+            Map<String, Map<String, Object>> batch = new LinkedHashMap<>();
+            phase.forEach(fieldId -> {
+                if (rest.containsKey(fieldId)) {
+                    batch.put(fieldId, rest.remove(fieldId));
+                }
+            });
+            batches.add(batch);
+        }
+        batches.add(rest);
+        return batches;
     }
 
     protected Case findCase(String processIdentifier, String query) {
