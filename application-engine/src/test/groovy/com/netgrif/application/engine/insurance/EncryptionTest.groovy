@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.insurance
 
+import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl
 import com.netgrif.application.engine.auth.service.AuthorityService
 import com.netgrif.application.engine.importer.service.Importer
@@ -41,6 +42,9 @@ class EncryptionTest {
     private Importer importer
 
     @Autowired
+    private TestHelper helper
+
+    @Autowired
     private AuthorityService authorityService
 
     @Autowired
@@ -54,6 +58,7 @@ class EncryptionTest {
 
     @Test
     void testEncryption() {
+        helper.truncateDbs()
         String id = createCase()
 
         Case useCase = loadCase(id)

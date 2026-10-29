@@ -1,0 +1,14 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+	<id>simple_role</id>
+	<version>1.0.0</version>
+	<initials>SMR</initials>
+	<title>Simple Role</title>
+	<icon>device_hub</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>true</anonymousRole>
+	<transitionRole>false</transitionRole>
+	<role>
+		<id>simple_role</id>
+		<title>Simple role</title>
+	</role>
+</document>

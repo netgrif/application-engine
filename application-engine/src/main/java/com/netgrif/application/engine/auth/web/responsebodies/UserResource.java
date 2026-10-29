@@ -5,9 +5,9 @@ import org.springframework.hateoas.EntityModel;
 
 import java.util.ArrayList;
 
-public class UserResource extends EntityModel<User> {
+public class UserResource extends EntityModel<UserDto> {
 
-    public UserResource(User content, String selfRel) {
+    public UserResource(UserDto content) {
         super(content, new ArrayList<>());
     }
 

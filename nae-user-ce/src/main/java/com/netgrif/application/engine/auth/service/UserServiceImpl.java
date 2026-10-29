@@ -584,6 +584,7 @@ public class UserServiceImpl implements UserService {
             system.setLastName(UserConstants.SYSTEM_USER_SURNAME);
             system.setState(UserState.ACTIVE);
             saveUser(system);
+            systemUser = system;
         }
         return system;
     }

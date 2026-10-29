@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.permissions
 
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.adapter.spring.auth.domain.User
 import com.netgrif.application.engine.auth.service.AuthorityService
 import com.netgrif.application.engine.auth.service.GroupService
 import com.netgrif.application.engine.auth.service.UserService
@@ -98,7 +99,7 @@ class QueryDSLViewPermissionTest {
 
         userAuthority = authorityService.getOrCreate(Authority.user)
 
-        testUser = importHelper.createUser(new com.netgrif.application.engine.adapter.spring.auth.domain.User(firstName: "Role", lastName: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
+        testUser = importHelper.createUser(new User(firstName: "Role", lastName: "User", username: USER_EMAIL, email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [userAuthority] as Authority[], [] as ProcessRole[])
     }
 
