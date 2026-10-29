@@ -25,6 +25,8 @@ public class TabbedCaseViewBody extends ViewBody {
     private boolean allowHeaderTableMode = true;
     private List<String> headersMode = new ArrayList<>(List.of("sort", "edit", "search"));
     private String headersDefaultMode = "sort";
+    private List<String> headersSortModeActive;
+    private String headersSortModeDirection = "desc";
     private List<String> defaultHeaders;
     private boolean isHeaderModeChangeable = true;
     private boolean useDefaultHeaders = true;
@@ -64,6 +66,10 @@ public class TabbedCaseViewBody extends ViewBody {
                 this.headersMode == null ? new ArrayList<>() : this.headersMode);
         outcome.putDataSetEntry(TabbedCaseViewConstants.FIELD_HEADERS_DEFAULT_MODE, FieldType.ENUMERATION_MAP,
                 this.headersDefaultMode);
+        outcome.putDataSetEntry(TabbedCaseViewConstants.FIELD_HEADERS_SORT_MODE_ACTIVE, FieldType.TEXT,
+                this.headersSortModeActive != null ? String.join(",", this.headersSortModeActive) : null);
+        outcome.putDataSetEntry(TabbedCaseViewConstants.FIELD_HEADERS_SORT_MODE_DIRECTION, FieldType.ENUMERATION_MAP,
+                this.headersSortModeDirection);
         outcome.putDataSetEntry(TabbedCaseViewConstants.FIELD_DEFAULT_HEADERS, FieldType.TEXT,
                 this.defaultHeaders != null ? String.join(",", this.defaultHeaders) : null);
         outcome.putDataSetEntry(TabbedCaseViewConstants.FIELD_IS_HEADER_MODE_CHANGEABLE, FieldType.BOOLEAN,
