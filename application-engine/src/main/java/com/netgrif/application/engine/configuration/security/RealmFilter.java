@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.configuration.security;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.netgrif.application.engine.adapter.spring.configuration.filters.NetgrifOncePerRequestFilter;
 import com.netgrif.application.engine.adapter.spring.configuration.filters.requests.NetgrifHttpServletRequest;
 import com.netgrif.application.engine.auth.service.RealmService;
@@ -12,7 +11,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.JsonNode;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -25,11 +27,13 @@ import java.util.Optional;
 @Component
 public class RealmFilter extends NetgrifOncePerRequestFilter {
 
-    private final String REALM_ID_HEADER = "X-Realm-ID";
+    private static final String REALM_ID_HEADER = "X-Realm-ID";
 
-    private final String REALM_ID_BODY = "realmId";
+    private static final String REALM_ID_BODY = "realmId";
 
-    private final String REALM_NAME_BODY = "realmName";
+    private static final String REALM_NAME_BODY = "realName";
+
+    private static final String REALM_ALIAS_BODY = "realm";
 
     private final RealmService realmService;
 
@@ -42,17 +46,19 @@ public class RealmFilter extends NetgrifOncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         log.debug("Trying to get realm id from the HTTP request...");
 
-        Optional<Realm> realmOpt = findRealmInHeaders(request);
-
-        if (realmOpt.isEmpty()) {
-            realmOpt = findRealmInBody(request);
-        }
-
-        if (realmOpt.isEmpty()) {
+        RealmSelection selection = findRequestedRealm(request);
+        Optional<Realm> realmOpt;
+        if (selection.specified()) {
+            realmOpt = selection.realm();
+            if (realmOpt.isEmpty()) {
+                log.warn("Authentication rejected because the explicitly requested realm does not exist");
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid realm");
+                return;
+            }
+            log.debug("Realm was successfully found in the request");
+        } else {
             log.debug("Realm could not be found in the request. Using the default realm if available.");
             realmOpt = realmService.getDefaultRealm();
-        } else {
-            log.debug("Realm was successfully found in the request");
         }
 
         if (realmOpt.isEmpty()) {
@@ -68,44 +74,47 @@ public class RealmFilter extends NetgrifOncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    /**
-     * Finds realm by realm id in headers by {@link #REALM_ID_HEADER}
-     * */
-    private Optional<Realm> findRealmInHeaders(HttpServletRequest request) {
+    @Bean
+    public FilterRegistrationBean<RealmFilter> realmFilterFilterRegistrationBean(RealmFilter filter) {
+        FilterRegistrationBean<RealmFilter> registration = new FilterRegistrationBean<>(filter);
+        registration.setEnabled(false);
+        return registration;
+    }
+
+    private RealmSelection findRequestedRealm(NetgrifHttpServletRequest request) {
         String realmId = request.getHeader(REALM_ID_HEADER);
-        if (realmId == null || realmId.isBlank()) {
-            return Optional.empty();
+        if (realmId != null && !realmId.isBlank()) {
+            return new RealmSelection(true, realmService.getRealmById(realmId));
         }
-        return realmService.getRealmById(realmId);
-    }
 
-    /**
-     * Finds realm by realm id {@link #REALM_ID_BODY} or realm name {@link #REALM_NAME_BODY} in request body
-     * */
-    private Optional<Realm> findRealmInBody(NetgrifHttpServletRequest request) {
-        JsonNode requestBodyJson = HttpReqRespUtils.extractBodyFromRequest(request);
+        tools.jackson.databind.JsonNode requestBodyJson = HttpReqRespUtils.extractBodyFromRequest(request);
         if (requestBodyJson == null) {
-            return Optional.empty();
+            return new RealmSelection(false, Optional.empty());
         }
 
-        JsonNode realmIdNode = requestBodyJson.get(REALM_ID_BODY);
-        Optional<Realm> realmOpt = Optional.empty();
-
-        if (hasJsonNodeValue(realmIdNode)) {
-            realmOpt = realmService.getRealmById(String.valueOf(realmIdNode.textValue()));
+        tools.jackson.databind.JsonNode realmIdNode = requestBodyJson.get(REALM_ID_BODY);
+        if (hasText(realmIdNode)) {
+            return new RealmSelection(true, realmService.getRealmById(realmIdNode.textValue()));
         }
 
-        if (realmOpt.isEmpty()) {
-            JsonNode realmNameNode = requestBodyJson.get(REALM_NAME_BODY);
-            if (hasJsonNodeValue(realmNameNode)) {
-                realmOpt = realmService.getRealmByName(realmNameNode.textValue());
-            }
+        tools.jackson.databind.JsonNode realmNameNode = requestBodyJson.get(REALM_NAME_BODY);
+        if (hasText(realmNameNode)) {
+            return new RealmSelection(true, realmService.getRealmByName(realmNameNode.textValue()));
         }
 
-        return realmOpt;
+        tools.jackson.databind.JsonNode realmAliasNode = requestBodyJson.get(REALM_ALIAS_BODY);
+        if (hasText(realmAliasNode)) {
+            Optional<Realm> realm = realmService.getRealmById(realmAliasNode.textValue())
+                    .or(() -> realmService.getRealmByName(realmAliasNode.textValue()));
+            return new RealmSelection(true, realm);
+        }
+
+        return new RealmSelection(false, Optional.empty());
     }
 
-    private static boolean hasJsonNodeValue(JsonNode node) {
+    private static boolean hasText(JsonNode node) {
         return node != null && node.textValue() != null && !node.textValue().isBlank();
     }
+
+    private record RealmSelection(boolean specified, Optional<Realm> realm) {}
 }

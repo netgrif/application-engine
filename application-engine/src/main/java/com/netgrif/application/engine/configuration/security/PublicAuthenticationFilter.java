@@ -70,13 +70,17 @@ public class PublicAuthenticationFilter extends NetgrifOncePerRequestFilter {
         log.debug("Loaded realm {} (publicAccess={})", realm.getName(), realm.isPublicAccess());
         if (!realm.isPublicAccess()) {
             log.debug("Public access disabled for realm {}; skipping anon auth", realm.getName());
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-            response.getWriter().write("""
-            {"error":"forbidden","message":"Public access disabled for realm"}
-            """);
-            response.getWriter().flush();
+            if (path.contains("/public/")) {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
+                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+                response.getWriter().write("""
+                    {"error":"forbidden","message":"Public access disabled for realm"}
+                """);
+                response.getWriter().flush();
+                return;
+            }
+            filterChain.doFilter(request, response);
             return;
         }
 

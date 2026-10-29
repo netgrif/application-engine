@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -28,6 +29,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -76,6 +78,9 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
     @Autowired
     private RealmFilter realmFilter;
 
+    @Autowired
+    private AuthRequestBodyFilter authRequestBodyFilter;
+
     @Bean
     public FilterRegistrationBean<RealmFilter> realmFilterFilterRegistrationBean(RealmFilter filter) {
         FilterRegistrationBean<RealmFilter> registration = new FilterRegistrationBean<>(filter);
@@ -118,6 +123,7 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
                 .addFilterBefore(publicAuthenticationFilter, SecurityContextFilter.class)
                 .addFilterBefore(netgrifHttpRequestTransformFilter, BasicAuthenticationFilter.class)
                 .addFilterBefore(realmFilter, PublicAuthenticationFilter.class)
+                .addFilterBefore(authRequestBodyFilter, RealmFilter.class)
                 .addFilterAfter(actuatorRequestFilter(), BasicAuthenticationFilter.class)
                 .authorizeHttpRequests(requestMatcherRegistry ->
                         requestMatcherRegistry
@@ -137,6 +143,10 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
         setCsrf(http);
         corsEnable(http);
         return http.build();
+    }
+
+    public static PathPatternRequestMatcher loginPathMatcher() {
+        return PathPatternRequestMatcher.pathPattern(HttpMethod.POST, "/api/auth/login");
     }
 
     @Override

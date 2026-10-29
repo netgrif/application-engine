@@ -1,12 +1,12 @@
 package com.netgrif.application.engine.utils;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.netgrif.application.engine.adapter.spring.configuration.filters.requests.NetgrifHttpServletRequest;
 import com.netgrif.application.engine.auth.domain.NetgrifAuthenticationToken;
 import com.netgrif.application.engine.objects.auth.domain.Realm;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import tools.jackson.databind.JsonNode;
 
 
 public class HttpReqRespUtils {
