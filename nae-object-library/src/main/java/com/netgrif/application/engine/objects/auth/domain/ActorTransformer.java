@@ -1,7 +1,12 @@
 package com.netgrif.application.engine.objects.auth.domain;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.Duration;
 import java.util.Set;
+import java.util.HashSet;
+import java.util.stream.Collectors;
 
 /**
  * Transformer class responsible for converting between different user/actor representations
@@ -13,9 +18,34 @@ public class ActorTransformer {
     /**
      * Factory for creating new LoggedUser instances.
      * Default implementation throws IllegalStateException if no factory is configured.
+     * The lambda expression provides a no-op factory that throws an exception to indicate
+     * that no valid LoggedUserFactory has been set.
+     * <p>
+     * -- SETTER --
+     * Sets the factory used for creating LoggedUser instances.
+     *
+     * @param f the LoggedUserFactory implementation to be used
      */
-    private static LoggedUserFactory factory = () -> {
+    @Setter
+    @Getter
+    private static LoggedUserFactory loggedUserFactory = () -> {
         throw new IllegalStateException("No LoggedUserFactory configured");
+    };
+
+
+    /**
+     * Factory for creating new AbstractUser instances.
+     * Default implementation throws IllegalStateException if no factory is configured.
+     * The lambda expression provides a no-op factory that throws an exception to indicate
+     * that no valid UserFactory has been set.
+     * <p>
+     * -- SETTER --
+     * Sets the factory used for creating AbstractUser instances.
+     **/
+    @Setter
+    @Getter
+    private static UserFactory userFactory = () -> {
+        throw new IllegalStateException("No UserFactory configured");
     };
 
     /**
@@ -38,17 +68,27 @@ public class ActorTransformer {
         default void resolveAuthoritiesRecursively(AbstractActor actor, Set<String> authorityIds, Set<String> visitedGroupIds) {};
     }
 
-    /**
-     * Sets the factory used for creating LoggedUser instances.
-     * @param f the LoggedUserFactory implementation to be used
-     */
-    public static void setLoggedUserFactory(LoggedUserFactory f) {
-        factory = f;
-    }
+    @FunctionalInterface
+    public interface UserFactory {
+        /**
+         * Creates a new AbstractUser instance.
+         * @return newly created AbstractUser instance
+         */
+        AbstractUser create();
 
 
-    public static LoggedUserFactory getLoggedUserFactory() {
-        return factory;
+        /**
+         * Creates a new AbstractUser instance based on the provided LoggedUser instance.
+         * By default, this method throws an IllegalStateException, and must be explicitly
+         * implemented by the concrete UserFactory implementation.
+         *
+         * @param loggedUser the LoggedUser containing user details
+         * @return newly created AbstractUser instance representing the same user
+         * @throws IllegalStateException if the method is not implemented
+         */
+        default AbstractUser create(LoggedUser loggedUser) {
+            throw new IllegalStateException("Method is not implemented");
+        }
     }
 
     /**
@@ -57,7 +97,7 @@ public class ActorTransformer {
      * @return new LoggedUser instance with copied user data
      */
     public static LoggedUser toLoggedUser(AbstractUser user) {
-        LoggedUser loggedUser = factory.create();
+        LoggedUser loggedUser = loggedUserFactory.create();
         loggedUser.setId(user.getStringId());
         loggedUser.setRealmId(user.getRealmId());
         loggedUser.setUsername(user.getUsername());
@@ -74,6 +114,28 @@ public class ActorTransformer {
         factory.resolveProcessRoles(loggedUser);
         factory.resolveAuthorities(loggedUser);
         return loggedUser;
+    }
+
+    /**
+     * Converts a LoggedUser into an AbstractUser by copying all relevant user information.
+     *
+     * @param loggedUser the LoggedUser to transform
+     * @return a new AbstractUser instance with copied user data
+     */
+    public static AbstractUser toUser(LoggedUser loggedUser) {
+        AbstractUser user = userFactory.create(loggedUser);
+        user.setId(loggedUser.getStringId());
+        user.setRealmId(loggedUser.getRealmId());
+        user.setUsername(loggedUser.getUsername());
+        user.setEmail(loggedUser.getEmail());
+        user.setFirstName(loggedUser.getFirstName());
+        user.setMiddleName(loggedUser.getMiddleName());
+        user.setLastName(loggedUser.getLastName());
+        user.setAuthoritySet(loggedUser.getAuthoritySet());
+        user.setProcessRoles(loggedUser.getProcessRoles());
+        user.setAttributes(loggedUser.getAttributes());
+        user.setGroupIds(loggedUser.getGroupIds());
+        return user;
     }
 
     /**
@@ -102,7 +164,8 @@ public class ActorTransformer {
                 user.getStringId(),
                 user.getRealmId(),
                 user.getUsername(),
-                user.getName()
+                user.getName(),
+                user.getAuthoritySet().stream().map(Authority::getName).collect(Collectors.toSet())
         );
     }
 
@@ -116,7 +179,8 @@ public class ActorTransformer {
                 loggedUser.getStringId(),
                 loggedUser.getRealmId(),
                 loggedUser.getUsername(),
-                loggedUser.getName()
+                loggedUser.getName(),
+                loggedUser.getAuthoritySet().stream().map(Authority::getName).collect(Collectors.toSet())
         );
     }
 
@@ -130,7 +194,8 @@ public class ActorTransformer {
                 group.getStringId(),
                 group.getRealmId(),
                 group.getIdentifier(),
-                group.getName()
+                group.getName(),
+                group.getAuthoritySet().stream().map(Authority::getName).collect(Collectors.toSet())
         );
     }
 
@@ -143,7 +208,8 @@ public class ActorTransformer {
                 "",
                 "",
                 "***",
-                "***"
+                "***",
+                new HashSet<>()
         );
     }
 }

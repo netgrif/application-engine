@@ -13,12 +13,13 @@ import org.springframework.context.annotation.Configuration;
 @RequiredArgsConstructor
 public class LoggedUserConfiguration {
 
-    private final GroupService groupService;
-    private final ProcessRoleService processRoleService;
-    private final AuthorityService authorityService;
+    private final ActorTransformer.LoggedUserFactory loggedUserFactory;
+
+    private final ActorTransformer.UserFactory userFactory;
 
     @PostConstruct
     public void initializeLoggedUserFactory() {
-        ActorTransformer.setLoggedUserFactory(new DefaultLoggedUserFactory(groupService, processRoleService, authorityService));
+        ActorTransformer.setLoggedUserFactory(loggedUserFactory);
+        ActorTransformer.setUserFactory(userFactory);
     }
 }

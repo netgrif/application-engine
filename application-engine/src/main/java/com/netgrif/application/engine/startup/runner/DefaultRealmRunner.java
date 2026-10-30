@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.startup.runner;
 
 import com.netgrif.application.engine.auth.service.RealmService;
+import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import com.netgrif.application.engine.objects.auth.domain.Realm;
@@ -19,6 +20,8 @@ public class DefaultRealmRunner implements ApplicationEngineStartupRunner {
 
     private final RealmService realmService;
 
+    private final SecurityConfigurationProperties.WebProperties webProperties;
+
     @Override
     public void run(ApplicationArguments args) throws Exception {
         if (realmService.getDefaultRealm().isPresent()) {
@@ -29,6 +32,9 @@ public class DefaultRealmRunner implements ApplicationEngineStartupRunner {
         createRequest.setDescription("Default realm");
         createRequest.setAdminRealm(true);
         createRequest.setDefaultRealm(true);
-        realmService.createRealm(createRequest);
+        Realm realm = realmService.createRealm(createRequest);
+        if (webProperties.getPublicWeb().isEnabled()) {
+            realmService.enableAnonymUser(realm);
+        }
     }
 }

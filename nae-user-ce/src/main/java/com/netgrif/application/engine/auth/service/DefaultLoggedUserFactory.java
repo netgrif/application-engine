@@ -5,7 +5,8 @@ import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRol
 import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 import java.util.Set;

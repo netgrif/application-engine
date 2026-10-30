@@ -1,26 +1,27 @@
 package com.netgrif.application.engine.configuration;
 
+import com.netgrif.application.engine.adapter.spring.configuration.filters.NetgrifHttpRequestTransformFilter;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigurationProperties;
 import com.netgrif.application.engine.configuration.security.*;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.auth.service.AuthorityService;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.configuration.security.filter.HostValidationRequestFilter;
-import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
+import com.netgrif.application.engine.configuration.security.RealmFilter;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AnonymousAuthenticationProvider;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -28,6 +29,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -41,7 +43,6 @@ import static org.springframework.http.HttpMethod.OPTIONS;
 
 
 @Slf4j
-@Controller
 @Configuration
 @EnableWebSecurity
 @Order(SecurityFilterProperties.DEFAULT_FILTER_ORDER)
@@ -54,19 +55,7 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
     private RestAuthenticationEntryPoint authenticationEntryPoint;
 
     @Autowired
-    private AuthorityService authorityService;
-
-    @Autowired
-    private IJwtService jwtService;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
     private SecurityConfigurationProperties securityConfigurationProperties;
-
-    @Autowired
-    private SecurityConfigurationProperties properties;
 
     @Autowired
     private ISecurityContextService securityContextService;
@@ -78,22 +67,36 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
     private List<AuthenticationProvider> authenticationProviders;
 
     @Autowired
-    private AuthenticationManagerBuilder authenticationManagerBuilder;
+    private PublicAuthenticationFilter publicAuthenticationFilter;
 
     @Autowired
     private WebEndpointProperties webEndpointProperties;
 
-    private static final String ANONYMOUS_USER = "anonymousUser";
+    @Autowired
+    private NetgrifHttpRequestTransformFilter netgrifHttpRequestTransformFilter;
+
+    @Autowired
+    private RealmFilter realmFilter;
+
+    @Autowired
+    private AuthRequestBodyFilter authRequestBodyFilter;
+
+    @Bean
+    public FilterRegistrationBean<RealmFilter> realmFilterFilterRegistrationBean(RealmFilter filter) {
+        FilterRegistrationBean<RealmFilter> registration = new FilterRegistrationBean<>(filter);
+        registration.setEnabled(false);
+        return registration;
+    }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        List<String> allowedOrigins = properties.getAllowedOrigins();
+        List<String> allowedOrigins = securityConfigurationProperties.getAllowedOrigins();
 
         CorsConfiguration config = new CorsConfiguration().applyPermitDefaultValues();
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
         config.addExposedHeader("X-Auth-Token");
-        config.addExposedHeader("X-Jwt-Token");
+        config.addExposedHeader("X-Anonymous-Token");
         config.setAllowCredentials(true);
         if (allowedOrigins == null || allowedOrigins.isEmpty()) {
             config.addAllowedOriginPattern("*");
@@ -114,10 +117,13 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
                 .httpBasic(httpSecurityHttpBasicConfigurer ->
                         httpSecurityHttpBasicConfigurer.authenticationEntryPoint(authenticationEntryPoint))
                 .addFilterBefore(new ForwardedHeaderFilter(), WebAsyncManagerIntegrationFilter.class)
-                .addFilterBefore(createPublicAuthenticationFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(createSecurityContextFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(impersonationRequestFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(hostValidationRequestFilter(), BasicAuthenticationFilter.class)
+                .addFilterBefore(publicAuthenticationFilter, SecurityContextFilter.class)
+                .addFilterBefore(netgrifHttpRequestTransformFilter, BasicAuthenticationFilter.class)
+                .addFilterBefore(realmFilter, PublicAuthenticationFilter.class)
+                .addFilterBefore(authRequestBodyFilter, RealmFilter.class)
                 .addFilterAfter(actuatorRequestFilter(), BasicAuthenticationFilter.class)
                 .authorizeHttpRequests(requestMatcherRegistry ->
                         requestMatcherRegistry
@@ -139,6 +145,10 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
         return http.build();
     }
 
+    public static PathPatternRequestMatcher loginPathMatcher() {
+        return PathPatternRequestMatcher.pathPattern(HttpMethod.POST, "/api/auth/login");
+    }
+
     @Override
     protected boolean isOpenRegistration() {
         return this.serverAuthProperties.isOpenRegistration();
@@ -146,12 +156,12 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Override
     protected boolean isCsrfEnabled() {
-        return properties.isCsrf();
+        return securityConfigurationProperties.isCsrf();
     }
 
     @Override
     protected boolean isCorsEnabled() {
-        return properties.isCors();
+        return securityConfigurationProperties.isCors();
     }
 
     @Override
@@ -171,28 +181,16 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Override
     protected SecurityConfigurationProperties getSecurityConfigProperties() {
-        return properties;
+        return securityConfigurationProperties;
     }
 
-    protected PublicAuthenticationFilter createPublicAuthenticationFilter() throws Exception {
-        Authority authority = authorityService.getOrCreate(Authority.anonymous);
-        return new PublicAuthenticationFilter(
-                (ProviderManager) authenticationManager(authenticationManagerBuilder),
-                new AnonymousAuthenticationProvider(ANONYMOUS_USER),
-                securityConfigurationProperties.getServerPatterns(),
-                securityConfigurationProperties.getAnonymousExceptions(),
-                jwtService,
-                userService,
-                authorityService
-        );
-    }
 
     private SecurityContextFilter createSecurityContextFilter() {
         return new SecurityContextFilter(securityContextService);
     }
 
     private HostValidationRequestFilter hostValidationRequestFilter() {
-        return new HostValidationRequestFilter(properties);
+        return new HostValidationRequestFilter(securityConfigurationProperties);
     }
 
     private ImpersonationRequestFilter impersonationRequestFilter() {

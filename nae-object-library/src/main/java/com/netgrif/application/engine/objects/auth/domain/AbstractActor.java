@@ -389,6 +389,17 @@ public abstract class AbstractActor implements Serializable {
         return this.authoritySet.stream().anyMatch(it -> it.getName().equals(Authority.admin));
     }
 
+
+    /**
+     * Checks if the actor has anonymous authority.
+     * This indicates whether the actor is granted permissions for anonymous access.
+     *
+     * @return true if the actor has anonymous authority, false otherwise
+     */
+    public boolean isAnonymous() {
+        return authoritySet.stream().anyMatch(it -> it.getName().equals(Authority.anonymous));
+    }
+
     public Set<String> getGroupIds() {
         if (groupIds == null) {
             groupIds = new HashSet<>();
