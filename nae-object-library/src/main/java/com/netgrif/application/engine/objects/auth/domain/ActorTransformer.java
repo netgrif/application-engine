@@ -111,8 +111,8 @@ public class ActorTransformer {
         loggedUser.setProcessRoles(user.getProcessRoles());
         loggedUser.setAttributes(user.getAttributes());
         loggedUser.setGroupIds(user.getGroupIds());
-        factory.resolveProcessRoles(loggedUser);
-        factory.resolveAuthorities(loggedUser);
+        loggedUserFactory.resolveProcessRoles(loggedUser);
+        loggedUserFactory.resolveAuthorities(loggedUser);
         return loggedUser;
     }
 

@@ -62,7 +62,7 @@ public class TaskController extends AbstractTaskController {
     }
 
     @Override
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN')")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN')")
     @Operation(summary = "Get all tasks", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<LocalisedTaskResource> getAll(Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
@@ -70,7 +70,7 @@ public class TaskController extends AbstractTaskController {
     }
 
     @Override
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS')")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS')")
     @Operation(summary = "Get all tasks by cases", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = {"/case", "/public/case"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<LocalisedTaskResource> getAllByCases(@RequestBody List<String> cases, Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
@@ -78,7 +78,7 @@ public class TaskController extends AbstractTaskController {
     }
 
     @Override
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS')")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS')")
     @Operation(summary = "Get tasks of the case", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = {"/case/{id}", "/public/case/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<TaskReference> getTasksOfCase(@PathVariable("id") String caseId, Locale locale) {
@@ -86,14 +86,14 @@ public class TaskController extends AbstractTaskController {
     }
 
     @Override
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN')")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN')")
     @Operation(summary = "Get task by id", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public LocalisedTaskResource getOne(@PathVariable("id") String taskId, Locale locale) {
         return super.getOne(taskId, locale);
     }
 
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS') && @taskAuthorizationService.canCallAssign(@userService.getLoggedUser(), #taskId)")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS') && @taskAuthorizationService.canCallAssign(@userService.getLoggedUser(), #taskId)")
     @Operation(summary = "Assign task",
             description = "Caller must be able to perform the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -106,7 +106,7 @@ public class TaskController extends AbstractTaskController {
         return super.assign(taskId, locale);
     }
 
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN') && @taskAuthorizationService.canCallDelegate(@userService.getLoggedUser(), #taskId)")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN') && @taskAuthorizationService.canCallDelegate(@userService.getLoggedUser(), #taskId)")
     @Operation(summary = "Delegate task",
             description = "Caller must be able to delegate the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -119,7 +119,7 @@ public class TaskController extends AbstractTaskController {
         return super.delegate(taskId, delegatedId, locale);
     }
 
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS') && @taskAuthorizationService.canCallFinish(@userService.getLoggedUser(), #taskId)")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS') && @taskAuthorizationService.canCallFinish(@userService.getLoggedUser(), #taskId)")
     @Operation(summary = "Finish task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -132,7 +132,7 @@ public class TaskController extends AbstractTaskController {
         return super.finish(taskId, locale);
     }
 
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS') && @taskAuthorizationService.canCallCancel(@userService.getLoggedUser(), #taskId)")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS') && @taskAuthorizationService.canCallCancel(@userService.getLoggedUser(), #taskId)")
     @Operation(summary = "Cancel task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -146,7 +146,7 @@ public class TaskController extends AbstractTaskController {
     }
 
     @Override
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN')")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN')")
     @Operation(summary = "Get all tasks assigned to logged user", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/my", produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<LocalisedTaskResource> getMy(Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
@@ -154,7 +154,7 @@ public class TaskController extends AbstractTaskController {
     }
 
     @Override
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN')")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN')")
     @Operation(summary = "Get all finished tasks by logged user", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/my/finished", produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<LocalisedTaskResource> getMyFinished(Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
@@ -162,7 +162,7 @@ public class TaskController extends AbstractTaskController {
     }
 
     @Override
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN')")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN')")
     @Operation(summary = "Generic task search on Mongo database", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<LocalisedTaskResource> search(Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation,  PagedResourcesAssembler<Task> assembler, Locale locale) {
@@ -170,7 +170,7 @@ public class TaskController extends AbstractTaskController {
     }
 
     @Override
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN')")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN')")
     @Operation(summary = "Generic task search on Elasticsearch database", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/search_es", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<LocalisedTaskResource> searchElastic(Pageable pageable, @RequestBody SingleElasticTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation,  PagedResourcesAssembler<Task> assembler, Locale locale) {
@@ -178,7 +178,7 @@ public class TaskController extends AbstractTaskController {
     }
 
     @Override
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN')")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN')")
     @Operation(summary = "Count tasks by provided criteria", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/count", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public CountResponse count(@RequestBody SingleElasticTaskSearchRequestAsList query, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Locale locale) {
@@ -186,7 +186,7 @@ public class TaskController extends AbstractTaskController {
     }
 
     @Override
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS') && @taskAuthorizationService.canCallGetData(@userService.getLoggedUser(), #taskId)")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS') && @taskAuthorizationService.canCallGetData(@userService.getLoggedUser(), #taskId)")
     @Operation(summary = "Get all task data",
             description = "Caller must be able to view the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -195,7 +195,7 @@ public class TaskController extends AbstractTaskController {
         return super.getData(taskId, locale);
     }
 
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS') && @taskAuthorizationService.canCallSaveData(@userService.getLoggedUser(), #taskId)")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS') && @taskAuthorizationService.canCallSaveData(@userService.getLoggedUser(), #taskId)")
     @Operation(summary = "Set task data",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -209,7 +209,7 @@ public class TaskController extends AbstractTaskController {
         return super.setData(taskId, dataBody, locale);
     }
 
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS') && @taskAuthorizationService.canCallSaveFile(@userService.getLoggedUser(), #taskId)")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS') && @taskAuthorizationService.canCallSaveFile(@userService.getLoggedUser(), #taskId)")
     @Operation(summary = "Upload file into the task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -222,7 +222,7 @@ public class TaskController extends AbstractTaskController {
         return super.saveFile(taskId, multipartFile, dataBody, locale);
     }
 
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS') && @taskAuthorizationService.canCallGetData(@userService.getLoggedUser(), #taskId)")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS') && @taskAuthorizationService.canCallGetData(@userService.getLoggedUser(), #taskId)")
     @Operation(summary = "Download task file field value",
             description = "Caller must be able to view the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -231,7 +231,7 @@ public class TaskController extends AbstractTaskController {
         return super.getFile(taskId, fieldId);
     }
 
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS') && @taskAuthorizationService.canCallSaveFile(@userService.getLoggedUser(), #taskId)")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS') && @taskAuthorizationService.canCallSaveFile(@userService.getLoggedUser(), #taskId)")
     @Operation(summary = "Remove file from the task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -244,7 +244,7 @@ public class TaskController extends AbstractTaskController {
         return super.deleteFile(requestBody.getParentTaskId(), requestBody.getFieldId());
     }
 
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS') && @taskAuthorizationService.canCallSaveFile(@userService.getLoggedUser(), #taskId)")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS') && @taskAuthorizationService.canCallSaveFile(@userService.getLoggedUser(), #taskId)")
     @Operation(summary = "Upload multiple files into the task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -257,7 +257,7 @@ public class TaskController extends AbstractTaskController {
         return super.saveFiles(taskId, multipartFiles, requestBody);
     }
 
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS') && @taskAuthorizationService.canCallGetData(@userService.getLoggedUser(), #taskId)")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS') && @taskAuthorizationService.canCallGetData(@userService.getLoggedUser(), #taskId)")
     @Operation(summary = "Download one file from tasks file list field value",
             description = "Caller must be able to view the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -266,7 +266,7 @@ public class TaskController extends AbstractTaskController {
         return super.getNamedFile(taskId, fieldId, fileName);
     }
 
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS') && @taskAuthorizationService.canCallSaveFile(@userService.getLoggedUser(), #taskId)")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS') && @taskAuthorizationService.canCallSaveFile(@userService.getLoggedUser(), #taskId)")
     @Operation(summary = "Remove file from tasks file list field value",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -279,7 +279,7 @@ public class TaskController extends AbstractTaskController {
         return super.deleteNamedFile(requestBody.getParentTaskId(), requestBody.getFieldId(), requestBody.getFileName());
     }
 
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS') && @taskAuthorizationService.canCallGetData(@userService.getLoggedUser(), #taskId)")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS') && @taskAuthorizationService.canCallGetData(@userService.getLoggedUser(), #taskId)")
     @Operation(summary = "Download preview for file field value",
             description = "Caller must be able to view the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})

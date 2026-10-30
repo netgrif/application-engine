@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.auth.service;
 
-import java.util.Arrays;
 import java.util.Set;
 
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;

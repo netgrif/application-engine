@@ -7,7 +7,6 @@ import com.netgrif.application.engine.auth.web.requestbodies.PreferencesRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.UserCreateRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.UserSearchRequestBody;
 import com.netgrif.application.engine.auth.web.responsebodies.PreferencesResource;
-import com.netgrif.application.engine.auth.web.responsebodies.User;
 import com.netgrif.application.engine.auth.web.responsebodies.UserDto;
 import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.objects.preferences.Preferences;
