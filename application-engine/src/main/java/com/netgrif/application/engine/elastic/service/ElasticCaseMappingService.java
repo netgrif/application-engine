@@ -29,8 +29,15 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
 
     protected void populateDataSet(ElasticCase transformedCase, Case useCase) {
         for (String id : useCase.getImmediateDataFields()) {
-            Optional<DataField> parsedValue = this.transformDataField(id, useCase);
-            parsedValue.ifPresent(dataField -> transformedCase.getDataSet().put(id, dataField));
+            if (useCase.isPartiallyLoaded()) {
+                if (useCase.getDataSet() != null && useCase.getDataSet().containsKey(id)) {
+                    Optional<DataField> parsedValue = this.transformDataField(id, useCase);
+                    transformedCase.getDataSet().put(id, parsedValue.orElse(null));
+                }
+            } else {
+                Optional<DataField> parsedValue = this.transformDataField(id, useCase);
+                parsedValue.ifPresent(dataField -> transformedCase.getDataSet().put(id, dataField));
+            }
         }
     }
 
@@ -38,7 +45,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
         Field<?> netField = useCase.getField(fieldId);
         com.netgrif.application.engine.objects.workflow.domain.DataField caseField = useCase.getDataField(fieldId);
 
-        if (caseField.getValue() == null) {
+        if (caseField == null || caseField.getValue() == null) {
             return Optional.empty();
         } else if (netField instanceof EnumerationMapField) {
             return this.transformEnumerationMapField(caseField, (EnumerationMapField) netField);
