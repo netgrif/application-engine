@@ -48,7 +48,7 @@ public class ResourceLinkAssembler {
                     .getAll(null, null, null)).withRel("all"));
         if (!selfRel.equalsIgnoreCase("search"))
             pagedResources.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
-                    .search(null, MergeFilterOperation.OR, null, null, null, null, null)).withRel("search"));
+                    .search(null, MergeFilterOperation.OR, null, null, null, null)).withRel("search"));
         if (!selfRel.equalsIgnoreCase("count"))
             pagedResources.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
                     .count(null, MergeFilterOperation.OR, null)).withRel("count"));
