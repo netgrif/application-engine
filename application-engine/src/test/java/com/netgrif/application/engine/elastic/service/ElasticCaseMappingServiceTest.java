@@ -42,7 +42,7 @@ class ElasticCaseMappingServiceTest {
         when(c.getTitle()).thenReturn("Test Case");
         when(c.getLastModified()).thenReturn(LocalDateTime.now());
         when(c.getCreationDate()).thenReturn(LocalDateTime.now());
-        when(c.getAuthor()).thenReturn(new ActorRef("user-1", "netgrif", "Test User", "testuser"));
+        when(c.getAuthor()).thenReturn(new ActorRef("user-1", "netgrif", "Test User", "testuser", Collections.emptySet()));
         when(c.getImmediateDataFields()).thenReturn(immediateFields);
         when(c.isPartiallyLoaded()).thenReturn(partial);
         when(c.getDataSet()).thenReturn(dataSet);
