@@ -11,6 +11,7 @@ import tools.jackson.databind.introspect.BeanPropertyDefinition;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Custom JSON serializer that provides selective field serialization based on a {@link FieldSelector} configuration.
@@ -111,6 +112,20 @@ public class DynamicFieldSerializer extends ValueSerializer<Object> {
             return;
         }
 
+        if (value instanceof java.util.Map<?, ?> map) {
+            gen.writeStartObject();
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
+                String key = String.valueOf(entry.getKey());
+                if (!selector.includes(key)) {
+                        continue;
+                    }
+                gen.writeName(key);
+                serializeWithSelector(entry.getValue(), gen, context, selector.nested(key));
+            }
+            gen.writeEndObject();
+            return;
+        }
+
         JavaType type = context.constructType(value.getClass());
         BeanDescription desc = context.introspectBeanDescription(type);
 
@@ -123,12 +138,11 @@ public class DynamicFieldSerializer extends ValueSerializer<Object> {
             }
 
             Object propValue = prop.getAccessor().getValue(value);
-            gen.writeName(name);
 
             if (propValue == null) {
-                gen.writeNull();
                 continue;
             }
+            gen.writeName(name);
 
             FieldSelector nested = selector.nested(name);
             if (nested.includeAll()) {

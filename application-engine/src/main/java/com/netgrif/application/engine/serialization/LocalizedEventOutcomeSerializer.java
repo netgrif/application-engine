@@ -34,7 +34,6 @@ import java.io.IOException;
  * @see FieldSelector
  * @see DynamicFieldSerializer
  */
-@JacksonComponent(type = LocalisedEventOutcome.class)
 public class LocalizedEventOutcomeSerializer extends ValueSerializer<LocalisedEventOutcome> {
 
     /**
