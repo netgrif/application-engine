@@ -53,6 +53,8 @@ public final class FieldSelector {
         this(null, null);
     }
 
+    private static final int MAX_DEPTH = 32;
+
     /**
      * Creates a new FieldSelector with specified field selections and nested selectors.
      *
@@ -62,6 +64,10 @@ public final class FieldSelector {
     private FieldSelector(Set<String> fields, Map<String, FieldSelector> nested) {
         this.fields = fields;
         this.nested = nested;
+    }
+
+    public static FieldSelector parse(final String spec) {
+        return parse(spec, 0);
     }
 
     /**
@@ -82,7 +88,10 @@ public final class FieldSelector {
      * @return a FieldSelector instance representing the parsed specification
      * @throws IllegalArgumentException if the specification contains unmatched parentheses
      */
-    public static FieldSelector parse(String spec) {
+    private static FieldSelector parse(final String spec, int depth) {
+        if (depth >= MAX_DEPTH) {
+            throw new IllegalArgumentException("Field selector nesting exceeds maximum depth of " + MAX_DEPTH);
+        }
         if (spec == null || spec.isBlank()) {
             return new FieldSelector(null, null);
         }
@@ -100,7 +109,7 @@ public final class FieldSelector {
                 int closeParenthesisIdx = findMatchingParen(spec, parenthesisIdx);
                 String inner = spec.substring(parenthesisIdx + 1, closeParenthesisIdx);
                 fields.add(name);
-                nested.put(name, parse(inner));
+                nested.put(name, parse(inner, depth + 1));
                 i = closeParenthesisIdx + 1;
                 if (i < spec.length() && spec.charAt(i) == ',') i++;
             } else {
@@ -181,6 +190,9 @@ public final class FieldSelector {
             if (c == '(') depth++;
             else if (c == ')') depth--;
             else if (c == ',' && depth == 0) return i;
+        }
+        if (depth != 0) {
+            throw new IllegalArgumentException("Unbalanced parentheses in field selector specification");
         }
         return spec.length();
     }

@@ -115,6 +115,11 @@ public class DynamicFieldSerializer extends ValueSerializer<Object> {
             Object propValue = prop.getAccessor().getValue(value);
             gen.writeName(name);
 
+            if (propValue == null) {
+                gen.writeNull();
+                continue;
+            }
+
             FieldSelector nested = selector.nested(name);
             if (nested.includeAll()) {
                 context.findValueSerializer(propValue.getClass()).serialize(propValue, gen, context);

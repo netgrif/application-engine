@@ -18,7 +18,12 @@ public class FieldSelectorInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) {
         String fields = request.getParameter("fields");
-        holder.setSelector(FieldSelector.parse(fields));
+        try {
+            holder.setSelector(FieldSelector.parse(fields));
+        } catch (IllegalArgumentException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return false;
+        }
         return true;
     }
 }

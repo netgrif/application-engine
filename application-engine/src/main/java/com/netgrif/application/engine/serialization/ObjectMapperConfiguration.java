@@ -16,6 +16,7 @@ public class ObjectMapperConfiguration {
         module.addSerializer(LocalisedEventOutcome.class, new LocalizedEventOutcomeSerializer(holder));
         return builder -> builder
                 .changeDefaultPropertyInclusion(include -> include.withValueInclusion(JsonInclude.Include.NON_NULL))
-                .findAndAddModules();
+                .findAndAddModules()
+                .addModule(module);
     }
 }
