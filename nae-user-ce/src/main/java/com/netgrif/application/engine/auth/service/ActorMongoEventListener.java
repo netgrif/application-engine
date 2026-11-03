@@ -13,14 +13,14 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class UserMongoEventListener implements AfterConvertCallback<AbstractActor> {
+public class ActorMongoEventListener implements AfterConvertCallback<AbstractActor> {
 
     private final ProcessRoleService processRoleService;
 
     private final AuthorityService authorityService;
 
-    public UserMongoEventListener(@Lazy ProcessRoleService processRoleService,
-                                  @Lazy AuthorityService authorityService) {
+    public ActorMongoEventListener(@Lazy ProcessRoleService processRoleService,
+                                   @Lazy AuthorityService authorityService) {
         this.processRoleService = processRoleService;
         this.authorityService = authorityService;
     }

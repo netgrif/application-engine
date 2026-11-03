@@ -76,7 +76,7 @@ class AssignRemoveTest {
         assert netOptional.getNet() != null;
         def net = netOptional.getNet()
         def userAuthorities = importHelper.createAuthorities(["user": Authority.user])
-        def testUser = importHelper.createUser(new User(firstName: "Test", lastName: "Integration", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
+        def testUser = importHelper.createUser(new User(firstName: "Test", lastName: "Integration", username: USER_EMAIL, email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [userAuthorities.get("user")] as Authority[],
                 [] as ProcessRole[])
         def loggedUser = ActorTransformer.toLoggedUser(testUser)
