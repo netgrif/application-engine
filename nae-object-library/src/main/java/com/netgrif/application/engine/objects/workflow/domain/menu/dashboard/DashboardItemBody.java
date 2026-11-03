@@ -36,7 +36,9 @@ public class DashboardItemBody {
 
     public ToDataSetOutcome toDataSet() {
         ToDataSetOutcome outcome = new ToDataSetOutcome();
-        outcome.putDataSetEntry(DashboardItemConstants.FIELD_ID, FieldType.TEXT, this.id);
+        if (this.id != null) {
+            outcome.putDataSetEntry(DashboardItemConstants.FIELD_ID, FieldType.TEXT, this.id);
+        }
         outcome.putDataSetEntry(DashboardItemConstants.FIELD_MENU_ITEM_LIST, FieldType.ENUMERATION_MAP, this.menuItems);
         outcome.putDataSetEntry(DashboardItemConstants.FIELD_IS_INTERNAL, FieldType.BOOLEAN, this.isInternal);
         outcome.putDataSetEntry(DashboardItemConstants.FIELD_EXTERNAL_URL, FieldType.TEXT, this.externalUrl);
