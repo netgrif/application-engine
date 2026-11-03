@@ -49,9 +49,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.FileNotFoundException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -103,10 +103,10 @@ public class WorkflowController {
 
     @Operation(summary = "Get all cases of the system, paginated", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/all", produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<CaseResource> getAll(Pageable pageable, PagedResourcesAssembler<Case> assembler) {
-        Page<Case> cases = workflowService.getAll(pageable);
+    public PagedModel<CaseResource> getAll(Pageable pageable, PagedResourcesAssembler<Case> assembler, @RequestParam(required = false) List<String> fields) {
+        Page<Case> cases = fields == null ? workflowService.getAll(pageable) : workflowService.getAllProjected(pageable, fields);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
-                .getAll(pageable, assembler)).withRel("all");
+                .getAll(pageable, assembler, fields)).withRel("all");
         PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
         ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel().toString());
         return resources;
@@ -125,15 +125,15 @@ public class WorkflowController {
 
     @Operation(summary = "Generic case search on Elasticsearch database, paginated", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/case/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<CaseResource> search(@RequestBody SingleCaseSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
+    public PagedModel<CaseResource> search(@RequestBody SingleCaseSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale, @RequestParam(required = false) List<String> fields) {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
 
-        Page<Case> cases = elasticCaseService.search(searchBody.getList(), user, pageable, locale, operation == MergeFilterOperation.AND);
+        Page<Case> cases = elasticCaseService.search(searchBody.getList(), user, pageable, locale, operation == MergeFilterOperation.AND, fields);
         if (log.isTraceEnabled()) {
             log.trace("Found {} cases with id {}.", cases.getNumberOfElements(), cases.map(Case::getStringId));
         }
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
-                .search(searchBody, operation, pageable, assembler, auth, locale)).withRel("search");
+                .search(searchBody, operation, pageable, assembler, auth, locale, fields)).withRel("search");
 
         PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
 
@@ -170,8 +170,8 @@ public class WorkflowController {
 
     @Operation(summary = "Get case by id", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
-    public CaseResource getOne(@PathVariable("id") String caseId) {
-        Case aCase = workflowService.findOne(caseId);
+    public CaseResource getOne(@PathVariable("id") String caseId, @RequestParam(required = false) List<String> fields) {
+        Case aCase = fields == null ? workflowService.findOne(caseId) : workflowService.findOneProjected(caseId, fields);
         if (aCase == null)
             return null;
         return new CaseResource(aCase);

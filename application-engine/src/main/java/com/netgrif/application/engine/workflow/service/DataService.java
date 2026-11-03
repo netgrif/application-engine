@@ -16,6 +16,7 @@ import com.netgrif.application.engine.objects.event.events.data.SetDataEvent;
 import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.objects.petrinet.domain.Component;
 import com.netgrif.application.engine.objects.petrinet.domain.*;
+import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.FieldBehavior;
@@ -128,7 +129,7 @@ public class DataService implements IDataService {
     @Override
     public GetDataEventOutcome getData(String taskId, Map<String, String> params, boolean eventsEnabled) {
         Task task = taskService.findOne(taskId);
-        Case useCase = workflowService.findOne(task.getCaseId());
+        Case useCase = workflowService.findOneProjected(task.getCaseId(), net -> resolveGetDataKeys(net, task));
 
         return getData(task, useCase, params, eventsEnabled);
     }
@@ -211,7 +212,13 @@ public class DataService implements IDataService {
             }
         });
 
-        workflowService.save(useCase);
+        if (!useCase.isPartiallyLoaded()) {
+            workflowService.save(useCase);
+        } else if (eventsEnabled && hasGetEvents(useCase.getPetriNet(), transition)) {
+            // Only persist when GET event actions actually executed and could have mutated data fields.
+            // This prevents costly database writes and Elasticsearch re-indexing on read-only requests.
+            workflowService.savePartial(useCase);
+        }
 
         dataSetFields.stream().filter(field -> field instanceof NumberField).forEach(field -> {
             DataField dataField = useCase.getDataSet().get(field.getImportId());
@@ -427,7 +434,7 @@ public class DataService implements IDataService {
     @Override
     public GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale, Set<String> collectedTaskIds, int level, String parentTaskRefId, boolean eventsEnabled) {
         Task task = taskService.findOne(taskId);
-        Case useCase = workflowService.findOne(task.getCaseId());
+        Case useCase = workflowService.findOneProjected(task.getCaseId(), net -> resolveGetDataKeys(net, task));
         PetriNet net = useCase.getPetriNet();
         Transition transition = net.getTransition(task.getTransitionId());
         GetDataGroupsEventOutcome outcome = new GetDataGroupsEventOutcome(useCase, task);
@@ -882,7 +889,7 @@ public class DataService implements IDataService {
 
     @Override
     public List<Field<?>> getImmediateFields(Task task) {
-        Case useCase = workflowService.findOne(task.getCaseId());
+        Case useCase = workflowService.findOneProjected(task.getCaseId(), task.getImmediateDataFields());
         List<Field<?>> fields = task.getImmediateDataFields().stream().map(id -> fieldFactory.buildFieldWithoutValidation(useCase, id, task.getTransitionId())).collect(Collectors.toList());
         LongStream.range(0L, fields.size()).forEach(index -> fields.get((int) index).setOrder(index));
         return fields;
@@ -1198,7 +1205,7 @@ public class DataService implements IDataService {
     }
 
     private String getFieldTypeFromNode(ObjectNode node) {
-        return node.get("type").asText();
+        return node.get("type") != null ? node.get("type").asText() : "default";
     }
 
     private Map<String, Object> parseFilterMetadataValue(ObjectNode node, String fieldType) {
@@ -1328,10 +1335,29 @@ public class DataService implements IDataService {
         });
     }
 
-//    public void validateTaskRefValue(List<String> taskIds, String restrictedTaskId) throws IllegalArgumentException {
-//        if (taskIds != null && taskIds.contains(restrictedTaskId)) {
-//            throw new IllegalArgumentException(String.format("Task with id '%s' cannot be added to task ref, since it is a task which is displaying task ref", restrictedTaskId));
-//        }
-//    }
+    private Collection<String> resolveGetDataKeys(PetriNet net, Task task) {
+        if (net == null || task == null) {
+            return Collections.emptySet();
+        }
+        Transition transition = net.getTransition(task.getTransitionId());
+        if (transition == null || transition.getDataSet() == null) {
+            return Collections.emptySet();
+        }
+        if (hasGetEvents(net, transition)) {
+            return net.getDataSet() != null ? net.getDataSet().keySet() : Collections.emptySet();
+        }
+        return transition.getDataSet().keySet();
+    }
+
+    private boolean hasGetEvents(PetriNet net, Transition transition) {
+        if (net == null || transition == null || transition.getDataSet() == null || net.getDataSet() == null) {
+            return false;
+        }
+        return transition.getDataSet().entrySet().stream().anyMatch(entry -> {
+            Field<?> field = net.getDataSet().get(entry.getKey());
+            return (field != null && field.getEvents() != null && field.getEvents().containsKey(DataEventType.GET))
+                    || (entry.getValue() != null && entry.getValue().getEvents() != null && entry.getValue().getEvents().containsKey(DataEventType.GET));
+        });
+    }
 
 }

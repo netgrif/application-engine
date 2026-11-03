@@ -1,0 +1,646 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
+    <id>projection_test_net</id>
+    <version>1.0.0</version>
+    <title>Projection and Partial Hydration Test Net</title>
+    <initials>PTN</initials>
+    <defaultRole>true</defaultRole>
+
+    <!-- ROLES -->
+    <role>
+        <id>tester</id>
+        <title>Tester</title>
+    </role>
+    <role>
+        <id>reviewer</id>
+        <title>Reviewer</title>
+    </role>
+
+    <!-- DATASET: ALL TYPES AND COMPONENTS -->
+    <!-- 1. Text Types & Components -->
+    <data type="text" immediate="true">
+        <id>txt_simple</id>
+        <title>Simple Text</title>
+        <init>Initial text value</init>
+    </data>
+    <data type="text" immediate="true">
+        <id>txt_area</id>
+        <title>Text Area</title>
+        <init>Multi-line content description</init>
+        <component>
+            <name>textarea</name>
+            <property key="rows">4</property>
+        </component>
+    </data>
+    <data type="text">
+        <id>txt_password</id>
+        <title>Password Field</title>
+        <component>
+            <name>password</name>
+        </component>
+    </data>
+
+    <!-- 2. Number Types & Components -->
+    <data type="number" immediate="true">
+        <id>num_standard</id>
+        <title>Standard Number</title>
+        <init>42</init>
+    </data>
+    <data type="number" immediate="true">
+        <id>num_currency</id>
+        <title>Currency Number</title>
+        <init>1250.50</init>
+        <format>
+            <currency>
+                <code>EUR</code>
+                <fractionSize>2</fractionSize>
+                <locale>sk_SK</locale>
+            </currency>
+        </format>
+    </data>
+    <data type="number">
+        <id>num_slider</id>
+        <title>Slider Percentage</title>
+        <init>75</init>
+        <component>
+            <name>slider</name>
+            <property key="min">0</property>
+            <property key="max">100</property>
+            <property key="step">5</property>
+        </component>
+    </data>
+
+    <!-- 3. Boolean -->
+    <data type="boolean" immediate="true">
+        <id>bool_flag</id>
+        <title>Active Flag</title>
+        <init>true</init>
+    </data>
+    <data type="boolean">
+        <id>bool_opt_in</id>
+        <title>Opt-in Confirmation</title>
+        <init>false</init>
+    </data>
+
+    <!-- 4. Date & DateTime -->
+    <data type="date" immediate="true">
+        <id>dt_birth</id>
+        <title>Birth Date</title>
+        <init>01.01.2000</init>
+    </data>
+    <data type="dateTime" immediate="true">
+        <id>dtt_scheduled</id>
+        <title>Scheduled Timestamp</title>
+        <init>21.10.2026 14:30</init>
+    </data>
+
+    <!-- 5. Enumeration & Maps -->
+    <data type="enumeration" immediate="true">
+        <id>enum_dropdown</id>
+        <title>Priority Dropdown</title>
+        <values>LOW</values>
+        <values>MEDIUM</values>
+        <values>HIGH</values>
+        <init>MEDIUM</init>
+    </data>
+    <data type="enumeration" immediate="true">
+        <id>enum_autocomplete</id>
+        <title>Country Autocomplete</title>
+        <values>Slovakia</values>
+        <values>Czech Republic</values>
+        <values>Germany</values>
+        <values>Austria</values>
+        <init>Slovakia</init>
+        <component>
+            <name>autocomplete</name>
+        </component>
+    </data>
+    <data type="enumeration_map" immediate="true">
+        <id>enum_map_status</id>
+        <title>Status Map</title>
+        <options>
+            <option key="NEW">New</option>
+            <option key="IN_PROGRESS">In Progress</option>
+            <option key="RESOLVED">Resolved</option>
+        </options>
+        <init>NEW</init>
+    </data>
+
+    <!-- 6. Multichoice & Maps -->
+    <data type="multichoice" immediate="true">
+        <id>multi_tags</id>
+        <title>Tags Selection</title>
+        <values>BUG</values>
+        <values>FEATURE</values>
+        <values>REFACTOR</values>
+        <inits>
+            <init>FEATURE</init>
+            <init>REFACTOR</init>
+        </inits>
+    </data>
+    <data type="multichoice_map" immediate="true">
+        <id>multi_map_roles</id>
+        <title>Assigned Capabilities</title>
+        <options>
+            <option key="READ">Read Permission</option>
+            <option key="WRITE">Write Permission</option>
+            <option key="ADMIN">Admin Permission</option>
+        </options>
+        <inits>
+            <init>READ</init>
+            <init>WRITE</init>
+        </inits>
+    </data>
+
+    <!-- 7. Files -->
+    <data type="file" immediate="true">
+        <id>file_document</id>
+        <title>Main Attachment</title>
+    </data>
+    <data type="fileList" immediate="true">
+        <id>file_gallery</id>
+        <title>Supporting Files List</title>
+    </data>
+
+    <!-- 8. Actor & ActorList -->
+    <data type="actor" immediate="true">
+        <id>actor_assignee</id>
+        <title>Task Assignee</title>
+    </data>
+    <data type="actorList" immediate="true">
+        <id>actor_reviewers</id>
+        <title>Reviewer Team</title>
+    </data>
+
+    <!-- 9. References (CaseRef, TaskRef) & Filter -->
+    <data type="caseRef">
+        <id>ref_related_cases</id>
+        <title>Related Cases</title>
+    </data>
+    <data type="taskRef">
+        <id>ref_embedded_task</id>
+        <title>Embedded Task Reference</title>
+        <inits>
+            <init>t_embedded_task</init>
+        </inits>
+    </data>
+    <data type="filter">
+        <id>filter_query</id>
+        <title>Custom Case Filter</title>
+    </data>
+
+    <!-- 10. Interactive Button, i18n & String Collection -->
+    <data type="button" immediate="true">
+        <id>btn_action</id>
+        <title>Trigger Action</title>
+        <placeholder>Execute</placeholder>
+        <component>
+            <name>fab</name>
+        </component>
+    </data>
+    <data type="i18n" immediate="true">
+        <id>i18n_notice</id>
+        <title>Localized Notice</title>
+        <init name="notice_key">Default notice text</init>
+    </data>
+    <data type="i18n" immediate="true">
+        <id>i18n_divider</id>
+        <title>Section Separator</title>
+        <init name="divider_key">Configuration Section</init>
+        <component>
+            <name>divider</name>
+        </component>
+    </data>
+    <data type="stringCollection">
+        <id>str_list_keywords</id>
+        <title>Keyword List</title>
+    </data>
+
+    <!-- I18N LOCALIZATION -->
+    <i18n locale="sk">
+        <i18nString name="notice_key">Lokalizované slovenské oznámenie</i18nString>
+        <i18nString name="divider_key">Sekcia konfigurácie</i18nString>
+    </i18n>
+
+    <!-- PLACES -->
+    <place>
+        <id>p_start</id>
+        <x>100</x>
+        <y>150</y>
+        <label>Start</label>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p_mid</id>
+        <x>400</x>
+        <y>150</y>
+        <label>In Progress</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p_end</id>
+        <x>700</x>
+        <y>150</y>
+        <label>Done</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+
+    <!-- TRANSITIONS WITH SUBSETS OF DATAFIELDS -->
+
+    <!-- Transition 1: Basic Form Fields (Text, Number, Boolean, Date) -->
+    <transition>
+        <id>t1_basic</id>
+        <x>250</x>
+        <y>100</y>
+        <cols>2</cols>
+        <label>Step 1: Basic Details</label>
+        <assignPolicy>auto</assignPolicy>
+        <roleRef>
+            <id>tester</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>dg_text_number</id>
+            <title>Text and Numbers</title>
+            <dataRef>
+                <id>txt_simple</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>txt_area</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>num_standard</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>num_currency</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>bool_flag</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>dt_birth</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+
+    <!-- Transition 2: Choices and Maps (Enumeration, Multichoice) -->
+    <transition>
+        <id>t2_choices</id>
+        <x>250</x>
+        <y>200</y>
+        <cols>2</cols>
+        <label>Step 2: Choices and Options</label>
+        <assignPolicy>auto</assignPolicy>
+        <roleRef>
+            <id>tester</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>dg_choices</id>
+            <title>Selection Fields</title>
+            <dataRef>
+                <id>enum_dropdown</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>enum_autocomplete</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>enum_map_status</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>multi_tags</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>multi_map_roles</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+
+    <!-- Transition 3: Files and Binary Attachments -->
+    <transition>
+        <id>t3_files_media</id>
+        <x>550</x>
+        <y>100</y>
+        <cols>1</cols>
+        <label>Step 3: Document Attachments</label>
+        <assignPolicy>auto</assignPolicy>
+        <roleRef>
+            <id>tester</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>dg_files</id>
+            <title>Files</title>
+            <dataRef>
+                <id>file_document</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>file_gallery</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+
+    <!-- Transition 4: Actors and Case/Task References -->
+    <transition>
+        <id>t4_actors_references</id>
+        <x>550</x>
+        <y>200</y>
+        <cols>2</cols>
+        <label>Step 4: Users and References</label>
+        <assignPolicy>auto</assignPolicy>
+        <roleRef>
+            <id>tester</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>dg_actors_refs</id>
+            <title>Assignments and Links</title>
+            <dataRef>
+                <id>actor_assignee</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>actor_reviewers</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>ref_related_cases</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>ref_embedded_task</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>filter_query</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+
+    <!-- Transition 5: Interactive Elements, i18n and Sliders -->
+    <transition>
+        <id>t5_interactive_i18n</id>
+        <x>400</x>
+        <y>250</y>
+        <cols>2</cols>
+        <label>Step 5: Interactive Controls</label>
+        <assignPolicy>auto</assignPolicy>
+        <roleRef>
+            <id>tester</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>dg_interactive</id>
+            <title>Controls and Localization</title>
+            <dataRef>
+                <id>i18n_divider</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>i18n_notice</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>num_slider</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>str_list_keywords</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>btn_action</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+
+    <!-- Transition 6: Read-Only Review of Mixed Subset -->
+    <transition>
+        <id>t6_review_all</id>
+        <x>700</x>
+        <y>250</y>
+        <cols>2</cols>
+        <label>Step 6: Review Summary</label>
+        <assignPolicy>auto</assignPolicy>
+        <roleRef>
+            <id>reviewer</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>dg_summary</id>
+            <title>Summary Overview</title>
+            <dataRef>
+                <id>txt_simple</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>num_currency</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>enum_map_status</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>actor_assignee</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+
+    <!-- Transition: Independent Embedded Task (Outside Process Flow) -->
+    <transition>
+        <id>t_embedded_task</id>
+        <x>100</x>
+        <y>300</y>
+        <cols>2</cols>
+        <label>Embedded Standalone Task</label>
+        <assignPolicy>auto</assignPolicy>
+        <roleRef>
+            <id>tester</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>dg_embedded_task</id>
+            <title>Embedded Form Data</title>
+            <dataRef>
+                <id>txt_simple</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>num_standard</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+
+    <!-- ARCS -->
+    <arc>
+        <id>a1</id>
+        <type>regular</type>
+        <sourceId>p_start</sourceId>
+        <destinationId>t1_basic</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a2</id>
+        <type>regular</type>
+        <sourceId>p_start</sourceId>
+        <destinationId>t2_choices</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a3</id>
+        <type>regular</type>
+        <sourceId>t1_basic</sourceId>
+        <destinationId>p_mid</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a4</id>
+        <type>regular</type>
+        <sourceId>t2_choices</sourceId>
+        <destinationId>p_mid</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a5</id>
+        <type>regular</type>
+        <sourceId>p_mid</sourceId>
+        <destinationId>t3_files_media</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a6</id>
+        <type>regular</type>
+        <sourceId>p_mid</sourceId>
+        <destinationId>t4_actors_references</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a7</id>
+        <type>regular</type>
+        <sourceId>p_mid</sourceId>
+        <destinationId>t5_interactive_i18n</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a8</id>
+        <type>regular</type>
+        <sourceId>t3_files_media</sourceId>
+        <destinationId>p_end</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a9</id>
+        <type>regular</type>
+        <sourceId>t4_actors_references</sourceId>
+        <destinationId>p_end</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a10</id>
+        <type>regular</type>
+        <sourceId>t5_interactive_i18n</sourceId>
+        <destinationId>p_end</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a11</id>
+        <type>read</type>
+        <sourceId>p_end</sourceId>
+        <destinationId>t6_review_all</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+</document>
