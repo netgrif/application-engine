@@ -83,8 +83,8 @@
                     if (item_id.value == "") {
                         return
                     }
-                    def itemWithIdExists = findCaseElastic("processIdentifier:\"dashboard_item\" AND dataSet.item_id.textValue.keyword:\"${item_id.value}\" AND dataSet.is_active.booleanValue:true" as String)
-                    if (itemWithIdExists != null) {
+                    def itemsWithId = findCasesElastic("processIdentifier:\"dashboard_item\" AND dataSet.item_id.textValue.keyword:\"${item_id.value}\" AND dataSet.is_active.booleanValue:true" as String, org.springframework.data.domain.PageRequest.of(0, 100))
+                    if (itemsWithId.any { it.stringId != useCase.stringId }) {
                         throw new IllegalArgumentException("Dashboard item with given ID already exists.")
                     }
                 </action>
@@ -717,8 +717,8 @@
                     if (item_id.value == null || item_id.value == "") {
                         throw new IllegalArgumentException("Dashboard item ID cannot be empty.")
                     }
-                    def itemWithIdExists = findCaseElastic("processIdentifier:\"dashboard_item\" AND dataSet.item_id.textValue.keyword:\"${item_id.value}\" AND dataSet.is_active.booleanValue:true" as String)
-                    if (itemWithIdExists != null) {
+                    def itemsWithId = findCasesElastic("processIdentifier:\"dashboard_item\" AND dataSet.item_id.textValue.keyword:\"${item_id.value}\" AND dataSet.is_active.booleanValue:true" as String, org.springframework.data.domain.PageRequest.of(0, 100))
+                    if (itemsWithId.any { it.stringId != useCase.stringId }) {
                         throw new IllegalArgumentException("Dashboard item with given ID already exists.")
                     }
                     if (is_internal.value) {
