@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -117,7 +118,11 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
     }
 
     public void setAllAuthorities() {
-        superUser.setAuthoritySet(new HashSet<>(authorityService.findAll(Pageable.unpaged()).stream().toList()));
+        List<Authority> authorities = authorityService.findAll(Pageable.unpaged())
+            .stream()
+            .filter(authority -> !authority.getName().equals(Authority.anonymous))
+            .toList();
+        superUser.setAuthoritySet(new HashSet<>(authorities));
         superUser = userService.saveUser(superUser, null);
     }
 

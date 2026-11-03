@@ -6,8 +6,7 @@ import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.User;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
-import com.netgrif.application.engine.objects.event.events.user.UserLoginEvent;
-import jakarta.servlet.http.HttpServletRequest;
+import com.netgrif.application.engine.utils.HttpReqRespUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +30,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
     protected ILoginAttemptService loginAttemptService;
-
-    @Autowired
-    protected HttpServletRequest request;
 
     @Override
     @Transactional(readOnly = true)
@@ -59,10 +55,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 
     protected String getClientIP() {
-        String xfHeader = request.getHeader("X-Forwarded-For");
-        if (xfHeader == null) {
-            return request.getRemoteAddr();
-        }
-        return xfHeader.split(",")[0];
+        return HttpReqRespUtils.getClientIpAddressIfServletRequestExists();
     }
 }
