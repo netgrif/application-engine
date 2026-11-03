@@ -10,6 +10,7 @@ import tools.jackson.databind.ValueSerializer;
 import tools.jackson.databind.introspect.BeanPropertyDefinition;
 
 import java.io.IOException;
+import java.util.Collection;
 
 /**
  * Custom JSON serializer that provides selective field serialization based on a {@link FieldSelector} configuration.
@@ -98,6 +99,15 @@ public class DynamicFieldSerializer extends ValueSerializer<Object> {
 
         if (selector.includeAll()) {
             context.findValueSerializer(value.getClass()).serialize(value, gen, context);
+            return;
+        }
+
+        if (value instanceof Collection<?> elements) {
+            gen.writeStartArray();
+            for (Object element : elements) {
+                    serializeWithSelector(element, gen, context, selector);
+                }
+            gen.writeEndArray();
             return;
         }
 

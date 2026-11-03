@@ -96,9 +96,10 @@ public class LocalizedEventOutcomeSerializer extends ValueSerializer<LocalisedEv
             gen.writeName("net");
             dynamicSerializer.serializeWithSelector(specificOutcome.getNet(), gen, context, selector.nested("net"));
         }
-        if (outcome instanceof LocalisedCaseEventOutcome specificOutcome && selector.includes("case") && specificOutcome.getaCase() != null) {
+        if (outcome instanceof LocalisedCaseEventOutcome specificOutcome && (selector.includes("aCase") || selector.includes("case")) && specificOutcome.getaCase() != null) {
             gen.writeName("aCase");
-            dynamicSerializer.serializeWithSelector(specificOutcome.getaCase(), gen, context, selector.nested("case"));
+            FieldSelector caseSelector = selector.includes("aCase") ? selector.nested("aCase") : selector.nested("case");
+            dynamicSerializer.serializeWithSelector(specificOutcome.getaCase(), gen, context, caseSelector);
         }
         if (outcome instanceof LocalisedTaskEventOutcome specificOutcome && selector.includes("task") && specificOutcome.getTask() != null) {
             gen.writeName("task");
