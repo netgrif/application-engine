@@ -82,7 +82,7 @@
         <mapstruct.version>1.6.3</mapstruct.version>
         <querydsl.version>5.1.0</querydsl.version>
         <protobuf.version>4.33.1</protobuf.version>
-        <grpc.version>1.80.0</grpc.version>
+        <grpc.version>1.84.1</grpc.version>
         <commons-lang3.version>3.20.0</commons-lang3.version>
 
         <sonar.organization>netgrif-oss</sonar.organization>
