@@ -224,4 +224,14 @@ class WorkflowServiceProjectionTest {
         assertTrue(outcome.getCase().getDataSet().containsKey("control_field"));
         assertTrue(outcome.getCase().getDataSet().containsKey("text_field"));
     }
+
+    @Test
+    void getDataWithoutEventsLoadsOnlyTransitionDataSet() {
+        Case created = createCase("p");
+        String taskId = created.getTasks().iterator().next().getTask();
+        var outcome = dataService.getData(taskId);
+        assertNotNull(outcome);
+        assertTrue(outcome.getCase().isPartiallyLoaded());
+        assertFalse(outcome.getCase().getDataSet().containsKey("userList1"));
+    }
 }

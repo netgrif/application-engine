@@ -28,16 +28,10 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
     }
 
     protected void populateDataSet(ElasticCase transformedCase, Case useCase) {
-        for (String id : useCase.getImmediateDataFields()) {
-            if (useCase.isPartiallyLoaded()) {
-                if (useCase.getDataSet() != null && useCase.getDataSet().containsKey(id)) {
-                    Optional<DataField> parsedValue = this.transformDataField(id, useCase);
-                    transformedCase.getDataSet().put(id, parsedValue.orElse(null));
-                }
-            } else {
-                Optional<DataField> parsedValue = this.transformDataField(id, useCase);
-                parsedValue.ifPresent(dataField -> transformedCase.getDataSet().put(id, dataField));
-            }
+        List<String> fieldIds = useCase.getImmediateDataFields().stream().filter(fieldId -> !useCase.isPartiallyLoaded() || (useCase.getDataSet() != null && useCase.getDataSet().containsKey(fieldId))).toList();
+        for (String id : fieldIds) {
+            Optional<DataField> parsedValue = this.transformDataField(id, useCase);
+            parsedValue.ifPresent(dataField -> transformedCase.getDataSet().put(id, dataField));
         }
     }
 
@@ -285,26 +279,22 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
         return Optional.of(new com.netgrif.application.engine.adapter.spring.elastic.domain.DateField(date.format(DateTimeFormatter.BASIC_ISO_DATE), date));
     }
 
-    protected Optional<DataField> transformBooleanField
-            (com.netgrif.application.engine.objects.workflow.domain.DataField booleanField) {
+    protected Optional<DataField> transformBooleanField(com.netgrif.application.engine.objects.workflow.domain.DataField booleanField) {
         return Optional.of(new com.netgrif.application.engine.adapter.spring.elastic.domain.BooleanField((Boolean) booleanField.getValue()));
     }
 
-    protected Optional<DataField> transformTextField
-            (com.netgrif.application.engine.objects.workflow.domain.DataField textField) {
+    protected Optional<DataField> transformTextField(com.netgrif.application.engine.objects.workflow.domain.DataField textField) {
         if (textField.getValue() == null) {
             return Optional.empty();
         }
         return Optional.of(new com.netgrif.application.engine.adapter.spring.elastic.domain.TextField((String) textField.getValue()));
     }
 
-    protected Optional<DataField> transformFileField
-            (com.netgrif.application.engine.objects.workflow.domain.DataField fileField) {
+    protected Optional<DataField> transformFileField(com.netgrif.application.engine.objects.workflow.domain.DataField fileField) {
         return Optional.of(new com.netgrif.application.engine.adapter.spring.elastic.domain.FileField((FileFieldValue) fileField.getValue()));
     }
 
-    protected Optional<DataField> transformFileListField
-            (com.netgrif.application.engine.objects.workflow.domain.DataField fileListField) {
+    protected Optional<DataField> transformFileListField(com.netgrif.application.engine.objects.workflow.domain.DataField fileListField) {
         return Optional.of(new com.netgrif.application.engine.adapter.spring.elastic.domain.FileField(((FileListFieldValue) fileListField.getValue()).getNamesPaths()));
     }
 

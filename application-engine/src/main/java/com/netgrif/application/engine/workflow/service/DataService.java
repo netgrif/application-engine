@@ -1355,9 +1355,14 @@ public class DataService implements IDataService {
         }
         return transition.getDataSet().entrySet().stream().anyMatch(entry -> {
             Field<?> field = net.getDataSet().get(entry.getKey());
-            return (field != null && field.getEvents() != null && field.getEvents().containsKey(DataEventType.GET))
-                    || (entry.getValue() != null && entry.getValue().getEvents() != null && entry.getValue().getEvents().containsKey(DataEventType.GET));
+            return hasEventActions(field != null && field.getEvents() != null ? field.getEvents().get(DataEventType.GET) : null)
+                    || hasEventActions(entry.getValue() != null && entry.getValue().getEvents() != null ? entry.getValue().getEvents().get(DataEventType.GET) : null);
         });
+    }
+
+    private boolean hasEventActions(DataEvent event) {
+        return event != null && ((event.getPreActions() != null && !event.getPreActions().isEmpty())
+                || (event.getPostActions() != null && !event.getPostActions().isEmpty()));
     }
 
 }
