@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 import java.util.List;
 
@@ -57,6 +58,56 @@ public interface ActionApi {
     Case findCase(String caseId);
 
     /**
+     * Finds a specific case by its ID with only the requested data fields.
+     *
+     * @param caseId       the ID of the case to find
+     * @param dataFieldIds the IDs of data fields to include in projection
+     * @return the partially loaded case
+     * @throws IllegalArgumentException if not found
+     */
+    Case findCase(String caseId, Collection<String> dataFieldIds);
+
+    /**
+     * Finds a specific case by its ID with only the requested data fields.
+     *
+     * @param caseId                 the ID of the case to find
+     * @param dataFieldIds           the IDs of data fields to include in projection
+     * @param includeImmediateFields whether to include immediate data fields
+     * @param setPetriNet            whether to set the petri net on the case
+     * @return the partially loaded case
+     * @throws IllegalArgumentException if not found
+     */
+    Case findCase(String caseId, Collection<String> dataFieldIds, boolean includeImmediateFields, boolean setPetriNet);
+
+    /**
+     * Finds cases by their IDs.
+     *
+     * @param caseIds the list of IDs of the cases to find
+     * @return the list of found cases
+     */
+    List<Case> findCases(List<String> caseIds);
+
+    /**
+     * Finds cases by their IDs with only the requested data fields.
+     *
+     * @param caseIds      the list of IDs of the cases to find
+     * @param dataFieldIds the IDs of data fields to include in projection
+     * @return the list of partially loaded cases
+     */
+    List<Case> findCases(List<String> caseIds, Collection<String> dataFieldIds);
+
+    /**
+     * Finds cases by their IDs with only the requested data fields.
+     *
+     * @param caseIds                the list of IDs of the cases to find
+     * @param dataFieldIds           the IDs of data fields to include in projection
+     * @param includeImmediateFields whether to include immediate data fields
+     * @param setPetriNet            whether to set the petri net on the case
+     * @return the list of partially loaded cases
+     */
+    List<Case> findCases(List<String> caseIds, Collection<String> dataFieldIds, boolean includeImmediateFields, boolean setPetriNet);
+
+    /**
      * Searches for cases matching the given predicate.
      *
      * @param processIdentifier reserved for interface compatibility; this implementation
@@ -70,6 +121,20 @@ public interface ActionApi {
     Page<Case> searchCases(String processIdentifier, Predicate predicate, Pageable pageable);
 
     /**
+     * Searches for cases matching the given predicate with only the requested data fields.
+     *
+     * @param processIdentifier reserved for interface compatibility; this implementation
+     *                          does not filter by process identifier and returns cases
+     *                          from all processes. Use the predicate parameter to filter
+     *                          by specific process(es) if needed.
+     * @param predicate         the criteria for filtering cases
+     * @param pageable          the pagination information
+     * @param dataFieldIds      the IDs of data fields to include in projection
+     * @return a page of cases matching the criteria
+     */
+    Page<Case> searchCases(String processIdentifier, Predicate predicate, Pageable pageable, Collection<String> dataFieldIds);
+
+    /**
      * Searches for cases using elastic search queries.
      *
      * @param elasticStringQueries a list of queries for filtering cases
@@ -80,6 +145,17 @@ public interface ActionApi {
      */
     Page<Case> searchCases(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection);
 
+    /**
+     * Searches for cases using elastic search queries with only the requested data fields.
+     *
+     * @param elasticStringQueries a list of queries for filtering cases
+     * @param authPrincipalDto     the authorization principal used for the search
+     * @param pageable             the pagination information
+     * @param isIntersection       true to intersect results of all queries; false for union
+     * @param dataFieldIds         the IDs of data fields to include in projection
+     * @return a page of cases matching the criteria
+     */
+    Page<Case> searchCases(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection, Collection<String> dataFieldIds);
 
     /**
      * Counts the number of cases that match the provided elastic search queries.
@@ -100,10 +176,25 @@ public interface ActionApi {
      *                          by specific process(es) if needed.
      * @param predicate         the criteria for filtering cases
      * @param pageable          the pagination information
-     * @param params           additional parameters for the operation
+     * @param params            additional parameters for the operation
      * @return a page of cases matching the criteria
      */
     Page<Case> searchCases(String processIdentifier, Predicate predicate, Pageable pageable, Map<String, String> params);
+
+    /**
+     * Searches for cases matching the given predicate with only the requested data fields.
+     *
+     * @param processIdentifier reserved for interface compatibility; this implementation
+     *                          does not filter by process identifier and returns cases
+     *                          from all processes. Use the predicate parameter to filter
+     *                          by specific process(es) if needed.
+     * @param predicate         the criteria for filtering cases
+     * @param pageable          the pagination information
+     * @param dataFieldIds      the IDs of data fields to include in projection
+     * @param params            additional parameters for the operation
+     * @return a page of cases matching the criteria
+     */
+    Page<Case> searchCases(String processIdentifier, Predicate predicate, Pageable pageable, Collection<String> dataFieldIds, Map<String, String> params);
 
     /**
      * Searches for cases using elastic search queries.
@@ -112,10 +203,23 @@ public interface ActionApi {
      * @param authPrincipalDto     the authorization principal used for the search
      * @param pageable             the pagination information
      * @param isIntersection       true to intersect results of all queries; false for union
-     * @param params           additional parameters for the operation
+     * @param params               additional parameters for the operation
      * @return a page of cases matching the criteria
      */
     Page<Case> searchCases(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection, Map<String, String> params);
+
+    /**
+     * Searches for cases using elastic search queries with only the requested data fields.
+     *
+     * @param elasticStringQueries a list of queries for filtering cases
+     * @param authPrincipalDto     the authorization principal used for the search
+     * @param pageable             the pagination information
+     * @param isIntersection       true to intersect results of all queries; false for union
+     * @param dataFieldIds         the IDs of data fields to include in projection
+     * @param params               additional parameters for the operation
+     * @return a page of cases matching the criteria
+     */
+    Page<Case> searchCases(List<String> elasticStringQueries, AuthPrincipalDto authPrincipalDto, Pageable pageable, Boolean isIntersection, Collection<String> dataFieldIds, Map<String, String> params);
 
 
     /**
@@ -149,6 +253,40 @@ public interface ActionApi {
      * @return the outcome of the delete operation
      */
     DeleteCaseEventOutcome deleteCase(String caseId, Map<String, String> params);
+
+    /**
+     * Persists a partially loaded case using Mongo $set updates and updates Elasticsearch partially.
+     *
+     * @param partialCase the partially loaded case to persist
+     * @return the persisted case
+     */
+    Case savePartialCase(Case partialCase);
+
+    /**
+     * Persists a partially loaded case using Mongo $set updates and updates Elasticsearch partially.
+     *
+     * @param partialCase the partially loaded case to persist
+     * @param params      additional parameters for the operation
+     * @return the persisted case
+     */
+    Case savePartialCase(Case partialCase, Map<String, String> params);
+
+    /**
+     * Persists a partially loaded case using Mongo $set updates and updates Elasticsearch partially.
+     *
+     * @param partialCase the partially loaded case to persist
+     * @return the persisted case
+     */
+    Case savePartial(Case partialCase);
+
+    /**
+     * Persists a partially loaded case using Mongo $set updates and updates Elasticsearch partially.
+     *
+     * @param partialCase the partially loaded case to persist
+     * @param params      additional parameters for the operation
+     * @return the persisted case
+     */
+    Case savePartial(Case partialCase, Map<String, String> params);
 
     /**
      * Finds a specific task by its ID.

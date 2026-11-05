@@ -146,43 +146,61 @@ public class MenuImportExportService implements IMenuImportExportService {
         List<String> importedEntryAndFilterCaseIds = new ArrayList<>();
         MenuAndFilters menuAndFilters = loadFromXML(ffv);
 
-        //Firstly, remove existing preference_filter_item cases having the same menu identifier as any menu
-        // which is being currently imported.
-        List<String> menuItemIdsToReplace = menuItemCases.stream().filter(caze -> menuAndFilters.getMenuList().getMenus().stream()
-                        .anyMatch(menu -> Objects.equals(menu.getMenuIdentifier(), caze.getDataSet().get(MENU_IDENTIFIER).getValue())))
-                .map(Case::getStringId).collect(Collectors.toList());
-
-        //Change remove_option button value to trigger its SET action
-        if (!menuItemIdsToReplace.isEmpty()) menuItemIdsToReplace.forEach(id -> {
-            Case caseToRemove = workflowService.findOne(id);
-            Map<String, Map<String, String>> caseToRemoveData = new HashMap<>();
-            Map<String, String> removeBtnData = new HashMap<>();
-            removeBtnData.put("type", "button");
-            Object removeOption = caseToRemove.getFieldValue("remove_option");
-            int nextRemoveOption = 1;
-            if (removeOption instanceof Number number) {
-                nextRemoveOption = number.intValue() + 1;
-            } else if (removeOption instanceof String value && value.matches("-?\\d+")) {
-                nextRemoveOption = Integer.parseInt(value) + 1;
-            }
-            removeBtnData.put("value", String.valueOf(nextRemoveOption));
-            caseToRemoveData.put("remove_option", removeBtnData);
-
-            QTask qTask = new QTask("task");
-            Task task = taskService.searchOne(qTask.transitionId.eq("view").and(qTask.caseId.eq(caseToRemove.getStringId())));
-            dataService.setData(task, ImportHelper.populateDataset(caseToRemoveData));
-        });
-
         //Import filters
         Map<String, String> importedFilterTaskIds = filterImportExportService.importFilters(menuAndFilters.getFilterList());
 
         //Import each menu individually
         menuAndFilters.getMenuList().getMenus().forEach(menu -> {
             resultMessage.append("\nIMPORTING MENU \"").append(menu.getMenuIdentifier()).append("\":\n");
-            menu.getMenuEntries().forEach(menuItem -> {
-                String entryAndFilterCaseId = createMenuItemCase(resultMessage, menuItem, menu.getMenuIdentifier(), parentId, importedFilterTaskIds.get(menuItem.getFilterCaseId()));
-                if (!entryAndFilterCaseId.equals("")) importedEntryAndFilterCaseIds.add(entryAndFilterCaseId);
-            });
+
+            boolean allFiltersPresent = true;
+            if (menu.getMenuEntries() != null) {
+                for (MenuEntry menuItem : menu.getMenuEntries()) {
+                    String filterTaskId = importedFilterTaskIds.get(menuItem.getFilterCaseId());
+                    if (filterTaskId == null || filterTaskId.isBlank()) {
+                        log.warn("Menu entry \"{}\" references filter case with original ID '{}', which was not imported. Menu entry was skipped.",
+                                menuItem.getEntryName(), menuItem.getFilterCaseId());
+                        resultMessage.append("\nMenu entry \"").append(menuItem.getEntryName())
+                                .append("\": Filter not found! Menu entry was skipped.\n");
+                        allFiltersPresent = false;
+                    }
+                }
+            }
+
+            if (allFiltersPresent) {
+                //Remove existing preference_filter_item cases having the same menu identifier as the menu being imported.
+                List<String> menuItemIdsToReplace = menuItemCases.stream().filter(caze ->
+                                Objects.equals(menu.getMenuIdentifier(), caze.getDataSet().get(MENU_IDENTIFIER).getValue()))
+                        .map(Case::getStringId).collect(Collectors.toList());
+
+                //Change remove_option button value to trigger its SET action
+                if (!menuItemIdsToReplace.isEmpty()) menuItemIdsToReplace.forEach(id -> {
+                    Case caseToRemove = workflowService.findOne(id);
+                    Map<String, Map<String, String>> caseToRemoveData = new HashMap<>();
+                    Map<String, String> removeBtnData = new HashMap<>();
+                    removeBtnData.put("type", "button");
+                    Object removeOption = caseToRemove.getFieldValue("remove_option");
+                    int nextRemoveOption = 1;
+                    if (removeOption instanceof Number number) {
+                        nextRemoveOption = number.intValue() + 1;
+                    } else if (removeOption instanceof String value && value.matches("-?\\d+")) {
+                        nextRemoveOption = Integer.parseInt(value) + 1;
+                    }
+                    removeBtnData.put("value", String.valueOf(nextRemoveOption));
+                    caseToRemoveData.put("remove_option", removeBtnData);
+
+                    QTask qTask = new QTask("task");
+                    Task task = taskService.searchOne(qTask.transitionId.eq("view").and(qTask.caseId.eq(caseToRemove.getStringId())));
+                    dataService.setData(task, ImportHelper.populateDataset(caseToRemoveData));
+                });
+
+                if (menu.getMenuEntries() != null) {
+                    menu.getMenuEntries().forEach(menuItem -> {
+                        String entryAndFilterCaseId = createMenuItemCase(resultMessage, menuItem, menu.getMenuIdentifier(), parentId, importedFilterTaskIds.get(menuItem.getFilterCaseId()));
+                        if (!entryAndFilterCaseId.isEmpty()) importedEntryAndFilterCaseIds.add(entryAndFilterCaseId);
+                    });
+                }
+            }
 
             QTask qTask = new QTask("task");
             Task task = taskService.searchOne(qTask.transitionId.eq(GROUP_NAV_TASK).and(qTask.caseId.eq(parentId)));

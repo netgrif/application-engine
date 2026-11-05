@@ -13,18 +13,14 @@ public class UserResourceAssembler implements RepresentationModelAssembler<Abstr
     private UserFactory userFactory;
 
     private Locale locale;
-    private String selfRel;
-    private boolean small;
 
     private boolean initialized = false;
 
     public UserResourceAssembler() {
     }
 
-    public void initialize(Locale locale, boolean small, String selfRel) {
+    public void initialize(Locale locale) {
         this.locale = locale;
-        this.selfRel = selfRel;
-        this.small = small;
         this.initialized = true;
     }
 
@@ -34,6 +30,6 @@ public class UserResourceAssembler implements RepresentationModelAssembler<Abstr
             throw new IllegalStateException("You must initialize the UserResourceAssembler before calling the toResource method! To initialize the assembler call the initialize method.");
         }
 
-        return new UserResource(userFactory.getUser(entity, locale), selfRel);
+        return new UserResource(userFactory.getUser(entity, locale));
     }
 }

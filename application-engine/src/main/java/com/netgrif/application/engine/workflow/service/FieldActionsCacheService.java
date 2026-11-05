@@ -22,6 +22,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -99,11 +102,50 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
 
         Cache.ValueWrapper wrapper = actionsCache.get(stringId);
         if (shouldRewriteCachedActions || wrapper == null) {
-            Closure code = (Closure) shell.evaluate("{-> " + action.getDefinition() + "}");
-            actionsCache.put(stringId, code);
-            return code;
+            boolean traceEnabled = log.isTraceEnabled();
+            String fingerprint = traceEnabled ? actionFingerprint(action) : null;
+            long startedAt = traceEnabled ? System.nanoTime() : 0;
+            if (traceEnabled) {
+                String reason = shouldRewriteCachedActions ? "rewrite-requested" : "cache-miss";
+                log.trace("Compiling Groovy action: reason={}, actionId={}, importId={}, trigger={}, definitionFingerprint={}",
+                        reason, stringId, action.getImportId(), action.getTrigger(), fingerprint);
+            }
+            try {
+                Closure code = (Closure) shell.evaluate("{-> " + action.getDefinition() + "}");
+                actionsCache.put(stringId, code);
+                if (traceEnabled) {
+                    log.trace("Compiled Groovy action: actionId={}, importId={}, trigger={}, definitionFingerprint={}, durationMs={}",
+                            stringId, action.getImportId(), action.getTrigger(), fingerprint, elapsedMillis(startedAt));
+                }
+                return code;
+            } catch (RuntimeException e) {
+                if (traceEnabled) {
+                    log.trace("Groovy action compilation failed: actionId={}, importId={}, trigger={}, definitionFingerprint={}, durationMs={}",
+                            stringId, action.getImportId(), action.getTrigger(), fingerprint, elapsedMillis(startedAt), e);
+                }
+                throw e;
+            }
+        }
+        if (log.isTraceEnabled()) {
+            log.trace("Groovy action cache hit: actionId={}, importId={}, trigger={}",
+                    stringId, action.getImportId(), action.getTrigger());
         }
         return (Closure) wrapper.get();
+    }
+
+    private long elapsedMillis(long startedAt) {
+        return (System.nanoTime() - startedAt) / 1_000_000;
+    }
+
+    private String actionFingerprint(Action action) {
+        String definition = action.getDefinition() == null ? "" : action.getDefinition();
+        try {
+            byte[] digest = MessageDigest.getInstance("SHA-256")
+                    .digest(definition.getBytes(StandardCharsets.UTF_8));
+            return HexFormat.of().formatHex(digest, 0, 8);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 digest is not available", e);
+        }
     }
 
     @Override
@@ -197,7 +239,13 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
 
     @Override
     public void clearActionCache() {
-        getRequiredCache(CacheMapKeys.ACTIONS).clear();
+        Cache actionsCache = getRequiredCache(CacheMapKeys.ACTIONS);
+        if (log.isTraceEnabled()) {
+            Object nativeCache = actionsCache.getNativeCache();
+            int entries = nativeCache instanceof Map<?, ?> map ? map.size() : -1;
+            log.trace("Clearing Groovy action cache: entries={}", entries);
+        }
+        actionsCache.clear();
     }
 
     @Override
