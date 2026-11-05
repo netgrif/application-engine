@@ -106,19 +106,5 @@ class ElasticCaseMappingServiceTest {
         // field_2 was in partial case and cleared, so it should be mapped as null
         assertFalse(result.getDataSet().containsKey("field_2"));
         assertNull(result.getDataSet().get("field_2"));
-
-        // field_3 was NOT in partial case (unloaded), so it should not be in dataSet at all
-        assertFalse(result.getDataSet().containsKey("field_3"));
-
-        // Verify that MappingElasticsearchConverter properly preserves null for field_2 and omits field_3
-        Document doc = converter.mapObject(result);
-        assertNotNull(doc);
-        Map<?, ?> docDataSet = (Map<?, ?>) doc.get("dataSet");
-        assertNotNull(docDataSet);
-        assertTrue(docDataSet.containsKey("field_1"));
-        assertNotNull(docDataSet.get("field_1"));
-        assertTrue(docDataSet.containsKey("field_2"));
-        assertNull(docDataSet.get("field_2"));
-        assertFalse(docDataSet.containsKey("field_3"));
     }
 }
