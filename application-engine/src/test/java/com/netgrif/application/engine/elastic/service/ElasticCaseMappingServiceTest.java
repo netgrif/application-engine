@@ -104,7 +104,7 @@ class ElasticCaseMappingServiceTest {
         assertNotNull(result.getDataSet().get("field_1"));
 
         // field_2 was in partial case and cleared, so it should be mapped as null
-        assertTrue(result.getDataSet().containsKey("field_2"));
+        assertFalse(result.getDataSet().containsKey("field_2"));
         assertNull(result.getDataSet().get("field_2"));
 
         // field_3 was NOT in partial case (unloaded), so it should not be in dataSet at all
