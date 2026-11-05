@@ -79,18 +79,6 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
                               @Lazy IWorkflowService workflowService,
                               IElasticCasePrioritySearch elasticCasePrioritySearch,
                               ApplicationEventPublisher publisher,
-                              ElasticsearchClient elasticsearchClient) {
-        this(repository, template, executors, elasticProperties, petriNetService, workflowService, elasticCasePrioritySearch, publisher, elasticsearchClient, null);
-    }
-
-    public ElasticCaseService(ElasticCaseRepository repository,
-                              ElasticsearchTemplate template,
-                              Executor executors,
-                              DataConfigurationProperties.ElasticsearchProperties elasticProperties,
-                              @Lazy IPetriNetService petriNetService,
-                              @Lazy IWorkflowService workflowService,
-                              IElasticCasePrioritySearch elasticCasePrioritySearch,
-                              ApplicationEventPublisher publisher,
                               ElasticsearchClient elasticsearchClient,
                               @Lazy IElasticCaseMappingService caseMappingService) {
         this.repository = repository;
@@ -103,10 +91,6 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         this.publisher = publisher;
         this.caseElasticIndexQueueManager = new ElasticQueueManager(elasticProperties, elasticsearchClient, publisher);
         this.caseElasticDeleteQueueManager = new ElasticQueueManager(elasticProperties, elasticsearchClient, publisher);
-        this.caseMappingService = caseMappingService;
-    }
-
-    public void setCaseMappingService(IElasticCaseMappingService caseMappingService) {
         this.caseMappingService = caseMappingService;
     }
 
