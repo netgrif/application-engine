@@ -57,6 +57,8 @@ jobs:
 
       elasticsearch:
         image: elasticsearch:8.19.16
+        env:
+          ES_JAVA_OPTS: '-Xms768m -Xmx768m'
         ports:
           - 9200:9200
           - 9300:9300
