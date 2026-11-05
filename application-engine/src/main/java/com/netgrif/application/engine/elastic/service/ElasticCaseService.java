@@ -522,7 +522,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         List<String> validIds = Stream.concat(
                 Optional.ofNullable(request.stringId).orElse(Collections.emptyList()).stream(),
                 Optional.ofNullable(request.id).orElse(Collections.emptyList()).stream()
-        ).toList();
+        ).filter(id -> id != null && !id.isBlank()).toList();
 
         if (validIds.isEmpty()) {
             return;
