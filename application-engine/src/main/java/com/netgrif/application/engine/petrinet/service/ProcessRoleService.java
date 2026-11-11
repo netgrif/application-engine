@@ -5,6 +5,7 @@ import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.RoleN
 import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.RoleReferencedException;
 import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties;
 import com.netgrif.application.engine.auth.service.*;
+import com.netgrif.application.engine.objects.annotations.Authorize;
 import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.objects.event.events.user.UserRoleChangeEvent;
 import com.netgrif.application.engine.objects.importer.model.EventPhaseType;
@@ -115,12 +116,16 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
 
 
     @Override
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "ROLE_ASSIGN_TO_USER")
     public void assignRolesToUser(AbstractUser user, Collection<ProcessResourceId> processResourceIds, LoggedUser loggedUser) {
         assignRolesToActor(user, processResourceIds);
         saveUserAndReloadContext(user, loggedUser);
     }
 
     @Override
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "ROLE_ASSIGN_TO_GROUP")
     public void assignRolesToGroup(Group group, Collection<ProcessResourceId> requestedRolesIds) {
         assignRolesToActor(group, requestedRolesIds);
         groupService.save(group);

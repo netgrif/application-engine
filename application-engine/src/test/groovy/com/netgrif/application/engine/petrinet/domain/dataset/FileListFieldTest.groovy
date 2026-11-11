@@ -2,6 +2,7 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl
+import com.netgrif.application.engine.auth.context.OriginFilter
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.files.minio.MinIoHostInfo
 import com.netgrif.application.engine.files.minio.StorageConfigurationProperties
@@ -129,6 +130,7 @@ class FileListFieldTest {
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .apply(SecurityMockMvcConfigurers.springSecurity())
+                .addFilters(new OriginFilter())
                 .build()
         objectMapper = new ObjectMapper()
 

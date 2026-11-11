@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
+    <id>authority_service_methods_test</id>
+    <version>1.0.0</version>
+    <initials>ASMT</initials>
+    <title>Authority Service Method test</title>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>true</anonymousRole>
+    <transitionRole>false</transitionRole>
+
+    <!-- DATA -->
+    <!-- AuthorityService methods -->
+    <data type="button">
+        <id>btn_authority_service_find_all</id>
+        <title/>
+        <placeholder>authorityService.findAll</placeholder>
+        <event type="set">
+            <id>authority_service_find_all_set</id>
+            <actions phase="post">
+                <action>
+                    authorityService.findAll(org.springframework.data.domain.PageRequest.of(0, 10));
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_authority_service_get_or_create</id>
+        <title/>
+        <placeholder>authorityService.getOrCreate</placeholder>
+        <event type="set">
+            <id>authority_service_get_or_create_set</id>
+            <actions phase="post">
+                <action>
+                    authorityService.getOrCreate("ROLE_USER");
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_authority_service_get_one</id>
+        <title/>
+        <placeholder>authorityService.getOne</placeholder>
+        <event type="set">
+            <id>authority_service_get_one_set</id>
+            <actions phase="post">
+                <action>
+                    authorityService.getOne(authorityService.getOrCreate("ROLE_USER").stringId);
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_authority_service_find_all_by_ids</id>
+        <title/>
+        <placeholder>authorityService.findAllByIds</placeholder>
+        <event type="set">
+            <id>authority_service_find_all_by_ids_set</id>
+            <actions phase="post">
+                <action>
+                    authorityService.findAllByIds([authorityService.getOrCreate("ROLE_USER").stringId], org.springframework.data.domain.PageRequest.of(0, 10));
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_authority_service_search</id>
+        <title/>
+        <placeholder>authorityService.search</placeholder>
+        <event type="set">
+            <id>authority_service_search_set</id>
+            <actions phase="post">
+                <action>
+                    authorityService.search(new com.netgrif.application.engine.objects.auth.dto.AuthoritySearchDto(), org.springframework.data.domain.PageRequest.of(0, 10));
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_authority_service_delete</id>
+        <title/>
+        <placeholder>authorityService.delete</placeholder>
+        <event type="set">
+            <id>authority_service_delete_set</id>
+            <actions phase="post">
+                <action>
+                    authorityService.delete("ROLE_TO_DELETE");
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_authority_service_find_by_scope</id>
+        <title/>
+        <placeholder>authorityService.findByScope</placeholder>
+        <event type="set">
+            <id>authority_service_find_by_scope_set</id>
+            <actions phase="post">
+                <action>
+                    authorityService.findByScope("*");
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_authority_service_find_by_name</id>
+        <title/>
+        <placeholder>authorityService.findByName</placeholder>
+        <event type="set">
+            <id>authority_service_find_by_name_set</id>
+            <actions phase="post">
+                <action>
+                    authorityService.findByName(authorityService.getOrCreate("ROLE_USER").name);
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_authority_service_find_optional_by_name</id>
+        <title/>
+        <placeholder>authorityService.findOptionalByName</placeholder>
+        <event type="set">
+            <id>authority_service_find_optional_by_name_set</id>
+            <actions phase="post">
+                <action>
+                    authorityService.findOptionalByName("ROLE_USER");
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_authority_service_get_default_user_authorities</id>
+        <title/>
+        <placeholder>authorityService.getDefaultUserAuthorities</placeholder>
+        <event type="set">
+            <id>authority_service_get_default_user_authorities_set</id>
+            <actions phase="post">
+                <action>
+                    authorityService.getDefaultUserAuthorities();
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_authority_service_get_default_anonymous_authorities</id>
+        <title/>
+        <placeholder>authorityService.getDefaultAnonymousAuthorities</placeholder>
+        <event type="set">
+            <id>authority_service_get_default_anonymous_authorities_set</id>
+            <actions phase="post">
+                <action>
+                    authorityService.getDefaultAnonymousAuthorities();
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="button">
+        <id>btn_authority_service_get_default_admin_authorities</id>
+        <title/>
+        <placeholder>authorityService.getDefaultAdminAuthorities</placeholder>
+        <event type="set">
+            <id>authority_service_get_default_admin_authorities_set</id>
+            <actions phase="post">
+                <action>
+                    authorityService.getDefaultAdminAuthorities();
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>t1</id>
+        <x>250</x>
+        <y>150</y>
+        <label>Execute Service Tests</label>
+        <dataRef>
+            <id>btn_authority_service_find_all</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_authority_service_get_or_create</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_authority_service_get_one</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_authority_service_find_all_by_ids</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_authority_service_search</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_authority_service_delete</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_authority_service_find_by_scope</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_authority_service_find_by_name</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_authority_service_find_optional_by_name</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_authority_service_get_default_user_authorities</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_authority_service_get_default_anonymous_authorities</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>btn_authority_service_get_default_admin_authorities</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+    </transition>
+</document>
