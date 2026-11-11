@@ -131,7 +131,7 @@ public class PetriNetController {
         }
     }
 
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN')")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN')")
     @Operation(summary = "Get all processes", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<Page<PetriNetReference>> getAll(@RequestParam(value = "indentifier", required = false) String identifier, @RequestParam(value = "version", required = false) String version, Pageable pageable, Locale locale) {
@@ -148,14 +148,14 @@ public class PetriNetController {
         }
     }
 
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS')")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS')")
     @Operation(summary = "Get process by id", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = {"/{id}", "/public/{id}"}, produces = MediaTypes.HAL_JSON_VALUE)
     public PetriNetReferenceResource getOne(@PathVariable("id") String id, Locale locale) {
         return new PetriNetReferenceResource(IPetriNetService.transformToReference(service.getPetriNet(decodeUrl(id)), locale));
     }
 
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS')")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS')")
     @Operation(summary = "Get process by identifier and version", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = {"/{identifier}/{version}", "/public/{identifier}/{version}"}, produces = MediaTypes.HAL_JSON_VALUE)
     public PetriNetReferenceResource getOne(@PathVariable("identifier") String identifier, @PathVariable("version") String version, Locale locale) {
@@ -163,7 +163,7 @@ public class PetriNetController {
         return new PetriNetReferenceResource(service.getReference(resolvedIdentifier, converter.convert(version), ActorTransformer.toLoggedUser(userService.getLoggedUserFromContext()), locale));
     }
 
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS')")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS')")
     @Operation(summary = "Get transitions of processes", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = {"/transitions", "/public/transitions"}, produces = MediaTypes.HAL_JSON_VALUE)
     public TransitionReferencesResource getTransitionReferences(@RequestParam List<String> ids, Locale locale) {
@@ -171,14 +171,14 @@ public class PetriNetController {
         return new TransitionReferencesResource(service.getTransitionReferences(ids, ActorTransformer.toLoggedUser(userService.getLoggedUserFromContext()), locale));
     }
 
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS')")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS')")
     @Operation(summary = "Get data fields of transitions", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = {"/data", "/public/data"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public DataFieldReferencesResource getDataFieldReferences(@RequestBody List<TransitionReference> referenceBody, Locale locale) {
         return new DataFieldReferencesResource(service.getDataFieldReferences(referenceBody, locale));
     }
 
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS')")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS')")
     @Operation(summary = "Get roles of process", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = {"/{netId}/roles", "/public/{netId}/roles"}, produces = MediaTypes.HAL_JSON_VALUE)
     public ProcessRolesResource getRoles(@PathVariable("netId") String netId, Locale locale) {
@@ -186,7 +186,7 @@ public class PetriNetController {
         return new ProcessRolesResource(roleService.findAllByNetStringId(netId), service.getPetriNet(decodeUrl(netId)).getPermissions(), netId, locale);
     }
 
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS')")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS')")
     @Operation(summary = "Get transactions of process", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = {"/{netId}/transactions", "/public/{netId}/transactions"}, produces = MediaTypes.HAL_JSON_VALUE)
     public TransactionsResource getTransactions(@PathVariable("netId") String netId, Locale locale) {
@@ -206,7 +206,7 @@ public class PetriNetController {
         return fileResource;
     }
 
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS')")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS')")
     @Operation(summary = "Search processes", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = {"/search", "/public/search"}, produces = MediaTypes.HAL_JSON_VALUE)
     public @ResponseBody
@@ -216,7 +216,7 @@ public class PetriNetController {
         return ResponseEntity.ok(new PageImpl<>(nets.stream().map(PetriNetReferenceResource::new).toList(), pageable, nets.getTotalElements()));
     }
 
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN')")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN')")
     @Operation(summary = "Search elastic processes", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/search_elastic", produces = MediaTypes.HAL_JSON_VALUE)
     public @ResponseBody
@@ -266,7 +266,7 @@ public class PetriNetController {
         return MessageResource.successMessage("Petri net " + decodedProcessId + " is being deleted");
     }
 
-    @PreAuthorize("@authorizationService.hasAnyAuthority('USER', 'ADMIN')")
+    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN')")
     @Operation(summary = "Get net by case id", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public PetriNetImportReference getOne(@PathVariable("id") String caseId) {
