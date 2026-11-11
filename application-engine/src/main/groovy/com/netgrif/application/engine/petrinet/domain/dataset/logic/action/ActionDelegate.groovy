@@ -35,7 +35,6 @@ import com.netgrif.application.engine.objects.auth.domain.AbstractUser
 import com.netgrif.application.engine.objects.auth.domain.ActorTransformer
 import com.netgrif.application.engine.objects.auth.domain.Authority
 import com.netgrif.application.engine.objects.auth.dto.AuthoritySearchDto
-import com.netgrif.application.engine.objects.auth.dto.GroupSearchDto
 import com.netgrif.application.engine.menu.services.interfaces.DashboardItemService
 import com.netgrif.application.engine.menu.services.interfaces.DashboardManagementService
 import com.netgrif.application.engine.menu.services.interfaces.IMenuItemService
