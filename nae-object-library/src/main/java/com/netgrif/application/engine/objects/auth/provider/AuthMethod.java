@@ -1,6 +1,8 @@
 package com.netgrif.application.engine.objects.auth.provider;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.Realm;
 import org.bson.types.ObjectId;
 
 import java.security.Principal;
@@ -14,6 +16,12 @@ public interface AuthMethod<T> {
     ObjectId id();
 
     boolean isEnabled();
+
+    default AbstractUser createUser(String username, Realm realm, Map<String, ?> attributes,
+                                    Map<String, ?> credentials) {
+        throw new UnsupportedOperationException(
+                "Authentication provider [%s] does not support user creation".formatted(getName()));
+    }
 
     /**
      * Method to authenticate using this authentication method.

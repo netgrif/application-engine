@@ -7,6 +7,7 @@ import com.netgrif.application.engine.auth.web.requestbodies.PreferencesRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.UserCreateRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.UserSearchRequestBody;
 import com.netgrif.application.engine.auth.web.responsebodies.PreferencesResource;
+import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.auth.web.responsebodies.UserDto;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
@@ -30,6 +31,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -113,10 +115,10 @@ public class UserController {
     })
     @GetMapping(value = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDto> getLoggedUser(Authentication auth, Locale locale) {
-        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+        LoggedUser loggedUser = resolveAuthenticationToken(auth);
         AbstractUser user;
         try {
-            user = userService.findById(loggedUser.getStringId(), loggedUser.getRealmId());
+            user = resolveLoggedUser(loggedUser);
             if (user == null) {
                 return ResponseEntity
                         .status(HttpStatus.UNAUTHORIZED).build();
@@ -237,11 +239,14 @@ public class UserController {
     })
     @GetMapping(value = "/preferences", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PreferencesResource> preferences(Authentication auth) {
-        String userId = ((LoggedUser) auth.getPrincipal()).getStringId();
-        Preferences preferences = preferencesService.get(userId);
+        LoggedUser loggedUser = resolveAuthenticationToken(auth);
+        if (loggedUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Preferences preferences = preferencesService.get(loggedUser.getStringId());
 
         if (preferences == null) {
-            preferences = new com.netgrif.application.engine.adapter.spring.preferences.Preferences(userId);
+            preferences = new com.netgrif.application.engine.adapter.spring.preferences.Preferences(loggedUser.getStringId());
         }
         PreferencesResource preferencesResource = PreferencesResource.withPreferences(preferences);
 
@@ -279,5 +284,26 @@ public class UserController {
     private boolean realmExists(String realmId) {
         Optional<Realm> realm = realmService.getRealmById(realmId);
         return realm.isPresent();
+    }
+
+    private LoggedUser resolveAuthenticationToken(Authentication auth) {
+        if (auth != null) {
+            return (LoggedUser) auth.getPrincipal();
+        }
+        auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            return (LoggedUser) auth.getPrincipal();
+        }
+        return null;
+    }
+
+    private AbstractUser resolveLoggedUser(LoggedUser loggedUser) {
+        if (loggedUser == null) {
+            return null;
+        }
+        if (loggedUser.isAnonymous()) {
+            return ActorTransformer.toUser(loggedUser);
+        }
+        return userService.findById(loggedUser.getStringId(), loggedUser.getRealmId());
     }
 }

@@ -1,11 +1,15 @@
 package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.adapter.spring.auth.domain.LoggedUserImpl;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
+import org.springframework.stereotype.Component;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 import java.util.Set;
