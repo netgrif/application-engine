@@ -1,19 +1,16 @@
 package com.netgrif.application.engine.auth.service;
 
-import com.netgrif.application.engine.auth.service.interfaces.IAuthorizationService;
-
-import java.util.Arrays;
 import java.util.Set;
 
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class AuthorizationServiceImpl implements AuthorizationService {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
     @Override
     public boolean hasAuthority(String authority) {
