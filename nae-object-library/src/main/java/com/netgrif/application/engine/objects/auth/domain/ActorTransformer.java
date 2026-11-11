@@ -6,6 +6,7 @@ import lombok.Setter;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.stream.Collectors;
+import java.util.Set;
 
 /**
  * Transformer class responsible for converting between different user/actor representations
@@ -57,6 +58,14 @@ public class ActorTransformer {
          * @return newly created LoggedUser instance
          */
         LoggedUser create();
+
+        default void resolveProcessRoles(AbstractActor user) {};
+
+        default void resolveProcessRolesRecursively(AbstractActor actor, Set<String> processRoleIds, Set<String> visitedGroupIds) {};
+
+        default void resolveAuthorities(AbstractActor user) {};
+
+        default void resolveAuthoritiesRecursively(AbstractActor actor, Set<String> authorityIds, Set<String> visitedGroupIds) {};
     }
 
     @FunctionalInterface
@@ -102,6 +111,8 @@ public class ActorTransformer {
         loggedUser.setProcessRoles(user.getProcessRoles());
         loggedUser.setAttributes(user.getAttributes());
         loggedUser.setGroupIds(user.getGroupIds());
+        loggedUserFactory.resolveProcessRoles(loggedUser);
+        loggedUserFactory.resolveAuthorities(loggedUser);
         return loggedUser;
     }
 

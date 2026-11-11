@@ -1,0 +1,1346 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://petriflow.org/petriflow.schema.xsd">
+    <id>case_reader_plugin_test</id>
+    <initials>CRPT</initials>
+    <title>Case Reader Plugin Test</title>
+    <defaultRole>true</defaultRole>
+    <transitionRole>false</transitionRole>
+    <!-- ROLES -->
+    <role>
+        <id>admin</id>
+        <title>Admin Role</title>
+    </role>
+    <!-- DATA -->
+    <data type="text">
+        <id>test_field</id>
+        <title>Test Field</title>
+        <init>initial_value</init>
+    </data>
+    <data type="file">
+        <id>file_field</id>
+        <title>File Field</title>
+    </data>
+    <data type="fileList">
+        <id>file_list_field</id>
+        <title>File List Field</title>
+    </data>
+
+    <!-- TEST 1: showCaseTitle(Case) -->
+    <data type="button">
+        <id>btn_test_1</id>
+        <title></title>
+        <placeholder>TOTOK.caseReader.showCaseTitle(useCase)</placeholder>
+        <component>
+            <name>flat</name>
+        </component>
+        <event type="set">
+            <id>e_btn_test_1</id>
+            <actions phase="post">
+                <action>
+                    res_test_1: f.res_test_1;
+                    try {
+                    TOTOK.caseReader.showCaseTitle(useCase)
+                    change res_test_1 value { "SUCCESS: showCaseTitle executed for case [title: " + useCase.title + "]" }
+                    } catch (Exception e) {
+                    change res_test_1 value { "ERROR: " + e.message }
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="text">
+        <id>res_test_1</id>
+        <title>Result for showCaseTitle(Case)</title>
+    </data>
+
+    <!-- TEST 2: findCase(String) -->
+    <data type="button">
+        <id>btn_test_2</id>
+        <title></title>
+        <placeholder>TOTOK.caseReader.findCase(caseId)</placeholder>
+        <component>
+            <name>flat</name>
+        </component>
+        <event type="set">
+            <id>e_btn_test_2</id>
+            <actions phase="post">
+                <action>
+                    res_test_2: f.res_test_2;
+                    try {
+                    def found = TOTOK.caseReader.findCase(useCase.stringId)
+                    change res_test_2 value { "SUCCESS: Found case " + (found?.title ?: "null") + " (ID: " + (found?.stringId ?: "null") + ")" }
+                    } catch (Exception e) {
+                    change res_test_2 value { "ERROR: " + e.message }
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="text">
+        <id>res_test_2</id>
+        <title>Result for findCase(String)</title>
+    </data>
+
+    <!-- TEST 3: findCaseWithFields(String, Collection) -->
+    <data type="button">
+        <id>btn_test_3</id>
+        <title></title>
+        <placeholder>TOTOK.caseReader.findCaseWithFields(caseId, fieldIds)</placeholder>
+        <component>
+            <name>flat</name>
+        </component>
+        <event type="set">
+            <id>e_btn_test_3</id>
+            <actions phase="post">
+                <action>
+                    res_test_3: f.res_test_3;
+                    try {
+                    def found = TOTOK.caseReader.findCaseWithFields(useCase.stringId, ["test_field"])
+                    change res_test_3 value { "SUCCESS: Found case " + (found?.title ?: "null") + " with fields: " + (found?.dataSet?.keySet()?.join(", ") ?: "none") }
+                    } catch (Exception e) {
+                    change res_test_3 value { "ERROR: " + e.message }
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="text">
+        <id>res_test_3</id>
+        <title>Result for findCaseWithFields(String, Collection)</title>
+    </data>
+
+    <!-- TEST 4: findCaseWithOptions(String, Collection, boolean, boolean) -->
+    <data type="button">
+        <id>btn_test_4</id>
+        <title></title>
+        <placeholder>TOTOK.caseReader.findCaseWithOptions(caseId, fieldIds, immediate, setPetriNet)</placeholder>
+        <component>
+            <name>flat</name>
+        </component>
+        <event type="set">
+            <id>e_btn_test_4</id>
+            <actions phase="post">
+                <action>
+                    res_test_4: f.res_test_4;
+                    try {
+                    def found = TOTOK.caseReader.findCaseWithOptions(useCase.stringId, ["test_field"], true, false)
+                    change res_test_4 value { "SUCCESS: Found case " + (found?.title ?: "null") + " with options" }
+                    } catch (Exception e) {
+                    change res_test_4 value { "ERROR: " + e.message }
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="text">
+        <id>res_test_4</id>
+        <title>Result for findCaseWithOptions(String, Collection, boolean, boolean)</title>
+    </data>
+
+    <!-- TEST 5: findCases(List) -->
+    <data type="button">
+        <id>btn_test_5</id>
+        <title></title>
+        <placeholder>TOTOK.caseReader.findCases(caseIds)</placeholder>
+        <component>
+            <name>flat</name>
+        </component>
+        <event type="set">
+            <id>e_btn_test_5</id>
+            <actions phase="post">
+                <action>
+                    res_test_5: f.res_test_5;
+                    try {
+                    def found = TOTOK.caseReader.findCases([useCase.stringId])
+                    change res_test_5 value { "SUCCESS: Found " + found?.size() + " cases" }
+                    } catch (Exception e) {
+                    change res_test_5 value { "ERROR: " + e.message }
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="text">
+        <id>res_test_5</id>
+        <title>Result for findCases(List)</title>
+    </data>
+
+    <!-- TEST 6: findCasesWithFields(List, Collection) -->
+    <data type="button">
+        <id>btn_test_6</id>
+        <title></title>
+        <placeholder>TOTOK.caseReader.findCasesWithFields(caseIds, fieldIds)</placeholder>
+        <component>
+            <name>flat</name>
+        </component>
+        <event type="set">
+            <id>e_btn_test_6</id>
+            <actions phase="post">
+                <action>
+                    res_test_6: f.res_test_6;
+                    try {
+                    def found = TOTOK.caseReader.findCasesWithFields([useCase.stringId], ["test_field"])
+                    change res_test_6 value { "SUCCESS: Found " + found?.size() + " cases with fields" }
+                    } catch (Exception e) {
+                    change res_test_6 value { "ERROR: " + e.message }
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="text">
+        <id>res_test_6</id>
+        <title>Result for findCasesWithFields(List, Collection)</title>
+    </data>
+
+    <!-- TEST 7: findCasesWithOptions(List, Collection, boolean, boolean) -->
+    <data type="button">
+        <id>btn_test_7</id>
+        <title></title>
+        <placeholder>TOTOK.caseReader.findCasesWithOptions(caseIds, fieldIds, immediate, setPetriNet)</placeholder>
+        <component>
+            <name>flat</name>
+        </component>
+        <event type="set">
+            <id>e_btn_test_7</id>
+            <actions phase="post">
+                <action>
+                    res_test_7: f.res_test_7;
+                    try {
+                    def found = TOTOK.caseReader.findCasesWithOptions([useCase.stringId], ["test_field"], true, false)
+                    change res_test_7 value { "SUCCESS: Found " + found?.size() + " cases with options" }
+                    } catch (Exception e) {
+                    change res_test_7 value { "ERROR: " + e.message }
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="text">
+        <id>res_test_7</id>
+        <title>Result for findCasesWithOptions(List, Collection, boolean, boolean)</title>
+    </data>
+
+    <!-- TEST 8: findCaseByQuery(String) -->
+    <data type="button">
+        <id>btn_test_8</id>
+        <title></title>
+        <placeholder>TOTOK.caseReader.findCaseByQuery(query)</placeholder>
+        <component>
+            <name>flat</name>
+        </component>
+        <event type="set">
+            <id>e_btn_test_8</id>
+            <actions phase="post">
+                <action>
+                    res_test_8: f.res_test_8;
+                    try {
+                    def found = TOTOK.caseReader.findCaseByQuery("title:\"" + useCase.title + "\"")
+                    change res_test_8 value { "SUCCESS: Found case " + (found?.title ?: "none") }
+                    } catch (Exception e) {
+                    change res_test_8 value { "ERROR: " + e.message }
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="text">
+        <id>res_test_8</id>
+        <title>Result for findCaseByQuery(String)</title>
+    </data>
+
+    <!-- TEST 9: findCaseByQueryWithPrincipal(String, AuthPrincipalDto) -->
+    <data type="button">
+        <id>btn_test_9</id>
+        <title></title>
+        <placeholder>TOTOK.caseReader.findCaseByQueryWithPrincipal(query, principal)</placeholder>
+        <component>
+            <name>flat</name>
+        </component>
+        <event type="set">
+            <id>e_btn_test_9</id>
+            <actions phase="post">
+                <action>
+                    res_test_9: f.res_test_9;
+                    try {
+                    def found = TOTOK.caseReader.findCaseByQueryWithPrincipal("title:\"" + useCase.title + "\"", null)
+                    change res_test_9 value { "SUCCESS: Found case with principal: " + (found?.title ?: "none") }
+                    } catch (Exception e) {
+                    change res_test_9 value { "ERROR: " + e.message }
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="text">
+        <id>res_test_9</id>
+        <title>Result for findCaseByQueryWithPrincipal(String, AuthPrincipalDto)</title>
+    </data>
+
+    <!-- TEST 10: searchCases(Predicate) -->
+    <data type="button">
+        <id>btn_test_10</id>
+        <title></title>
+        <placeholder>TOTOK.caseReader.searchCases(predicate)</placeholder>
+        <component>
+            <name>flat</name>
+        </component>
+        <event type="set">
+            <id>e_btn_test_10</id>
+            <actions phase="post">
+                <action>
+                    res_test_10: f.res_test_10;
+                    try {
+                    def page = TOTOK.caseReader.searchCases(null)
+                    change res_test_10 value { "SUCCESS: searchCases returned " + page?.totalElements + " cases" }
+                    } catch (Exception e) {
+                    change res_test_10 value { "ERROR: " + e.message }
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="text">
+        <id>res_test_10</id>
+        <title>Result for searchCases(Predicate)</title>
+    </data>
+
+    <!-- TEST 11: searchCasesWithPageable(String, Predicate, Pageable) -->
+    <data type="button">
+        <id>btn_test_11</id>
+        <title></title>
+        <placeholder>TOTOK.caseReader.searchCasesWithPageable(processId, predicate, pageable)</placeholder>
+        <component>
+            <name>flat</name>
+        </component>
+        <event type="set">
+            <id>e_btn_test_11</id>
+            <actions phase="post">
+                <action>
+                    res_test_11: f.res_test_11;
+                    try {
+                    def pageable = org.springframework.data.domain.PageRequest.of(0, 10)
+                    def page = TOTOK.caseReader.searchCasesWithPageable(useCase.processIdentifier, null, pageable)
+                    change res_test_11 value { "SUCCESS: searchCasesWithPageable returned " + page?.totalElements + " cases" }
+                    } catch (Exception e) {
+                    change res_test_11 value { "ERROR: " + e.message }
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="text">
+        <id>res_test_11</id>
+        <title>Result for searchCasesWithPageable(String, Predicate, Pageable)</title>
+    </data>
+
+    <!-- TEST 12: searchCasesWithFields(String, Predicate, Pageable, Collection) -->
+    <data type="button">
+        <id>btn_test_12</id>
+        <title></title>
+        <placeholder>TOTOK.caseReader.searchCasesWithFields(processId, predicate, pageable, fieldIds)</placeholder>
+        <component>
+            <name>flat</name>
+        </component>
+        <event type="set">
+            <id>e_btn_test_12</id>
+            <actions phase="post">
+                <action>
+                    res_test_12: f.res_test_12;
+                    try {
+                    def pageable = org.springframework.data.domain.PageRequest.of(0, 10)
+                    def page = TOTOK.caseReader.searchCasesWithFields(useCase.processIdentifier, null, pageable, ["test_field"])
+                    change res_test_12 value { "SUCCESS: searchCasesWithFields returned " + page?.totalElements + " cases" }
+                    } catch (Exception e) {
+                    change res_test_12 value { "ERROR: " + e.message }
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="text">
+        <id>res_test_12</id>
+        <title>Result for searchCasesWithFields(String, Predicate, Pageable, Collection)</title>
+    </data>
+
+    <!-- TEST 13: searchCasesByProcessIdentifier(String, Pageable) -->
+    <data type="button">
+        <id>btn_test_13</id>
+        <title></title>
+        <placeholder>TOTOK.caseReader.searchCasesByProcessIdentifier(processId, pageable)</placeholder>
+        <component>
+            <name>flat</name>
+        </component>
+        <event type="set">
+            <id>e_btn_test_13</id>
+            <actions phase="post">
+                <action>
+                    res_test_13: f.res_test_13;
+                    try {
+                    def pageable = org.springframework.data.domain.PageRequest.of(0, 10)
+                    def page = TOTOK.caseReader.searchCasesByProcessIdentifier(useCase.processIdentifier, pageable)
+                    change res_test_13 value { "SUCCESS: searchCasesByProcessIdentifier returned " + page?.totalElements + " cases" }
+                    } catch (Exception e) {
+                    change res_test_13 value { "ERROR: " + e.message }
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="text">
+        <id>res_test_13</id>
+        <title>Result for searchCasesByProcessIdentifier(String, Pageable)</title>
+    </data>
+
+    <!-- TEST 14: searchCasesElastic(List, AuthPrincipalDto, Pageable, Boolean) -->
+    <data type="button">
+        <id>btn_test_14</id>
+        <title></title>
+        <placeholder>TOTOK.caseReader.searchCasesElastic(queries, principal, pageable, isIntersection)</placeholder>
+        <component>
+            <name>flat</name>
+        </component>
+        <event type="set">
+            <id>e_btn_test_14</id>
+            <actions phase="post">
+                <action>
+                    res_test_14: f.res_test_14;
+                    try {
+                    def pageable = org.springframework.data.domain.PageRequest.of(0, 10)
+                    def page = TOTOK.caseReader.searchCasesElastic(["title:\"" + useCase.title + "\""], null, pageable, false)
+                    change res_test_14 value { "SUCCESS: searchCasesElastic returned " + page?.totalElements + " cases" }
+                    } catch (Exception e) {
+                    change res_test_14 value { "ERROR: " + e.message }
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="text">
+        <id>res_test_14</id>
+        <title>Result for searchCasesElastic(List, AuthPrincipalDto, Pageable, Boolean)</title>
+    </data>
+
+    <!-- TEST 15: searchCasesElasticWithFields(List, AuthPrincipalDto, Pageable, Boolean, Collection) -->
+    <data type="button">
+        <id>btn_test_15</id>
+        <title></title>
+        <placeholder>TOTOK.caseReader.searchCasesElasticWithFields(queries, principal, pageable, isIntersection, fieldIds)</placeholder>
+        <component>
+            <name>flat</name>
+        </component>
+        <event type="set">
+            <id>e_btn_test_15</id>
+            <actions phase="post">
+                <action>
+                    res_test_15: f.res_test_15;
+                    try {
+                    def pageable = org.springframework.data.domain.PageRequest.of(0, 10)
+                    def page = TOTOK.caseReader.searchCasesElasticWithFields(["title:\"" + useCase.title + "\""], null, pageable, false, ["test_field"])
+                    change res_test_15 value { "SUCCESS: searchCasesElasticWithFields returned " + page?.totalElements + " cases" }
+                    } catch (Exception e) {
+                    change res_test_15 value { "ERROR: " + e.message }
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="text">
+        <id>res_test_15</id>
+        <title>Result for searchCasesElasticWithFields(List, AuthPrincipalDto, Pageable, Boolean, Collection)</title>
+    </data>
+
+    <!-- TEST 16: searchCasesByQuery(String, Pageable) -->
+    <data type="button">
+        <id>btn_test_16</id>
+        <title></title>
+        <placeholder>TOTOK.caseReader.searchCasesByQuery(query, pageable)</placeholder>
+        <component>
+            <name>flat</name>
+        </component>
+        <event type="set">
+            <id>e_btn_test_16</id>
+            <actions phase="post">
+                <action>
+                    res_test_16: f.res_test_16;
+                    try {
+                    def pageable = org.springframework.data.domain.PageRequest.of(0, 10)
+                    def page = TOTOK.caseReader.searchCasesByQuery("title:\"" + useCase.title + "\"", pageable)
+                    change res_test_16 value { "SUCCESS: searchCasesByQuery returned " + page?.totalElements + " cases" }
+                    } catch (Exception e) {
+                    change res_test_16 value { "ERROR: " + e.message }
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="text">
+        <id>res_test_16</id>
+        <title>Result for searchCasesByQuery(String, Pageable)</title>
+    </data>
+
+    <!-- TEST 17: searchCasesByQueryWithPrincipal(String, AuthPrincipalDto, Pageable) -->
+    <data type="button">
+        <id>btn_test_17</id>
+        <title></title>
+        <placeholder>TOTOK.caseReader.searchCasesByQueryWithPrincipal(query, principal, pageable)</placeholder>
+        <component>
+            <name>flat</name>
+        </component>
+        <event type="set">
+            <id>e_btn_test_17</id>
+            <actions phase="post">
+                <action>
+                    res_test_17: f.res_test_17;
+                    try {
+                    def pageable = org.springframework.data.domain.PageRequest.of(0, 10)
+                    def page = TOTOK.caseReader.searchCasesByQueryWithPrincipal("title:\"" + useCase.title + "\"", null, pageable)
+                    change res_test_17 value { "SUCCESS: searchCasesByQueryWithPrincipal returned " + page?.totalElements + " cases" }
+                    } catch (Exception e) {
+                    change res_test_17 value { "ERROR: " + e.message }
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="text">
+        <id>res_test_17</id>
+        <title>Result for searchCasesByQueryWithPrincipal(String, AuthPrincipalDto, Pageable)</title>
+    </data>
+
+    <!-- TEST 18: countCases(List, AuthPrincipalDto, Boolean) -->
+    <data type="button">
+        <id>btn_test_18</id>
+        <title></title>
+        <placeholder>TOTOK.caseReader.countCases(queries, principal, isIntersection)</placeholder>
+        <component>
+            <name>flat</name>
+        </component>
+        <event type="set">
+            <id>e_btn_test_18</id>
+            <actions phase="post">
+                <action>
+                    res_test_18: f.res_test_18;
+                    try {
+                    def count = TOTOK.caseReader.countCases(["title:\"" + useCase.title + "\""], null, false)
+                    change res_test_18 value { "SUCCESS: countCases returned " + count }
+                    } catch (Exception e) {
+                    change res_test_18 value { "ERROR: " + e.message }
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="text">
+        <id>res_test_18</id>
+        <title>Result for countCases(List, AuthPrincipalDto, Boolean)</title>
+    </data>
+
+    <!-- TEST 19: countCasesByQuery(String) -->
+    <data type="button">
+        <id>btn_test_19</id>
+        <title></title>
+        <placeholder>TOTOK.caseReader.countCasesByQuery(query)</placeholder>
+        <component>
+            <name>flat</name>
+        </component>
+        <event type="set">
+            <id>e_btn_test_19</id>
+            <actions phase="post">
+                <action>
+                    res_test_19: f.res_test_19;
+                    try {
+                    def count = TOTOK.caseReader.countCasesByQuery("title:\"" + useCase.title + "\"")
+                    change res_test_19 value { "SUCCESS: countCasesByQuery returned " + count }
+                    } catch (Exception e) {
+                    change res_test_19 value { "ERROR: " + e.message }
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="text">
+        <id>res_test_19</id>
+        <title>Result for countCasesByQuery(String)</title>
+    </data>
+
+    <!-- TEST 20: countCasesByQueryWithPrincipal(String, AuthPrincipalDto) -->
+    <data type="button">
+        <id>btn_test_20</id>
+        <title></title>
+        <placeholder>TOTOK.caseReader.countCasesByQueryWithPrincipal(query, principal)</placeholder>
+        <component>
+            <name>flat</name>
+        </component>
+        <event type="set">
+            <id>e_btn_test_20</id>
+            <actions phase="post">
+                <action>
+                    res_test_20: f.res_test_20;
+                    try {
+                    def count = TOTOK.caseReader.countCasesByQueryWithPrincipal("title:\"" + useCase.title + "\"", null)
+                    change res_test_20 value { "SUCCESS: countCasesByQueryWithPrincipal returned " + count }
+                    } catch (Exception e) {
+                    change res_test_20 value { "ERROR: " + e.message }
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="text">
+        <id>res_test_20</id>
+        <title>Result for countCasesByQueryWithPrincipal(String, AuthPrincipalDto)</title>
+    </data>
+
+    <!-- TEST 21: getCaseTitle(String) -->
+    <data type="button">
+        <id>btn_test_21</id>
+        <title></title>
+        <placeholder>TOTOK.caseReader.getCaseTitle(caseId)</placeholder>
+        <component>
+            <name>flat</name>
+        </component>
+        <event type="set">
+            <id>e_btn_test_21</id>
+            <actions phase="post">
+                <action>
+                    res_test_21: f.res_test_21;
+                    try {
+                    def title = TOTOK.caseReader.getCaseTitle(useCase.stringId)
+                    change res_test_21 value { "SUCCESS: getCaseTitle returned " + title }
+                    } catch (Exception e) {
+                    change res_test_21 value { "ERROR: " + e.message }
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="text">
+        <id>res_test_21</id>
+        <title>Result for getCaseTitle(String)</title>
+    </data>
+
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>t_main</id>
+        <x>100</x>
+        <y>100</y>
+        <label>Case Reader Plugin Tests</label>
+        <dataGroup>
+            <id>dg_tests</id>
+            <cols>2</cols>
+            <layout>grid</layout>
+
+            <!-- Row 0: Test 1 -->
+            <dataRef>
+                <id>btn_test_1</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>res_test_1</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+
+            <!-- Row 1: Test 2 -->
+            <dataRef>
+                <id>btn_test_2</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>res_test_2</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+
+            <!-- Row 2: Test 3 -->
+            <dataRef>
+                <id>btn_test_3</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>res_test_3</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+
+            <!-- Row 3: Test 4 -->
+            <dataRef>
+                <id>btn_test_4</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>res_test_4</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+
+            <!-- Row 4: Test 5 -->
+            <dataRef>
+                <id>btn_test_5</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>4</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>res_test_5</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>4</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+
+            <!-- Row 5: Test 6 -->
+            <dataRef>
+                <id>btn_test_6</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>5</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>res_test_6</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>5</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+
+            <!-- Row 6: Test 7 -->
+            <dataRef>
+                <id>btn_test_7</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>6</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>res_test_7</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>6</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+
+            <!-- Row 7: Test 8 -->
+            <dataRef>
+                <id>btn_test_8</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>7</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>res_test_8</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>7</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+
+            <!-- Row 8: Test 9 -->
+            <dataRef>
+                <id>btn_test_9</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>8</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>res_test_9</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>8</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+
+            <!-- Row 9: Test 10 -->
+            <dataRef>
+                <id>btn_test_10</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>9</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>res_test_10</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>9</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+
+            <!-- Row 10: Test 11 -->
+            <dataRef>
+                <id>btn_test_11</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>10</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>res_test_11</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>10</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+
+            <!-- Row 11: Test 12 -->
+            <dataRef>
+                <id>btn_test_12</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>11</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>res_test_12</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>11</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+
+            <!-- Row 12: Test 13 -->
+            <dataRef>
+                <id>btn_test_13</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>12</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>res_test_13</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>12</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+
+            <!-- Row 13: Test 14 -->
+            <dataRef>
+                <id>btn_test_14</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>13</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>res_test_14</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>13</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+
+            <!-- Row 14: Test 15 -->
+            <dataRef>
+                <id>btn_test_15</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>14</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>res_test_15</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>14</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+
+            <!-- Row 15: Test 16 -->
+            <dataRef>
+                <id>btn_test_16</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>15</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>res_test_16</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>15</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+
+            <!-- Row 16: Test 17 -->
+            <dataRef>
+                <id>btn_test_17</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>16</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>res_test_17</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>16</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+
+            <!-- Row 17: Test 18 -->
+            <dataRef>
+                <id>btn_test_18</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>17</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>res_test_18</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>17</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+
+            <!-- Row 18: Test 19 -->
+            <dataRef>
+                <id>btn_test_19</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>18</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>res_test_19</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>18</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+
+            <!-- Row 19: Test 20 -->
+            <dataRef>
+                <id>btn_test_20</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>19</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>res_test_20</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>19</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+
+            <!-- Row 20: Test 21 -->
+            <dataRef>
+                <id>btn_test_21</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>20</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>res_test_21</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>20</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+
+    <transition>
+        <id>helper_task</id>
+        <x>300</x>
+        <y>100</y>
+        <label>Helper Task</label>
+        <dataGroup>
+            <id>dg_helper</id>
+            <cols>2</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>test_field</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>file_field</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>file_list_field</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+
+    <!-- PLACES -->
+    <place>
+        <id>p1</id>
+        <x>200</x>
+        <y>50</y>
+        <label>Start Place</label>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+
+    <!-- ARCS -->
+    <arc>
+        <id>a1</id>
+        <type>read</type>
+        <sourceId>p1</sourceId>
+        <destinationId>t_main</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a2</id>
+        <type>read</type>
+        <sourceId>p1</sourceId>
+        <destinationId>helper_task</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+</document>

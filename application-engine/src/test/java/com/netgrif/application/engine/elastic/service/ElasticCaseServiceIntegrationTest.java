@@ -28,6 +28,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(classes = ApplicationEngine.class)
@@ -171,6 +172,22 @@ class ElasticCaseServiceIntegrationTest {
                 Locale.ENGLISH,
                 false
         ));
+    }
+
+    @Test
+    void savePartialUpdatesElasticsearchWithoutFullRead() throws InterruptedException {
+        Case initialCase = createAndIndexCase("InitialPartialUpdateCase");
+        waitForIndexedCases(List.of(initialCase.getStringId()));
+
+        Case partial = workflowService.findOneProjected(initialCase.getStringId(), List.of("text"));
+        partial.setTitle("UpdatedPartialElasticCase");
+        workflowService.savePartial(partial);
+
+        CaseSearchRequest request = fullTextRequest("UpdatedPartialElasticCase");
+        Page<Case> result = waitForSearchResult(List.of(request), true, 1);
+
+        assertEquals(1, result.getTotalElements());
+        assertCaseIds(result, initialCase);
     }
 
     private Case createAndIndexCase(String title) {

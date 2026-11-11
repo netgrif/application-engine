@@ -38,6 +38,10 @@ public class CaseEventHandler extends AbstractMongoEventListener<Case> {
         List<Field<?>> immediateFields = new ArrayList<>();
         if (useCase.getImmediateDataFields() != null) {
             useCase.getImmediateDataFields().forEach(fieldId -> {
+                if (useCase.getDataSet() != null && !useCase.getDataSet().containsKey(fieldId)) {
+                    log.debug("Skipping immediate field [{}] of case [{}]: data set entry not loaded", fieldId, useCase.getStringId());
+                    return;
+                }
                 try {
                     immediateFields.add(fieldFactory.buildImmediateField(useCase, fieldId));
                 } catch (Exception e) {

@@ -389,6 +389,33 @@ public abstract class AbstractActor implements Serializable {
         return this.authoritySet.stream().anyMatch(it -> it.getName().equals(Authority.admin));
     }
 
+    public Set<String> getGroupIds() {
+        if (groupIds == null) {
+            groupIds = new HashSet<>();
+        }
+        return groupIds;
+    }
+
+    public Map<String, Attribute<?>> getAttributes() {
+        if (attributes == null) {
+            attributes = new HashMap<>();
+        }
+        return attributes;
+    }
+
+    public Set<String> getAuthorityIds() {
+        if (authorityIds == null) {
+            authorityIds = new HashSet<>();
+        }
+        return authorityIds;
+    }
+
+    public Set<String> getProcessRoleIds() {
+        if (processRoleIds == null) {
+            processRoleIds = new HashSet<>();
+        }
+        return processRoleIds;
+    }
 
     /**
      * Checks if the actor has anonymous authority.

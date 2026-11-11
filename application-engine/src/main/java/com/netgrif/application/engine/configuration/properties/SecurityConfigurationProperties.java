@@ -66,7 +66,7 @@ public class SecurityConfigurationProperties {
      * Specifies URL patterns that are exceptions, where anonymous user access is permitted.
      * These patterns are excluded from typical security filters and authentication requirements.
      */
-    private String[] anonymousExceptions;
+    private String[] anonymousExceptions = {};
 
     /**
      * Specifies the key used for anonymous user authentication.

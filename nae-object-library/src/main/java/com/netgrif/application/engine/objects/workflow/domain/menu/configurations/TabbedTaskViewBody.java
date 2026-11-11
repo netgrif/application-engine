@@ -20,6 +20,8 @@ public class TabbedTaskViewBody extends ViewBody {
     private String viewSearchType = "fulltext_advanced";
     private List<String> headersMode = new ArrayList<>(List.of("sort", "edit"));
     private String headersDefaultMode = "sort";
+    private List<String> headersSortModeActive;
+    private String headersSortModeDirection = "desc";
     private boolean isHeaderModeChangeable = true;
     private boolean allowHeaderTableMode = true;
     private boolean useDefaultHeaders = true;
@@ -55,6 +57,10 @@ public class TabbedTaskViewBody extends ViewBody {
                 this.useDefaultHeaders);
         outcome.putDataSetEntry(TabbedTaskViewConstants.FIELD_DEFAULT_HEADERS, FieldType.TEXT,
                 this.defaultHeaders != null ? String.join(",", this.defaultHeaders) : null);
+        outcome.putDataSetEntry(TabbedTaskViewConstants.FIELD_HEADERS_SORT_MODE_ACTIVE, FieldType.TEXT,
+                this.headersSortModeActive != null ? String.join(",", this.headersSortModeActive) : null);
+        outcome.putDataSetEntry(TabbedTaskViewConstants.FIELD_HEADERS_SORT_MODE_DIRECTION, FieldType.ENUMERATION_MAP,
+                this.headersSortModeDirection);
         outcome.putDataSetEntry(TabbedTaskViewConstants.FIELD_SHOW_MORE_MENU, FieldType.BOOLEAN,
                 this.showMoreMenu);
 
