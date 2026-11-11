@@ -43,7 +43,7 @@ public class DataField implements Referencable, Serializable {
     private LocalDateTime lastModified;
 
     @Setter
-    private Long version = 0l;
+    private Long version = 0L;
 
     @Setter
     private Map<String, Component> dataRefComponents;

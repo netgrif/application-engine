@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.netgrif</groupId>
         <artifactId>application-engine-parent</artifactId>
-        <version>7.0.3</version>
+        <version>7.1.0</version>
     </parent>
 
     <artifactId>nae-user-common</artifactId>
@@ -127,6 +127,11 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

@@ -7,6 +7,7 @@ import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository;
 import com.netgrif.application.engine.elastic.service.ElasticCaseService;
 import com.netgrif.application.engine.elastic.service.ElasticTaskService;
 import com.netgrif.application.engine.elastic.service.executors.Executor;
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCasePrioritySearch;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
@@ -37,6 +38,7 @@ public class ElasticServiceConfiguration {
     private final IElasticCasePrioritySearch elasticCasePrioritySearch;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final ElasticsearchClient elasticsearchClient;
+    private final IElasticCaseMappingService caseMappingService;
 
     @Bean
     @Primary
@@ -49,7 +51,8 @@ public class ElasticServiceConfiguration {
                 workflowService,
                 elasticCasePrioritySearch,
                 applicationEventPublisher,
-                elasticsearchClient
+                elasticsearchClient,
+                caseMappingService
         );
     }
 
@@ -69,7 +72,8 @@ public class ElasticServiceConfiguration {
                 workflowService,
                 elasticCasePrioritySearch,
                 applicationEventPublisher,
-                elasticsearchClient
+                elasticsearchClient,
+                caseMappingService
         );
     }
 

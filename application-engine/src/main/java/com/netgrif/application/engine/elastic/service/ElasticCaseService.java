@@ -10,6 +10,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.elastic.domain.BulkOperationWrapper;
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.elastic.service.model.FullTextField;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticCase;
@@ -34,10 +35,13 @@ import org.springframework.data.domain.*;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
+import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHitSupport;
 import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.SearchPage;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.*;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -63,6 +67,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     protected ApplicationEventPublisher publisher;
     protected ElasticQueueManager caseElasticIndexQueueManager;
     protected ElasticQueueManager caseElasticDeleteQueueManager;
+    protected IElasticCaseMappingService caseMappingService;
 
     public ElasticCaseService(ElasticCaseRepository repository,
                               ElasticsearchTemplate template,
@@ -71,7 +76,8 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
                               @Lazy IWorkflowService workflowService,
                               IElasticCasePrioritySearch elasticCasePrioritySearch,
                               ApplicationEventPublisher publisher,
-                              ElasticsearchClient elasticsearchClient) {
+                              ElasticsearchClient elasticsearchClient,
+                              @Lazy IElasticCaseMappingService caseMappingService) {
         this.repository = repository;
         this.template = template;
         this.elasticProperties = elasticProperties;
@@ -81,7 +87,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         this.publisher = publisher;
         this.caseElasticIndexQueueManager = new ElasticQueueManager(elasticProperties, elasticsearchClient, publisher);
         this.caseElasticDeleteQueueManager = new ElasticQueueManager(elasticProperties, elasticsearchClient, publisher);
-
+        this.caseMappingService = caseMappingService;
     }
 
     @PreDestroy
@@ -124,8 +130,38 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         index(useCase);
     }
 
+    @Async
+    @Override
+    public void update(ElasticCase useCase) {
+        if (!repository.existsById(useCase.getId())) {
+            log.debug("[{}]: Case \"{}\" not found in index for update, queueing full-case index", useCase.getId(), useCase.getTitle());
+            if (this.workflowService != null && this.caseMappingService != null) {
+                Case fullCase = this.workflowService.findOne(useCase.getId());
+                if (fullCase != null) {
+                    index(this.caseMappingService.transform(fullCase));
+                    return;
+                }
+            }
+        }
+        caseElasticIndexQueueManager.push(BulkOperationWrapper.builder()
+                .operation(createUpdateOperation(useCase))
+                .publishableEvent(new IndexCaseEvent(useCase))
+                .build());
+        log.debug("[{}]: Case \"{}\" queued for partial update", useCase.getId(), useCase.getTitle());
+    }
+
+    @Override
+    public void updateNow(ElasticCase useCase) {
+        update(useCase);
+    }
+
     @Override
     public Page<Case> search(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
+        return search(requests, user, pageable, locale, isIntersection, null);
+    }
+
+    @Override
+    public Page<Case> search(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection, Collection<String> dataFieldIds) {
         if (requests == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
@@ -138,9 +174,10 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         List<Case> casePage;
         long total;
         if (query != null) {
-            SearchHits<ElasticCase> hits = template.search(query, ElasticCase.class, IndexCoordinates.of(elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX)));
-            Page<ElasticCase> indexedCases = (Page) SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
-            casePage = workflowService.findAllById(indexedCases.get().map(ElasticCase::getId).collect(Collectors.toList()));
+            SearchHits<com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase> hits = template.search(query, com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase.class, IndexCoordinates.of(elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX)));
+            Page<com.netgrif.application.engine.adapter.spring.elastic.domain.ElasticCase> indexedCases = (Page) SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
+            List<String> ids = indexedCases.get().map(ElasticCase::getId).collect(Collectors.toList());
+            casePage = dataFieldIds == null ? workflowService.findAllById(ids) : workflowService.findAllByIdProjected(ids, dataFieldIds);
             total = indexedCases.getTotalElements();
             log.debug("Found [{}] total elements of page [{}]", casePage.size(), pageable.getPageNumber());
         } else {
@@ -187,7 +224,8 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
         NativeQueryBuilder builder = new NativeQueryBuilder()
                 .withQuery(query.build()._toQuery())
-                .withPageable(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()));
+                .withPageable(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()))
+                .withSourceFilter(new FetchSourceFilterBuilder().withIncludes("id").build());
 
         for (org.springframework.data.domain.Sort.Order o : pageable.getSort()) {
             builder.withSort(s -> s.field(f -> f
@@ -480,7 +518,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         List<String> validIds = Stream.concat(
                 Optional.ofNullable(request.stringId).orElse(Collections.emptyList()).stream(),
                 Optional.ofNullable(request.id).orElse(Collections.emptyList()).stream()
-        ).toList();
+        ).filter(id -> id != null && !id.isBlank()).toList();
 
         if (validIds.isEmpty()) {
             return;
@@ -550,6 +588,15 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
                 .index(elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX))
                 .id(useCase.getId())
                 .document(template.getElasticsearchConverter().mapObject(useCase))));
+    }
+
+    private BulkOperation createUpdateOperation(ElasticCase useCase) {
+        return BulkOperation.of(op -> op.update(u -> u
+                .index(elasticProperties.getIndex().get(DataConfigurationProperties.ElasticsearchProperties.CASE_INDEX))
+                .id(useCase.getId())
+                .action(a -> a
+                        .doc(template.getElasticsearchConverter().mapObject(useCase))
+                )));
     }
 
     private List<String> normalizeFullTextSearch(String fullText) {

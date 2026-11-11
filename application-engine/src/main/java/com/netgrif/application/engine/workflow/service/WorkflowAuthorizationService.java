@@ -29,7 +29,8 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
             return true;
         }
 
-        Case requestedCase = workflowService.findOne(caseId);
+        // only static fields (permissions, actors, petri net) are needed - no data set entries are loaded
+        Case requestedCase = workflowService.findOneProjected(caseId, List.of());
         // TODO: impersonation user.getSelfOrImpersonated()
         Boolean userPerm = userHasUserListPermission(user, requestedCase, ProcessRolePermission.DELETE);
         if (userPerm != null) {
