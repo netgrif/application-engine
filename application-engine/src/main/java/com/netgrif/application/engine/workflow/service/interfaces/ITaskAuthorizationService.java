@@ -6,11 +6,11 @@ import com.netgrif.application.engine.petrinet.domain.throwable.IllegalTaskState
 import com.netgrif.application.engine.objects.workflow.domain.Task;
 
 public interface ITaskAuthorizationService {
-    Boolean userHasAtLeastOneRolePermission(AbstractUser loggedUser, String taskId, RolePermission... permissions);
+    Boolean userHasAtLeastOneRolePermission(AbstractUser user, String taskId, RolePermission... permissions);
 
     Boolean userHasAtLeastOneRolePermission(AbstractUser user, Task task, RolePermission... permissions);
 
-    Boolean userHasUserListPermission(AbstractUser loggedUser, String taskId, RolePermission... permissions);
+    Boolean userHasUserListPermission(AbstractUser user, String taskId, RolePermission... permissions);
 
     Boolean userHasUserListPermission(AbstractUser user, Task task, RolePermission... permissions);
 
@@ -18,16 +18,18 @@ public interface ITaskAuthorizationService {
 
     boolean isAssignee(AbstractUser user, Task task);
 
-    boolean canCallAssign(AbstractUser loggedUser, String taskId);
+    boolean canCallAssign(AbstractUser user, String taskId);
 
-    boolean canCallDelegate(AbstractUser loggedUser, String taskId);
+    boolean canCallDelegate(AbstractUser user, String taskId);
 
-    boolean canCallFinish(AbstractUser loggedUser, String taskId) throws IllegalTaskStateException;
+    boolean canCallFinish(AbstractUser user, String taskId) throws IllegalTaskStateException;
 
-    boolean canCallCancel(AbstractUser loggedUser, String taskId) throws IllegalTaskStateException;
+    boolean canCallCancel(AbstractUser user, String taskId) throws IllegalTaskStateException;
 
-    boolean canCallSaveData(AbstractUser loggedUser, String taskId);
+    boolean canCallGetData(AbstractUser user, String taskId);
 
-    boolean canCallSaveFile(AbstractUser loggedUser, String taskId);
+    boolean canCallSaveData(AbstractUser user, String taskId);
+
+    boolean canCallSaveFile(AbstractUser user, String taskId);
 
 }

@@ -416,4 +416,14 @@ public abstract class AbstractActor implements Serializable {
         }
         return processRoleIds;
     }
+
+    /**
+     * Checks if the actor has anonymous authority.
+     * This indicates whether the actor is granted permissions for anonymous access.
+     *
+     * @return true if the actor has anonymous authority, false otherwise
+     */
+    public boolean isAnonymous() {
+        return authoritySet.stream().anyMatch(it -> it.getName().equals(Authority.anonymous));
+    }
 }
