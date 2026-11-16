@@ -16,6 +16,10 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
 
     private final ITaskService taskService;
 
+    public TaskAuthorizationService(ITaskService taskService) {
+        this.taskService = taskService;
+    }
+
     @Override
     public Boolean userHasAtLeastOneRolePermission(AbstractUser user, String taskId, RolePermission... permissions) {
         return userHasAtLeastOneRolePermission(user, taskService.findById(taskId), permissions);
