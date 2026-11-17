@@ -100,7 +100,7 @@ public class TaskController extends AbstractTaskController {
         return super.getOne(taskId, locale);
     }
 
-    @Authorize(expression = "@taskAuthorizationService.canCallAssign(#auth.getPrincipal(), #taskId)")
+    @Authorize(expression = "@taskAuthorizationService.canCallAssign(@userService.getLoggedUser(), #taskId)")
     @Operation(summary = "Assign task",
             description = "Caller must be able to perform the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -113,7 +113,7 @@ public class TaskController extends AbstractTaskController {
         return super.assign(taskId, locale);
     }
 
-    @Authorize(expression = "@taskAuthorizationService.canCallDelegate(#auth.getPrincipal(), #taskId)")
+    @Authorize(expression = "@taskAuthorizationService.canCallDelegate(@userService.getLoggedUser(), #taskId)")
     @Operation(summary = "Delegate task",
             description = "Caller must be able to delegate the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -126,7 +126,7 @@ public class TaskController extends AbstractTaskController {
         return super.delegate(taskId, delegatedId, locale);
     }
 
-    @Authorize(expression = "@taskAuthorizationService.canCallFinish(#auth.getPrincipal(), #taskId)")
+    @Authorize(expression = "@taskAuthorizationService.canCallFinish(@userService.getLoggedUser(), #taskId)")
     @Operation(summary = "Finish task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -139,7 +139,7 @@ public class TaskController extends AbstractTaskController {
         return super.finish(taskId, locale);
     }
 
-    @Authorize(expression = "@taskAuthorizationService.canCallCancel(#auth.getPrincipal(), #taskId)")
+    @Authorize(expression = "@taskAuthorizationService.canCallCancel(@userService.getLoggedUser(), #taskId)")
     @Operation(summary = "Cancel task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -207,7 +207,7 @@ public class TaskController extends AbstractTaskController {
         return super.getData(taskId, locale);
     }
 
-    @Authorize(authority = {"USER", "ADMIN", "ANONYMOUS"}, expression = "@taskAuthorizationService.canCallSaveData(@userService.getLoggedUser(), #taskId)")
+    @Authorize(expression = "@taskAuthorizationService.canCallSaveData(@userService.getLoggedUser(), #taskId)")
     @Operation(summary = "Set task data",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -221,7 +221,7 @@ public class TaskController extends AbstractTaskController {
         return super.setData(taskId, dataBody, locale);
     }
 
-    @Authorize(authority = {"USER", "ADMIN", "ANONYMOUS"}, expression = "@taskAuthorizationService.canCallSaveFile(@userService.getLoggedUser(), #taskId) && @taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #dataBody.parentTaskId)")
+    @Authorize(expression = "@taskAuthorizationService.canCallSaveFile(@userService.getLoggedUser(), #taskId) && @taskAuthorizationService.canCallSaveFile(@userService.getLoggedUser(), #dataBody.parentTaskId)")
     @Operation(summary = "Upload file into the task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -234,7 +234,7 @@ public class TaskController extends AbstractTaskController {
         return super.saveFile(taskId, multipartFile, dataBody, locale);
     }
 
-    @Authorize(authority = {"USER", "ADMIN", "ANONYMOUS"}, expression = "@taskAuthorizationService.canCallGetData(@userService.getLoggedUser(), #taskId)")
+    @Authorize(expression = "@taskAuthorizationService.canCallGetData(@userService.getLoggedUser(), #taskId)")
     @Operation(summary = "Download task file field value",
             description = "Caller must be able to view the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -243,7 +243,7 @@ public class TaskController extends AbstractTaskController {
         return super.getFile(taskId, fieldId);
     }
 
-    @Authorize(authority = {"USER", "ADMIN", "ANONYMOUS"}, expression = "@taskAuthorizationService.canCallSaveFile(@userService.getLoggedUser(), #taskId) && @taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #dataBody.parentTaskId)")
+    @Authorize(expression = "@taskAuthorizationService.canCallSaveFile(@userService.getLoggedUser(), #taskId) && @taskAuthorizationService.canCallSaveFile(@userService.getLoggedUser(), #requestBody.parentTaskId)")
     @Operation(summary = "Remove file from the task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -256,7 +256,7 @@ public class TaskController extends AbstractTaskController {
         return super.deleteFile(requestBody.getParentTaskId(), requestBody.getFieldId());
     }
 
-    @Authorize(authority = {"USER", "ADMIN", "ANONYMOUS"}, expression = "@taskAuthorizationService.canCallSaveFile(@userService.getLoggedUser(), #taskId) && @taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #dataBody.parentTaskId)")
+    @Authorize(expression = "@taskAuthorizationService.canCallSaveFile(@userService.getLoggedUser(), #taskId) && @taskAuthorizationService.canCallSaveFile(@userService.getLoggedUser(), #requestBody.parentTaskId)")
     @Operation(summary = "Upload multiple files into the task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -269,7 +269,7 @@ public class TaskController extends AbstractTaskController {
         return super.saveFiles(taskId, multipartFiles, requestBody);
     }
 
-    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS') && @taskAuthorizationService.canCallGetData(@userService.getLoggedUser(), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallGetData(@userService.getLoggedUser(), #taskId)")
     @Operation(summary = "Download one file from tasks file list field value",
             description = "Caller must be able to view the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -278,7 +278,7 @@ public class TaskController extends AbstractTaskController {
         return super.getNamedFile(taskId, fieldId, fileName);
     }
 
-    @Authorize(authority = {"USER", "ADMIN", "ANONYMOUS"}, expression = "@taskAuthorizationService.canCallSaveFile(@userService.getLoggedUser(), #taskId) && @taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #dataBody.parentTaskId)")
+    @Authorize(expression = "@taskAuthorizationService.canCallSaveFile(@userService.getLoggedUser(), #taskId) && @taskAuthorizationService.canCallSaveFile(@userService.getLoggedUser(), #requestBody.parentTaskId)")
     @Operation(summary = "Remove file from tasks file list field value",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -291,7 +291,7 @@ public class TaskController extends AbstractTaskController {
         return super.deleteNamedFile(requestBody.getParentTaskId(), requestBody.getFieldId(), requestBody.getFileName());
     }
 
-    @PreAuthorize("@authorizationServiceImpl.hasAnyAuthority('USER', 'ADMIN', 'ANONYMOUS') && @taskAuthorizationService.canCallGetData(@userService.getLoggedUser(), #taskId)")
+    @Authorize(expression = "@taskAuthorizationService.canCallGetData(@userService.getLoggedUser(), #taskId)")
     @Operation(summary = "Download preview for file field value",
             description = "Caller must be able to view the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})

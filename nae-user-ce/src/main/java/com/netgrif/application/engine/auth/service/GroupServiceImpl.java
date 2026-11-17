@@ -237,7 +237,6 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Group getDefaultUserGroup(AbstractUser user) {
-        String errorMessage = "Default user group for user [%s] does not exist.".formatted(user.getUsername());
         // TODO: optimize - use ownerId + groupIdentifier == username (no need for iteration)
         Pageable pageable = PageRequest.of(0, paginationProperties.getBackendPageSize());
         Page<Group> userGroups;
@@ -251,7 +250,7 @@ public class GroupServiceImpl implements GroupService {
 
             pageable = pageable.next();
         } while (userGroups.hasNext());
-        throw new ResourceNotFoundException(ResourceNotFoundExceptionCode.DEFAULT_USER_GROUP_NOT_FOUND, errorMessage);
+        throw new ResourceNotFoundException(ResourceNotFoundExceptionCode.DEFAULT_USER_GROUP_NOT_FOUND, "Default user group for user [%s] does not exist.".formatted(user.getUsername()));
     }
 
     @Override

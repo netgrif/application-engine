@@ -80,7 +80,7 @@ public class WorkflowController {
 
     private final UserService userService;
 
-    @Authorize(authority = {"USER", "ADMIN", "ANONYMOUS"}, expression = "@workflowAuthorizationService.canCallCreate(@userService.getLoggedUser(), #body.netId)")
+    @Authorize(expression = "@workflowAuthorizationService.canCallCreate(@userService.getLoggedUser(), #body.netId)")
     @Operation(summary = "Create new case", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = {"/case", "/public/case"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage> createCase(@RequestBody CreateCaseBody body, Locale locale) {
@@ -215,7 +215,7 @@ public class WorkflowController {
         }
     }
 
-    @Authorize(authority = {"ADMIN", "USER"}, expression = "@workflowAuthorizationService.canCallDelete(@userService.getLoggedUser(), #caseId)")
+    @Authorize(expression = "@workflowAuthorizationService.canCallDelete(@userService.getLoggedUser(), #caseId)")
     @Operation(summary = "Delete case", security = {@SecurityRequirement(name = "BasicAuth")})
     @DeleteMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage> deleteCase(@PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) {

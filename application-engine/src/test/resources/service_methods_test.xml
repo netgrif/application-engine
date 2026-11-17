@@ -372,7 +372,7 @@
             <id>group_service_find_by_id_set</id>
             <actions phase="post">
                 <action>
-                    groupService.findById(groupService.getDefaultUserGroup(userService.getLoggedOrSystem()).stringId);
+                    groupService.findById(groupService.getDefaultUserGroup(userService.findUserByUsername("admin", null).get()).stringId);
                 </action>
             </actions>
         </event>
@@ -414,7 +414,7 @@
             <id>group_service_get_default_user_group_set</id>
             <actions phase="post">
                 <action>
-                    groupService.getDefaultUserGroup(userService.getLoggedOrSystem());
+                    groupService.getDefaultUserGroup(userService.findUserByUsername("admin", null).get());
                 </action>
             </actions>
         </event>
@@ -442,7 +442,7 @@
             <id>group_service_save_set</id>
             <actions phase="post">
                 <action>
-                    groupService.save(groupService.getDefaultUserGroup(userService.getLoggedOrSystem()));
+                    groupService.save(userService.findUserByUsername("admin", null).get());
                 </action>
             </actions>
         </event>
