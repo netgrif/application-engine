@@ -598,6 +598,14 @@
                 </includes>
                 <filtering>true</filtering>
             </resource>
+            <resource>
+                <directory>${project.basedir}</directory>
+                <includes>
+                    <include>LICENSE.txt</include>
+                    <include>THIRD-PARTY.txt</include>
+                </includes>
+                <targetPath>META-INF</targetPath>
+            </resource>
         </resources>
         <plugins>
             <plugin>
