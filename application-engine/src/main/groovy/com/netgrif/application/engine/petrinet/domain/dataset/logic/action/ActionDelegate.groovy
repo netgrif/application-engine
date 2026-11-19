@@ -84,6 +84,7 @@ import com.netgrif.application.engine.workflow.params.DeleteCaseParams
 import com.netgrif.application.engine.workflow.params.TaskParams
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream
 import com.netgrif.application.engine.workflow.service.InitValueExpressionEvaluator
+import com.netgrif.application.engine.workflow.scheduler.TimeTriggerSchedulingService
 import com.netgrif.application.engine.workflow.service.TaskService
 import com.netgrif.application.engine.workflow.service.interfaces.*
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource
@@ -104,6 +105,7 @@ import org.springframework.data.domain.Pageable
 import com.netgrif.application.engine.objects.utils.Nullable
 import org.springframework.data.util.Pair
 
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.stream.Collectors
 
@@ -224,6 +226,9 @@ class ActionDelegate extends DelegateExpando {
 
     @Autowired
     PaginationProperties paginationProperties
+
+    @Autowired
+    TimeTriggerSchedulingService timeTriggerSchedulingService
 
     FrontendActionOutcome Frontend
 
@@ -1059,6 +1064,24 @@ class ActionDelegate extends DelegateExpando {
         DeleteCaseEventOutcome outcome = workflowService.deleteCase(new DeleteCaseParams(caseId))
         this.outcomes.add(outcome)
         return outcome.case
+    }
+
+    boolean scheduleExecution(String taskId, Object when) {
+        LocalDateTime startDate = null
+        try {
+            startDate = FieldFactory.parseDateTime(when)
+        } catch (RuntimeException ignored) {
+        }
+        if (startDate == null) {
+            log.warn("Task [{}] was not scheduled, value [{}] cannot be converted to date time", taskId, when)
+            return false
+        }
+        Optional<Task> taskToSchedule = taskService.findOptionalById(taskId)
+        if (taskToSchedule.isEmpty()) {
+            log.warn("Task [{}] was not scheduled, it is not local or does not exist", taskId)
+            return false
+        }
+        return timeTriggerSchedulingService.reschedule(taskToSchedule.get(), startDate)
     }
 
     Task assignTask(String transitionId, Case aCase = useCase, AbstractUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {

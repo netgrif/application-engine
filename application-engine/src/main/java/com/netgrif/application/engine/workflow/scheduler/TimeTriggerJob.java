@@ -1,0 +1,79 @@
+package com.netgrif.application.engine.workflow.scheduler;
+
+import com.netgrif.application.engine.configuration.properties.TimeTriggerProperties;
+import com.netgrif.application.engine.workflow.service.TimeTriggerOutcome;
+import com.netgrif.application.engine.workflow.service.TimeTriggerRetryableException;
+import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
+import lombok.extern.slf4j.Slf4j;
+import org.quartz.DisallowConcurrentExecution;
+import org.quartz.Job;
+import org.quartz.JobDataMap;
+import org.quartz.JobExecutionContext;
+import org.springframework.beans.factory.annotation.Autowired;
+
+@Slf4j
+@DisallowConcurrentExecution
+public class TimeTriggerJob implements Job {
+
+    @Autowired
+    private ITaskService taskService;
+
+    @Autowired
+    private TimeTriggerSchedulingService schedulingService;
+
+    @Autowired
+    private TimeTriggerProperties timeTriggerProperties;
+
+    @Autowired
+    private TimeTriggerMetrics metrics;
+
+    public TimeTriggerJob() {
+    }
+
+    @Override
+    public void execute(JobExecutionContext context) {
+        JobDataMap data = context.getMergedJobDataMap();
+        String caseId = data.getString("caseId");
+        String taskId = data.getString("taskId");
+        String transitionId = data.getString("transitionId");
+
+        try {
+            Long dueAt = data.containsKey("dueAt") ? data.getLong("dueAt") : null;
+            TimeTriggerOutcome outcome = taskService.executeTimeTrigger(taskId, dueAt);
+            metrics.executed(outcome);
+            if (outcome == TimeTriggerOutcome.FIRED) {
+                if (data.containsKey("dueAt")) {
+                    long lateness = context.getFireTime().getTime() - data.getLongValue("dueAt");
+                    if (lateness >= 0) {
+                        metrics.lateness(lateness);
+                    } else {
+                        log.debug("Skipping negative time trigger lateness [{}] ms for task [{}]", lateness, taskId);
+                    }
+                }
+            } else if (outcome == TimeTriggerOutcome.RESUME_FAILED) {
+                metrics.failed();
+            }
+        } catch (TimeTriggerRetryableException e) {
+            redeliver(data, caseId, taskId, transitionId);
+        } catch (RuntimeException e) {
+            metrics.failed();
+            log.error("Time trigger execution failed for task [{}] of transition [{}] in case [{}]", taskId, transitionId, caseId, e);
+        }
+    }
+
+    private void redeliver(JobDataMap data, String caseId, String taskId, String transitionId) {
+        int attempts = data.containsKey("attempts") ? data.getIntValue("attempts") : 0;
+        if (attempts + 1 >= timeTriggerProperties.getRedeliver().getMaxAttempts()) {
+            metrics.failed();
+            log.error("Time trigger redelivery exhausted for task [{}] of transition [{}] in case [{}] after [{}] attempts", taskId, transitionId, caseId, attempts + 1);
+            return;
+        }
+
+        if (schedulingService.scheduleRedelivery(caseId, taskId, transitionId, data.getLongValue("dueAt"), attempts + 1)) {
+            metrics.redelivered();
+            log.info("Time trigger redelivery scheduled for task [{}] of transition [{}] in case [{}] (attempt [{}])", taskId, transitionId, caseId, attempts + 1);
+        } else {
+            metrics.scheduleFailed();
+        }
+    }
+}

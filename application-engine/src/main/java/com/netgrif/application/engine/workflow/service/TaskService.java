@@ -22,7 +22,6 @@ import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.RolePermission;
 import com.netgrif.application.engine.objects.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
-import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.validation.service.interfaces.IValidationService;
 import com.netgrif.application.engine.objects.workflow.domain.*;
@@ -35,6 +34,7 @@ import com.netgrif.application.engine.objects.workflow.domain.triggers.TimeTrigg
 import com.netgrif.application.engine.objects.workflow.domain.triggers.Trigger;
 import com.netgrif.application.engine.workflow.params.DelegateTaskParams;
 import com.netgrif.application.engine.workflow.params.TaskParams;
+import com.netgrif.application.engine.workflow.scheduler.TimeTriggerSchedulingService;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -44,19 +44,20 @@ import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.dao.TransientDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
@@ -87,8 +88,7 @@ public class TaskService implements ITaskService {
     protected TaskSearchService searchService;
 
     @Autowired
-    @Qualifier("taskScheduler")
-    protected TaskScheduler scheduler;
+    protected TimeTriggerSchedulingService timeTriggerSchedulingService;
 
     @Autowired
     protected IWorkflowService workflowService;
@@ -550,6 +550,11 @@ public class TaskService implements ITaskService {
             executeTransition(task, useCase);
             outcome.setAnyTaskExecuted(true);
         }
+        for (Task task : newTasks) {
+            if (!tasksToBeExecuted.contains(task)) {
+                scheduleTimeTriggers(task, useCase);
+            }
+        }
         return outcome;
     }
 
@@ -609,23 +614,92 @@ public class TaskService implements ITaskService {
     protected void executeTransition(Task task, Case useCase) {
         log.info("[{}]: executeTransition [{}] in case [{}]", useCase.getStringId(), task.getTransitionId(), useCase.getTitle());
         try {
-            log.info("assignTask [{}] in case [{}]", task.getTitle(), useCase.getTitle());
-            AssignTaskEventOutcome assignTaskEventOutcome = assignTask(TaskParams.with()
-                    .task(task)
-                    .build());
-
-            task = assignTaskEventOutcome.getTask();
-
-            log.info("getData [{}] in case [{}]", task.getTitle(), useCase.getTitle());
-            dataService.getData(task.getStringId());
-
-            log.info("finishTask [{}] in case [{}]", task.getTitle(), useCase.getTitle());
-            finishTask(TaskParams.with()
-                    .task(task)
-                    .build());
+            performTransition(task, useCase);
         } catch (Exception e) {
             log.error("Execution of task [{}] in case [{}] failed: ", task.getTitle(), useCase.getTitle(), e);
         }
+    }
+
+    private void performTransition(Task task, Case useCase) throws TransitionNotExecutableException {
+        log.info("assignTask [{}] in case [{}]", task.getTitle(), useCase.getTitle());
+        AssignTaskEventOutcome assignTaskEventOutcome = assignTask(TaskParams.with()
+                .task(task)
+                .build());
+
+        task = assignTaskEventOutcome.getTask();
+
+        log.info("getData [{}] in case [{}]", task.getTitle(), useCase.getTitle());
+        dataService.getData(task.getStringId());
+
+        log.info("finishTask [{}] in case [{}]", task.getTitle(), useCase.getTitle());
+        finishTask(TaskParams.with()
+                .task(task)
+                .build());
+    }
+
+    @Override
+    public TimeTriggerOutcome executeTimeTrigger(String taskId, Long dueAtMillis) {
+        try {
+            Optional<Task> taskOptional = findOptionalById(taskId);
+            if (taskOptional.isEmpty()) {
+                log.info("Cannot execute time trigger: task [{}] does not exist", taskId);
+                return TimeTriggerOutcome.SKIPPED_TASK_MISSING;
+            }
+            Task task = taskOptional.get();
+            if (isFinishedAtOrAfterDueDate(task, dueAtMillis)) {
+                log.info("Cannot execute time trigger: task [{}] of transition [{}] in case [{}] is already finished", taskId, task.getTransitionId(), task.getCaseId());
+                return TimeTriggerOutcome.SKIPPED_ALREADY_FINISHED;
+            }
+            Case useCase;
+            try {
+                useCase = workflowService.findOne(task.getCaseId());
+            } catch (IllegalArgumentException e) {
+                throw new TimeTriggerRetryableException("Cannot execute time trigger: case [" + task.getCaseId() + "] of task [" + taskId + "] does not exist", e);
+            }
+            Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
+            if (transition == null) {
+                log.info("Cannot execute time trigger: transition [{}] of task [{}] in case [{}] does not exist", task.getTransitionId(), taskId, task.getCaseId());
+                return TimeTriggerOutcome.SKIPPED_TRANSITION_MISSING;
+            }
+            if (task.getFinishDate() == null && task.getUserId() != null && task.getUserId().equals(userService.getSystem().getStringId())) {
+                log.warn("Time trigger: task [{}] of transition [{}] in case [{}] is assigned to the system user by an interrupted execution, finishing it", taskId, task.getTransitionId(), task.getCaseId());
+                try {
+                    dataService.getData(taskId);
+                    finishTask(TaskParams.with().task(task).build());
+                } catch (Exception e) {
+                    log.error("Time trigger resume failed for task [{}] of transition [{}] in case [{}]", taskId, task.getTransitionId(), task.getCaseId(), e);
+                    return TimeTriggerOutcome.RESUME_FAILED;
+                }
+                return TimeTriggerOutcome.RESUMED;
+            }
+            if (!isExecutable(transition, useCase.getPetriNet())) {
+                log.info("Cannot execute time trigger: transition [{}] of task [{}] in case [{}] is not executable", task.getTransitionId(), taskId, task.getCaseId());
+                return TimeTriggerOutcome.SKIPPED_NOT_EXECUTABLE;
+            }
+            if (task.getUserId() != null) {
+                log.info("Cannot execute time trigger: task [{}] of transition [{}] in case [{}] is assigned to a user", taskId, task.getTransitionId(), task.getCaseId());
+                return TimeTriggerOutcome.SKIPPED_ASSIGNED;
+            }
+            try {
+                performTransition(task, useCase);
+            } catch (TransitionNotExecutableException e) {
+                throw new RuntimeException(e);
+            }
+            return TimeTriggerOutcome.FIRED;
+        } catch (TransientDataAccessException e) {
+            throw new TimeTriggerRetryableException("Cannot execute time trigger: transient data access failure for task [" + taskId + "]", e);
+        }
+    }
+
+    private boolean isFinishedAtOrAfterDueDate(Task task, Long dueAtMillis) {
+        if (task.getFinishDate() == null) {
+            return false;
+        }
+        if (dueAtMillis == null) {
+            return true;
+        }
+        LocalDateTime dueAt = LocalDateTime.ofInstant(Instant.ofEpochMilli(dueAtMillis), ZoneId.systemDefault());
+        return !task.getFinishDate().isBefore(dueAt);
     }
 
     void validateData(Transition transition, Case useCase) {
@@ -660,7 +734,19 @@ public class TaskService implements ITaskService {
 
     protected void scheduleTaskExecution(Task task, LocalDateTime time, Case useCase) {
         log.info("[{}]: Task {} scheduled to run at {}", useCase.getStringId(), task.getTitle(), time);
-        scheduler.schedule(() -> executeTransition(task, useCase), DateUtils.localDateTimeToDate(time));
+        timeTriggerSchedulingService.schedule(task, time);
+    }
+
+    private void scheduleTimeTriggers(Task task, Case useCase) {
+        long timeTriggerCount = task.getTriggers().stream().filter(TimeTrigger.class::isInstance).count();
+        if (timeTriggerCount > 1) {
+            log.warn("Task [{}] in case [{}] has [{}] time triggers but only one job is scheduled per task", task.getStringId(), task.getCaseId(), timeTriggerCount);
+        }
+        for (Trigger trigger : task.getTriggers()) {
+            if (trigger instanceof TimeTrigger timeTrigger) {
+                scheduleTaskExecution(task, timeTrigger.getStartDate(), useCase);
+            }
+        }
     }
 
     @Override
@@ -915,10 +1001,6 @@ public class TaskService implements ITaskService {
         for (Trigger trigger : transition.getTriggers()) {
             Trigger taskTrigger = trigger.clone();
             task.addTrigger(taskTrigger);
-
-            if (taskTrigger instanceof TimeTrigger timeTrigger) {
-                scheduleTaskExecution(task, timeTrigger.getStartDate(), useCase);
-            }
         }
         ProcessRole defaultRole = processRoleService.getDefaultRole();
         ProcessRole anonymousRole = processRoleService.getAnonymousRole();
@@ -976,6 +1058,7 @@ public class TaskService implements ITaskService {
         log.info("[{}]: Tasks of case {} are being deleted", useCase.getStringId(), useCase.getTitle());
         taskRepository.deleteAll(tasks);
         tasks.forEach(t -> elasticTaskService.remove(t.getStringId()));
+        unscheduleTimeTriggers(tasks);
     }
 
     @Override
@@ -991,6 +1074,15 @@ public class TaskService implements ITaskService {
         log.info("[{}]: Tasks of case are being deleted", caseId);
         taskRepository.deleteAll(tasks);
         tasks.forEach(t -> elasticTaskService.remove(t.getStringId()));
+        unscheduleTimeTriggers(tasks);
+    }
+
+    private void unscheduleTimeTriggers(List<Task> tasks) {
+        List<String> timeTriggeredTaskIds = tasks.stream()
+                .filter(task -> task.getTriggers().stream().anyMatch(TimeTrigger.class::isInstance))
+                .map(Task::getStringId)
+                .toList();
+        timeTriggerSchedulingService.unscheduleAll(timeTriggeredTaskIds);
     }
 
     @Override
@@ -1005,6 +1097,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public void deleteTasksByPetriNetId(String petriNetId) {
+        unscheduleTimeTriggers(taskRepository.findAllByProcessId(petriNetId));
         taskRepository.deleteAllByProcessId(petriNetId);
     }
 
