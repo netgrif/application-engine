@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.6.0](https://github.com/netgrif/application-engine/releases/tag/v6.6.0) (2026-11-20)
+
+### Fixed
+- [NAE-2475] Advanced search is broken
+- [NAE-2468] UI/UX fixes & improvements
+
+### Added
+- [NAE-2453] System processes translations
+- [NAE-2460] PFQL placeholder support
+- [NAE-2470] PFQL double quote string support
+- [NAE-2466] Advanced search for PFQL
+- [NAE-2486] QueryLangEvaluator project implementations
+- [NAE-2498] PFQL tasksState support
+- [NAE-2489] View only builder
+- [NAE-2469] Fulltext search configuration
+
+### Changed
+- [NAE-2454] View Configuration 2.0
+- [NAE-2472] Menu Item improvements
+- [NAE-2483] Action API Improvements
+- [NAE-2461] Create case filter only deployed
+- [NAE-2462] Builder component decomposition
+
 ## [6.5.0](https://github.com/netgrif/application-engine/releases/tag/v6.5.0) (2026-07-20)
 
 ### Fixed
