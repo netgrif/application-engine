@@ -91,6 +91,7 @@ public class MenuItemService implements IMenuItemService {
      *
      * @throws IllegalArgumentException if the provided menu identifier already exists
      * */
+    // todo: should be transactional
     @Override
     public Case createMenuItem(MenuItemBody body) throws TransitionNotExecutableException {
         validateMenuItemBody(body);
@@ -247,6 +248,7 @@ public class MenuItemService implements IMenuItemService {
         Query query = Query.query(
                 Criteria.where("processIdentifier").is(MenuItemConstants.PROCESS_IDENTIFIER)
                         .and(String.format("dataSet.%s.value", MenuItemConstants.FIELD_NODE_PATH)).is(node.getUriPath())
+                        .and(String.format("dataSet.%s.value", MenuItemConstants.FIELD_IS_FOLDER)).is(true)
         );
         if (existDatabaseIndexes == null || !existDatabaseIndexes) {
             ensureDatabaseIndexes();
@@ -291,11 +293,11 @@ public class MenuItemService implements IMenuItemService {
         if (MenuItemUtils.isCyclicNodePath(itemCase, destUri)) {
             throw new IllegalArgumentException(String.format("Cyclic path not supported. Destination path: %s", destUri));
         }
-        List<Case> casesToSave = new ArrayList<>();
-
-        List<String> oldParentIdAsList = MenuItemUtils.getCaseIdsFromCaseRef(itemCase, MenuItemConstants.FIELD_PARENT_ID);
 
         UriNode destNode = uriService.getOrCreate(destUri, UriContentType.CASE);
+
+        List<Case> casesToSave = new ArrayList<>();
+        List<String> oldParentIdAsList = MenuItemUtils.getCaseIdsFromCaseRef(itemCase, MenuItemConstants.FIELD_PARENT_ID);
         Case newParent = getOrCreateFolderItem(destNode.getUriPath());
 
         if (oldParentIdAsList != null && !oldParentIdAsList.isEmpty()) {
@@ -421,7 +423,6 @@ public class MenuItemService implements IMenuItemService {
         }
         childIds.remove(childItem.getStringId());
         parentFolder.getDataField(MenuItemConstants.FIELD_CHILD_ITEM_IDS).setValue(childIds);
-        parentFolder.getDataField(MenuItemConstants.FIELD_HAS_CHILDREN).setValue(MenuItemUtils.hasFolderChildren(parentFolder));
         return workflowService.save(parentFolder);
     }
 
@@ -540,6 +541,9 @@ public class MenuItemService implements IMenuItemService {
                 throw new IllegalArgumentException("Uri cannot contain this identifier");
             }
         }
+        if (body.isFolder() && body.getView() != null) {
+            throw new IllegalArgumentException("Folder cannot have view");
+        }
     }
 
     protected Case findCase(String processIdentifier, String query) {
@@ -638,6 +642,8 @@ public class MenuItemService implements IMenuItemService {
     protected Case getOrCreateFolderItem(String uri) throws TransitionNotExecutableException {
         UriNode node = uriService.getOrCreate(uri, UriContentType.CASE);
         MenuItemBody body = new MenuItemBody(new I18nString(node.getName()), DEFAULT_FOLDER_ICON);
+        body.setIdentifier(MenuItemUtils.sanitize(node.getName()));
+        body.setIsFolder(true);
         return getOrCreateFolderRecursive(node, body);
     }
 
@@ -655,6 +661,10 @@ public class MenuItemService implements IMenuItemService {
             return folderCase;
         }
 
+        if (existsMenuItem(body.getIdentifier())) {
+            throw new IllegalArgumentException(String.format("Menu item with identifier '%s' is not folder", body.getIdentifier()));
+        }
+
         folderCase = createCase(MenuItemConstants.PROCESS_IDENTIFIER, body.getMenuName().getDefaultValue(),
                 loggedUser.transformToLoggedUser());
         folderCase.setUriNodeId(node.getParentId());
@@ -668,6 +678,8 @@ public class MenuItemService implements IMenuItemService {
         if (node.getParentId() != null) {
             UriNode parentNode = uriService.findById(node.getParentId());
             body = new MenuItemBody(new I18nString(parentNode.getName()), DEFAULT_FOLDER_ICON);
+            body.setIdentifier(MenuItemUtils.sanitize(parentNode.getName()));
+            body.setIsFolder(true);
 
             Case parentFolderCase = getOrCreateFolderRecursive(parentNode, body, folderCase);
             dataSetOutcome.putDataSetEntry(MenuItemConstants.FIELD_PARENT_ID, FieldType.CASE_REF, List.of(parentFolderCase.getStringId()));
@@ -688,8 +700,6 @@ public class MenuItemService implements IMenuItemService {
 
         dataSet.put(MenuItemConstants.FIELD_CHILD_ITEM_IDS, Map.of("type", FieldType.CASE_REF.getName(),
                 "value", childIds));
-        dataSet.put(MenuItemConstants.FIELD_HAS_CHILDREN, Map.of("type", FieldType.BOOLEAN.getName(),
-                "value", !childIds.isEmpty()));
     }
 
     protected void appendChildCaseIdInMemory(Case folderCase, String childItemCaseId) {
@@ -700,7 +710,6 @@ public class MenuItemService implements IMenuItemService {
             childIds.add(childItemCaseId);
             folderCase.getDataField(MenuItemConstants.FIELD_CHILD_ITEM_IDS).setValue(childIds);
         }
-        folderCase.getDataField(MenuItemConstants.FIELD_HAS_CHILDREN).setValue(MenuItemUtils.hasFolderChildren(folderCase));
     }
 
     protected Case appendChildCaseIdAndSave(Case folderCase, String childItemCaseId) {

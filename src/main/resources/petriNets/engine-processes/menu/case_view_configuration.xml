@@ -2,7 +2,7 @@
     <id>case_view_configuration</id>
     <version>1.0.0</version>
     <initials>CVC</initials>
-    <title>Case view configuration</title>
+    <title name="model_title">Case view configuration</title>
     <icon>check_box_outline_blank</icon>
     <defaultRole>true</defaultRole>
     <anonymousRole>false</anonymousRole>
@@ -155,6 +155,24 @@
         <id>show_create_case_button</id>
         <title name="show_create_case_button">Show create case button?</title>
         <init>true</init>
+        <event type="set">
+            <id>0</id>
+            <actions phase="post">
+                <action>
+                    trans: t.create_case_btn_settings,
+                    show_create_case_button: f.show_create_case_button,
+                    require_title_in_creation: f.require_title_in_creation,
+                    create_case_button_title: f.create_case_button_title,
+                    create_case_button_icon: f.create_case_button_icon,
+                    create_case_button_icon_preview: f.create_case_button_icon_preview,
+                    banned_nets_in_creation: f.banned_nets_in_creation;
+
+                    make [require_title_in_creation, create_case_button_title, create_case_button_icon, create_case_button_icon_preview, banned_nets_in_creation], hidden on trans when { !show_create_case_button.value }
+                    make [require_title_in_creation, create_case_button_title, create_case_button_icon, banned_nets_in_creation], editable on trans when { show_create_case_button.value }
+                    make create_case_button_icon_preview, visible on trans when { show_create_case_button.value }
+                </action>
+            </actions>
+        </event>
     </data>
     <data type="boolean" immediate="true">
         <id>require_title_in_creation</id>
@@ -226,6 +244,20 @@
         </options>
         <init>sort</init>
     </data>
+    <data type="text" immediate="true">
+        <id>case_headers_sort_mode_active</id>
+        <title name="case_headers_sort_mode_active">Active column for sorting</title>
+        <desc name="case_headers_sort_mode_active_desc">Example: meta-title</desc>
+    </data>
+    <data type="enumeration_map" immediate="true">
+        <id>case_headers_sort_mode_direction</id>
+        <title name="case_headers_sort_mode_direction">Default sort direction</title>
+        <options>
+            <option key="asc" name="ascending">Ascending</option>
+            <option key="desc" name="descending">Descending</option>
+        </options>
+        <init>desc</init>
+    </data>
     <data type="enumeration_map">
         <id>headers_options_holder</id>
         <title/>
@@ -248,21 +280,14 @@
     <data type="stringCollection" immediate="true">
         <id>case_default_headers</id>
         <title name="case_default_headers">Set default headers</title>
-        <desc name="default_headers_desc">Example: "meta-title", "meta-visualId"</desc>
+        <desc name="default_headers_desc">Example: "meta-title", "myProcessIdentifier-myDataFieldId", ...</desc>
     </data>
     <data type="enumeration_map" immediate="true">
         <id>view_configuration_type</id>
         <title name="view_configuration_type">View type</title>
         <options>
-            <init dynamic="true">menuItemService.getAvailableViewsAsOptions(true, useCase.processIdentifier)</init>
+            <init dynamic="true">menuItemService.getAvailableViewsAsOptions(useCase.processIdentifier)</init>
         </options>
-        <action trigger="set">
-            view_configuration_type: f.view_configuration_type;
-
-            if (view_configuration_type.options == null || view_configuration_type.options.isEmpty()) {
-                change view_configuration_type options { menuItemService.getAvailableViewsAsOptions(true, useCase.processIdentifier) }
-            }
-        </action>
     </data>
     <data type="caseRef">
         <id>view_configuration_id</id>
@@ -344,11 +369,30 @@
         <id>case_all_allowed_nets</id>
         <title name="case_all_allowed_nets">All allowed nets?</title>
         <init>true</init>
+        <event type="set">
+            <id>0</id>
+            <actions phase="post">
+                <action>
+                    trans: t.settings,
+                    case_all_allowed_nets: f.case_all_allowed_nets,
+                    case_allowed_nets: f.case_allowed_nets,
+                    case_inherit_allowed_nets: f.case_inherit_allowed_nets;
+
+                    make [case_allowed_nets, case_inherit_allowed_nets], hidden on trans when { case_all_allowed_nets.value }
+                    make [case_allowed_nets, case_inherit_allowed_nets], editable on trans when { !case_all_allowed_nets.value }
+                </action>
+            </actions>
+        </event>
     </data>
     <data type="boolean">
         <id>case_inherit_allowed_nets</id>
         <title name="case_inherit_allowed_nets">Inherit allowed nets?</title>
         <init>true</init>
+    </data>
+    <data type="stringCollection">
+        <id>case_fulltext_fields</id>
+        <title name="case_fulltext_fields">Full-text fields</title>
+        <desc name="case_fulltext_fields_desc">Fields to consider in a full-text search. You can enter fieldId also with a following '.keyword' suffix.</desc>
     </data>
 
     <!-- I18NS -->
@@ -357,7 +401,7 @@
         <i18nString name="create_case_button_icon">Identifikátor ikony tlačidla "Nová inštancia"</i18nString>
         <i18nString name="create_case_button_icon_preview">Náhľad ikony</i18nString>
         <i18nString name="case_default_headers">Predvolené hlavičky</i18nString>
-        <i18nString name="default_headers_desc">Napríklad: "meta-title", "meta-visualId"</i18nString>
+        <i18nString name="default_headers_desc">Napríklad: "meta-title", "myProcessIdentifier-myDataFieldId", ...</i18nString>
         <i18nString name="case_view_search_type">Typ vyhľadávania prípadov</i18nString>
         <i18nString name="hidden">Skryté</i18nString>
         <i18nString name="fulltext">Fulltext</i18nString>
@@ -395,13 +439,21 @@
         <i18nString name="open_case_settings">Zobrazenie po kliknutí na inštanciu</i18nString>
         <i18nString name="create_case_btn_settings">Tlačidlo vytvorenia inštancie</i18nString>
         <i18nString name="header_settings">Hlavičky</i18nString>
+        <i18nString name="case_headers_sort_mode_direction">Predvolený smer zoradenia</i18nString>
+        <i18nString name="ascending">Vzostupne</i18nString>
+        <i18nString name="descending">Zostupne</i18nString>
+        <i18nString name="case_headers_sort_mode_active">Aktívny stĺpec pre zoradenie</i18nString>
+        <i18nString name="case_headers_sort_mode_active_desc">Napríklad: meta-title</i18nString>
+        <i18nString name="model_title">Konfigurácia zobrazenia prípadov</i18nString>
+        <i18nString name="case_fulltext_fields">Full-text polia</i18nString>
+        <i18nString name="case_fulltext_fields_desc">Polia, ktoré sa použijú pre full-text vyhľadávanie. FieldId môžete zadať aj s príponou „.keyword“.</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="create_case_button_title">Schaltflächentitel "Neuer Fall"</i18nString>
         <i18nString name="create_case_button_icon">Ikone ID</i18nString>
         <i18nString name="create_case_button_icon_preview">Ikonevorschau</i18nString>
         <i18nString name="case_default_headers">Anzuzeigende Attributmenge auswählen</i18nString>
-        <i18nString name="default_headers_desc">Beispiel: "meta-title", "meta-visualId"</i18nString>
+        <i18nString name="default_headers_desc">Beispiel: "meta-title", "myProcessIdentifier-myDataFieldId", ...</i18nString>
         <i18nString name="hidden">Versteckt</i18nString>
         <i18nString name="fulltext">Einfacher Suchmodus</i18nString>
         <i18nString name="sort">Sortieren</i18nString>
@@ -426,11 +478,9 @@
         <i18nString name="settings">Einstellungen</i18nString>
         <i18nString name="case_allow_export">Erlaube Export?</i18nString>
         <i18nString name="case_empty_content_text">Leerer Inhaltstext</i18nString>
-        <i18nString name="case_empty_content_text_desc">Wenn dieses Feld leer ist, wird der Standardtext verwendet
-        </i18nString>
+        <i18nString name="case_empty_content_text_desc">Wenn dieses Feld leer ist, wird der Standardtext verwendet</i18nString>
         <i18nString name="case_empty_content_icon">Leeres Inhaltssymbol</i18nString>
-        <i18nString name="case_empty_content_icon_desc">Wenn dieses Feld leer ist, wird das Standardsymbol verwendet
-        </i18nString>
+        <i18nString name="case_empty_content_icon_desc">Wenn dieses Feld leer ist, wird das Standardsymbol verwendet</i18nString>
         <i18nString name="case_empty_content_icon_preview">Vorschau des leeren Inhaltssymbols</i18nString>
         <i18nString name="case_filter">Filter</i18nString>
         <i18nString name="case_filter_desc">Verwenden Sie PFQL Query</i18nString>
@@ -441,6 +491,14 @@
         <i18nString name="open_case_settings">Ansicht nach dem Klicken auf die Instanz</i18nString>
         <i18nString name="create_case_btn_settings">Schaltfläche zum Erstellen einer Instanz</i18nString>
         <i18nString name="header_settings">Kopfzeilen</i18nString>
+        <i18nString name="case_headers_sort_mode_direction">Standard-Sortierrichtung</i18nString>
+        <i18nString name="ascending">Aufsteigend</i18nString>
+        <i18nString name="descending">Absteigend</i18nString>
+        <i18nString name="case_headers_sort_mode_active">Aktive Spalte zum Sortieren</i18nString>
+        <i18nString name="case_headers_sort_mode_active_desc">Beispiel: meta-title</i18nString>
+        <i18nString name="model_title">Konfiguration der Fallansicht</i18nString>
+        <i18nString name="case_fulltext_fields">Volltextfelder</i18nString>
+        <i18nString name="case_fulltext_fields_desc">Bei der Volltextsuche zu berücksichtigende Felder. Sie können die fieldId auch mit einem angehängten „.keyword“-Suffix angeben.</i18nString>
     </i18n>
 
     <transition>
@@ -514,10 +572,10 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>case_show_more_menu</id>
+                <id>case_fulltext_fields</id>
                 <logic>
                     <behavior>editable</behavior>
-                    </logic>
+                </logic>
                 <layout>
                     <x>1</x>
                     <y>0</y>
@@ -528,7 +586,7 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>case_allow_export</id>
+                <id>case_show_more_menu</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
@@ -538,14 +596,14 @@
                     <rows>1</rows>
                     <cols>1</cols>
                     <template>material</template>
-                    <appearance>standard</appearance>
+                    <appearance>outline</appearance>
                 </layout>
             </dataRef>
             <dataRef>
                 <id>case_empty_content_text</id>
                 <logic>
                     <behavior>editable</behavior>
-                    </logic>
+                </logic>
                 <layout>
                     <x>0</x>
                     <y>1</y>
@@ -559,7 +617,7 @@
                 <id>case_empty_content_icon</id>
                 <logic>
                     <behavior>editable</behavior>
-                    </logic>
+                </logic>
                 <layout>
                     <x>1</x>
                     <y>1</y>
@@ -573,7 +631,7 @@
                 <id>case_empty_content_icon_preview</id>
                 <logic>
                     <behavior>visible</behavior>
-                    </logic>
+                </logic>
                 <layout>
                     <x>2</x>
                     <y>1</y>
@@ -587,7 +645,7 @@
                 <id>case_all_allowed_nets</id>
                 <logic>
                     <behavior>editable</behavior>
-                    </logic>
+                </logic>
                 <layout>
                     <x>0</x>
                     <y>2</y>
@@ -600,7 +658,7 @@
             <dataRef>
                 <id>case_allowed_nets</id>
                 <logic>
-                    <behavior>editable</behavior>
+                    <behavior>hidden</behavior>
                     </logic>
                 <layout>
                     <x>1</x>
@@ -614,8 +672,8 @@
             <dataRef>
                 <id>case_inherit_allowed_nets</id>
                 <logic>
-                    <behavior>editable</behavior>
-                    </logic>
+                    <behavior>hidden</behavior>
+                </logic>
                 <layout>
                     <x>2</x>
                     <y>2</y>
@@ -626,13 +684,27 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>advanced_content_form</id>
+                <id>case_allow_export</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
                 <layout>
                     <x>0</x>
                     <y>3</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>standard</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>advanced_content_form</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>4</y>
                     <rows>1</rows>
                     <cols>3</cols>
                     <template>material</template>
@@ -1042,6 +1114,37 @@
                     <appearance>outline</appearance>
                 </layout>
             </dataRef>
+            <dataRef>
+                <id>case_headers_sort_mode_active</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_headers_sort_mode_direction</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
         </dataGroup>
         <event type="assign">
             <id>assign</id>
@@ -1370,7 +1473,7 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>view_configuration_type</id>
+                <id>case_headers_sort_mode_active</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
@@ -1384,7 +1487,7 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>view_configuration_all_data_form</id>
+                <id>case_headers_sort_mode_direction</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
@@ -1398,13 +1501,55 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>case_allow_export</id>
+                <id>view_configuration_type</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
                 <layout>
                     <x>0</x>
                     <y>23</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>view_configuration_all_data_form</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>24</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_allow_export</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>25</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>case_fulltext_fields</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>26</y>
                     <rows>1</rows>
                     <cols>1</cols>
                     <template>material</template>

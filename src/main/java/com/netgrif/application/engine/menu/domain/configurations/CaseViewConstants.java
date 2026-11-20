@@ -15,6 +15,8 @@ public class CaseViewConstants extends ViewConstants {
     public static final String FIELD_ALLOW_HEADER_TABLE_MODE = "case_allow_header_table_mode";
     public static final String FIELD_HEADERS_MODE = "case_headers_mode";
     public static final String FIELD_HEADERS_DEFAULT_MODE = "case_headers_default_mode";
+    public static final String FIELD_HEADERS_SORT_MODE_ACTIVE = "case_headers_sort_mode_active";
+    public static final String FIELD_HEADERS_SORT_MODE_DIRECTION = "case_headers_sort_mode_direction";
     public static final String FIELD_IS_HEADER_MODE_CHANGEABLE = "case_is_header_mode_changeable";
     public static final String FIELD_USE_DEFAULT_HEADERS = "use_case_default_headers";
     public static final String FIELD_EMPTY_CONTENT_TEXT = "case_empty_content_text";
@@ -24,4 +26,5 @@ public class CaseViewConstants extends ViewConstants {
     public static final String FIELD_ALL_ALLOWED_NETS = "case_all_allowed_nets";
     public static final String FIELD_ALLOWED_NETS = "case_allowed_nets";
     public static final String FIELD_INHERIT_ALLOWED_NETS = "case_inherit_allowed_nets";
+    public static final String FIELD_FULLTEXT_FIELDS = "case_fulltext_fields";
 }

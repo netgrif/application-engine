@@ -17,7 +17,7 @@ import java.util.stream.Collectors
 class ValidationService implements IValidationService {
 
     @Override
-    public void valid(Field field, DataField dataField) {
+    void valid(Field field, DataField dataField) {
         if (field.getValidations() == null) {
             return
         }
@@ -36,6 +36,13 @@ class ValidationService implements IValidationService {
                     instance = new BooleanFieldValidation()
                 } else if (field instanceof DateField) {
                     instance = new DateFieldValidation()
+                } else if (field instanceof CaseFilterField) {
+                    instance = new CaseFilterFieldValidation()
+                } else if (field instanceof TaskFilterField) {
+                    instance = new TaskFilterFieldValidation()
+                } else if (field instanceof ProcessFilterField) {
+                    instance = new ProcessFilterValidation()
+                }
 //                } else if (field instanceof DateTimeField) {
 //                    instance = new DateTimeFieldValidation()
 //                } else if (field instanceof ButtonField) {
@@ -61,13 +68,12 @@ class ValidationService implements IValidationService {
 //                } else if (field instanceof UserListField) {
 //
 //                } else if (field instanceof I18nField) {
-                }
                 MetaMethod method = instance.metaClass.getMethods().find { it.name.toLowerCase() == rules.first().toLowerCase() }
                 if (method != null) {
                     I18nString validMessage = validation.getValidationMessage() != null ? validation.getValidationMessage() : new I18nString("Invalid Field value")
                     method.invoke(instance, new ValidationDataInput(dataField, validMessage, LocaleContextHolder.getLocale(), rules.stream().skip(1).collect(Collectors.joining(" "))))
                 } else {
-                    log.warn("Method [" + rules.first() + "] in dataField " + field.getImportId() + " not found")
+                    log.warn("Method [{}] in dataField {} not found", rules.first(), field.getImportId())
                 }
             }
         })

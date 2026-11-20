@@ -1,8 +1,11 @@
 package com.netgrif.application.engine.pfql;
 
 import com.netgrif.application.engine.TestHelper;
+import com.netgrif.application.engine.auth.domain.IUser;
+import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.domain.QUser;
 import com.netgrif.application.engine.auth.domain.User;
+import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.QPetriNet;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
@@ -19,7 +22,6 @@ import com.querydsl.core.types.dsl.DateTimePath;
 import com.querydsl.core.types.dsl.StringPath;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,10 +63,12 @@ public class QueryLangTest {
     @Autowired
     private TestHelper testHelper;
 
+    @Autowired
+    private IUserService userService;
+
     @Test
     @SuppressWarnings("unchecked")
-    @Disabled
-    public void testSearchService() {
+    public void testSearchService() throws InterruptedException {
         testHelper.truncateDbs();
 
         Optional<PetriNet> optionalPetriNet = helper.createNet("/pfql.xml");
@@ -81,10 +85,17 @@ public class QueryLangTest {
             helper.createCase(String.format("Test %02d", i), process, params);
         }
 
+        Thread.sleep(2000);
+
         Object cases = searchService.search("cases: processIdentifier eq 'query_test' page 1 size 5 sort by title desc");
         assertNotNull(cases);
         assertEquals(PageImpl.class, cases.getClass());
         assertEquals(10, ((Page<Case>) cases).getTotalElements());
+
+        Object cases2 = searchService.search("cases: processIdentifier eq \"query_test\" page 1 size 5 sort by title desc");
+        assertNotNull(cases2);
+        assertEquals(PageImpl.class, cases2.getClass());
+        assertEquals(10, ((Page<Case>) cases2).getTotalElements());
 
         Object case3 = searchService.search("case: processIdentifier eq 'query_test' and data.number_0.value == 3");
         assertNotNull(case3);
@@ -92,21 +103,64 @@ public class QueryLangTest {
         assertEquals("Test 03", ((Case) case3).getTitle());
         assertEquals(3, ((Case) case3).getFieldValue("number_0"));
 
-        Object case4 = searchService.search("case: processIdentifier eq 'query_test' and data.text_0.value == '4'");
+        Object case4 = searchService.search("case: processIdentifier eq 'query_test' and data.text_0.value == '444'");
         assertNotNull(case4);
         assertEquals(Case.class, case4.getClass());
-        assertEquals("4", ((Case) case4).getFieldValue("text_0"));
+        assertEquals("444", ((Case) case4).getFieldValue("text_0"));
+
+        Object case4_2 = searchService.search("case: processIdentifier eq \"query_test\" and data.text_0.value == \"444\"");
+        assertNotNull(case4_2);
+        assertEquals(Case.class, case4_2.getClass());
+        assertEquals("444", ((Case) case4_2).getFieldValue("text_0"));
+
+        Object case4_3 = searchService.search("case: processIdentifier eq 'query_test' and data.text_0.value == \"444\"");
+        assertNotNull(case4_3);
+        assertEquals(Case.class, case4_3.getClass());
+        assertEquals("444", ((Case) case4_3).getFieldValue("text_0"));
+
+        Object case4_4 = searchService.search("case: processIdentifier eq \"query_test\" and data.text_0.value == '444'");
+        assertNotNull(case4_4);
+        assertEquals(Case.class, case4_4.getClass());
+        assertEquals("444", ((Case) case4_4).getFieldValue("text_0"));
 
         Object case5 = searchService.search("case: processIdentifier eq 'query_test' and data.boolean_0.value == true");
         assertNotNull(case5);
         assertEquals(Case.class, case5.getClass());
         assertEquals(true, ((Case) case5).getFieldValue("boolean_0"));
 
+        Object case6 = searchService.search("case: processIdentifier eq 'query_test' and data.text_1.value neq null");
+        assertNotNull(case6);
+        assertEquals(Case.class, case6.getClass());
+        assertNotNull(((Case) case6).getFieldValue("text_1"));
+
+        Object case7 = searchService.search("case: processIdentifier eq 'query_test' and data.text_1.value eq null");
+        assertNotNull(case7);
+        assertEquals(Case.class, case7.getClass());
+        assertNull(((Case) case7).getFieldValue("text_1"));
+
         cases = searchService.search("cases: processIdentifier eq 'query_test' and data.boolean_0.value == true");
         assertEquals(5, ((Page<Case>) cases).getTotalElements());
 
-        cases = searchService.search("cases: processIdentifier eq 'query_test'    and data.boolean_0.value == true and data.text_0.value != '4'");
+        cases = searchService.search("cases: processIdentifier eq 'query_test'    and data.boolean_0.value == true and data.text_0.value != '444'");
         assertEquals(4, ((Page<Case>) cases).getTotalElements());
+
+        cases = searchService.search("cases: processIdentifier eq 'query_test' and author eq loggedUser.id");
+        assertEquals(10, ((Page<Case>) cases).getTotalElements());
+
+        cases = searchService.search("cases: processIdentifier eq 'query_test' and data.text_0.value eq 'x44'*");
+        assertEquals(1, ((Page<Case>) cases).getTotalElements());
+
+        cases = searchService.search("cases: processIdentifier eq 'query_test' and tasks.t1.state eq enabled");
+        assertEquals(10, ((Page<Case>) cases).getTotalElements());
+
+        cases = searchService.search("cases: processIdentifier eq 'query_test' and tasks.t1.state eq disabled");
+        assertEquals(0, ((Page<Case>) cases).getTotalElements());
+
+        cases = searchService.search("cases: processIdentifier eq 'query_test' and tasks.t1.state neq disabled");
+        assertEquals(10, ((Page<Case>) cases).getTotalElements());
+
+        cases = searchService.search("cases: processIdentifier eq 'query_test' and tasks.t1.state not eq disabled");
+        assertEquals(10, ((Page<Case>) cases).getTotalElements());
     }
 
     @Test
@@ -127,6 +181,16 @@ public class QueryLangTest {
 
         actual = evaluateQuery(String.format("process: id in('%s', '%s')", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullMongoQuery();
         expected = QPetriNet.petriNet._id.in(GENERIC_OBJECT_ID, GENERIC_OBJECT_ID);
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery("process: id eq null").getFullMongoQuery();
+        expected = QPetriNet.petriNet._id.isNull();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery("process: id neq null").getFullMongoQuery();
+        expected = QPetriNet.petriNet._id.isNotNull();
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
@@ -216,8 +280,23 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
+        actual = evaluateQuery("process: version not neq null").getFullMongoQuery(); // double negation -> should be null
+        expected = QPetriNet.petriNet.version.isNull();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery("process: version not eq null").getFullMongoQuery();
+        expected = QPetriNet.petriNet.version.isNotNull();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
         // title comparison
         checkStringComparison(mongoDbUtils, "process", "title", QPetriNet.petriNet.title.defaultValue);
+
+        actual = evaluateQuery("process: title eq 'somxthing'*").getFullMongoQuery();
+        expected = QPetriNet.petriNet.title.defaultValue.likeIgnoreCase("%somxthing%");
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
 
         // creationDate comparison
         checkDateComparison(mongoDbUtils, "process", "creationDate", QPetriNet.petriNet.creationDate);
@@ -235,6 +314,12 @@ public class QueryLangTest {
 
         actual = evaluateQuery(String.format("process: id neq '%s'", GENERIC_OBJECT_ID)).getFullMongoQuery();
         expected = QPetriNet.petriNet._id.eq(GENERIC_OBJECT_ID).not();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        IUser systemUser = userService.getSystem();
+        actual = evaluateQuery("process: id neq loggedUser.id").getFullMongoQuery();
+        expected = QPetriNet.petriNet._id.eq(new ObjectId(systemUser.getStringId())).not();
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
@@ -304,8 +389,31 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
-        actual = evaluateQuery(String.format("case: id in ('%s', '%s')", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullMongoQuery();
+        LoggedUser systemUser = userService.getSystem().transformToLoggedUser();
+        actual = evaluateQuery("case: id neq loggedUser.id").getFullMongoQuery();
+        expected = QCase.case$._id.eq(new ObjectId(systemUser.getId())).not();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("case: id in ('%s', '%s', loggedUser.id, loggedUser.username, loggedUser.fullName)",
+                GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QCase.case$._id.in(GENERIC_OBJECT_ID, GENERIC_OBJECT_ID, new ObjectId(systemUser.getId()));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("case: id in ('%s', '%s', loggedUser.username, loggedUser.fullName)",
+                GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullMongoQuery();
         expected = QCase.case$._id.in(GENERIC_OBJECT_ID, GENERIC_OBJECT_ID);
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery("case: id eq null").getFullMongoQuery();
+        expected = QCase.case$._id.isNull();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery("case: id neq null").getFullMongoQuery();
+        expected = QCase.case$._id.isNotNull();
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
@@ -317,6 +425,16 @@ public class QueryLangTest {
 
         actual = evaluateQuery(String.format("case: processId in ('%s', '%s')", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullMongoQuery();
         expected = QCase.case$.petriNetObjectId.in(GENERIC_OBJECT_ID, GENERIC_OBJECT_ID);
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery("case: processId eq null").getFullMongoQuery();
+        expected = QCase.case$.petriNetObjectId.isNull();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery("case: processId neq null").getFullMongoQuery();
+        expected = QCase.case$.petriNetObjectId.isNotNull();
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
@@ -335,15 +453,46 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
+        actual = evaluateQuery("case: author eq loggedUser.id").getFullMongoQuery();
+        expected = QCase.case$.author.id.eq(systemUser.getId());
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
         actual = evaluateQuery("case: author contains 'test'").getFullMongoQuery();
         expected = QCase.case$.author.id.contains("test");
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
-        actual = evaluateQuery("case: author in ('test', 'test1')").getFullMongoQuery();
-        expected = QCase.case$.author.id.in("test", "test1");
+        actual = evaluateQuery("case: author in ('test', 'test1', loggedUser.id, loggedUser.username, loggedUser.fullName)").getFullMongoQuery();
+        expected = QCase.case$.author.id.in("test", "test1", systemUser.getId(), systemUser.getUsername(), systemUser.getFullName());
 
         compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery("case: author eq null").getFullMongoQuery();
+        expected = QCase.case$.author.id.isNull();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery("case: author neq null").getFullMongoQuery();
+        expected = QCase.case$.author.id.isNotNull();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery("cases: title in ('test1' : loggedUser.username)").getFullMongoQuery();
+        expected = QCase.case$.title.gt("test1").and(QCase.case$.title.lt(systemUser.getUsername()));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery("cases: title in (loggedUser.username : 'test1')").getFullMongoQuery();
+        expected = QCase.case$.title.gt(systemUser.getUsername()).and(QCase.case$.title.lt("test1"));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery("cases: title in (loggedUser.username : loggedUser.fullName)").getFullMongoQuery();
+        expected = QCase.case$.title.gt(systemUser.getUsername()).and(QCase.case$.title.lt(systemUser.getFullName()));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
 
         // only available for elastic query
         // places comparison
@@ -399,6 +548,12 @@ public class QueryLangTest {
         assertNull(actual);
 
         actual = evaluateQuery("case: data.field1.value eq true").getFullMongoQuery();
+        assertNull(actual);
+
+        actual = evaluateQuery("case: data.field1.value eq null").getFullMongoQuery();
+        assertNull(actual);
+
+        actual = evaluateQuery("case: data.field1.value neq null").getFullMongoQuery();
         assertNull(actual);
 
         // data options comparison
@@ -459,8 +614,11 @@ public class QueryLangTest {
         compareMongoQueries(mongoDbUtils, actual, expected);
 
         // parenthesis comparison
-        actual = evaluateQuery(String.format("case: id eq '%s' and (title eq 'test' or title eq 'test1')", GENERIC_OBJECT_ID)).getFullMongoQuery();
-        expected = QCase.case$._id.eq(GENERIC_OBJECT_ID).and(QCase.case$.title.eq("test").or(QCase.case$.title.eq("test1")));
+        LoggedUser systemUser = userService.getSystem().transformToLoggedUser();
+        actual = evaluateQuery(String.format("case: id eq '%s' and (title eq 'test' or title eq 'test1' or title eq loggedUser.username)",
+                GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QCase.case$._id.eq(GENERIC_OBJECT_ID)
+                .and(QCase.case$.title.eq("test").or(QCase.case$.title.eq("test1")).or(QCase.case$.title.eq(systemUser.getUsername())));
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
@@ -489,8 +647,19 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
-        actual = evaluateQuery(String.format("task: id in ('%s', '%s')", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullMongoQuery();
-        expected = QTask.task._id.in(GENERIC_OBJECT_ID, GENERIC_OBJECT_ID);
+        LoggedUser systemUser = userService.getSystem().transformToLoggedUser();
+        actual = evaluateQuery(String.format("task: id in ('%s', '%s', loggedUser.id)", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QTask.task._id.in(GENERIC_OBJECT_ID, GENERIC_OBJECT_ID, new ObjectId(systemUser.getId()));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery("task: id eq null").getFullMongoQuery();
+        expected = QTask.task._id.isNull();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery("task: id neq null").getFullMongoQuery();
+        expected = QTask.task._id.isNotNull();
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
@@ -528,6 +697,16 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
+        actual = evaluateQuery("task: userId eq null").getFullMongoQuery();
+        expected = QTask.task.userId.isNull();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery("task: userId neq null").getFullMongoQuery();
+        expected = QTask.task.userId.isNotNull();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
         // caseId comparison
         actual = evaluateQuery("task: caseId eq 'test'").getFullMongoQuery();
         expected = QTask.task.caseId.eq("test");
@@ -544,6 +723,16 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
+        actual = evaluateQuery("task: caseId eq null").getFullMongoQuery();
+        expected = QTask.task.caseId.isNull();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery("task: caseId neq null").getFullMongoQuery();
+        expected = QTask.task.caseId.isNotNull();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
         // processId comparison
         actual = evaluateQuery("task: processId eq 'test'").getFullMongoQuery();
         expected = QTask.task.processId.eq("test");
@@ -557,6 +746,16 @@ public class QueryLangTest {
 
         actual = evaluateQuery("task: processId in ('test', 'test1')").getFullMongoQuery();
         expected = QTask.task.processId.in("test", "test1");
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery("task: processId eq null").getFullMongoQuery();
+        expected = QTask.task.processId.isNull();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery("task: processId neq null").getFullMongoQuery();
+        expected = QTask.task.processId.isNotNull();
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
@@ -654,8 +853,24 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
-        actual = evaluateQuery(String.format("user: id in ('%s', '%s')", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullMongoQuery();
-        expected = QUser.user._id.in(GENERIC_OBJECT_ID, GENERIC_OBJECT_ID);
+        LoggedUser systemUser = userService.getSystem().transformToLoggedUser();
+        actual = evaluateQuery("user: id eq loggedUser.id").getFullMongoQuery();
+        expected = QUser.user._id.eq(new ObjectId(systemUser.getId()));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("user: id in ('%s', '%s', loggEduser.id)", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QUser.user._id.in(GENERIC_OBJECT_ID, GENERIC_OBJECT_ID, new ObjectId(systemUser.getId()));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery("user: id eq null").getFullMongoQuery();
+        expected = QUser.user._id.isNull();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery("user: id neq null").getFullMongoQuery();
+        expected = QUser.user._id.isNotNull();
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
@@ -687,6 +902,12 @@ public class QueryLangTest {
         // and comparison
         actual = evaluateQuery(String.format("user: id eq '%s' and email eq 'test'", GENERIC_OBJECT_ID)).getFullMongoQuery();
         expected = QUser.user._id.eq(GENERIC_OBJECT_ID).and(QUser.user.email.eq("test"));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        LoggedUser systemUser = userService.getSystem().transformToLoggedUser();
+        actual = evaluateQuery(String.format("user: id eq '%s' and email eq loggedUser.username", GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QUser.user._id.eq(GENERIC_OBJECT_ID).and(QUser.user.email.eq(systemUser.getUsername()));
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
@@ -767,40 +988,31 @@ public class QueryLangTest {
         actual = evaluateQuery("process: version lte 1.1.1").getFullElasticQuery();
         assertNull(actual);
 
-
         actual = evaluateQuery("process: version gt 1.1.1").getFullElasticQuery();
         assertNull(actual);
 
-
         actual = evaluateQuery("process: version gte 1.1.1").getFullElasticQuery();
         assertNull(actual);
-
 
         // title comparison
         actual = evaluateQuery("process: title eq 'test'").getFullElasticQuery();
         assertNull(actual);
 
-
         actual = evaluateQuery("process: title contains 'test'").getFullElasticQuery();
         assertNull(actual);
-
 
         // creationDate comparison
         actual = evaluateQuery("process: creationDate eq 2011-12-03T10:15:30").getFullElasticQuery();
         assertNull(actual);
 
-
         actual = evaluateQuery("process: creationDate lt 2011-12-03T10:15:30").getFullElasticQuery();
         assertNull(actual);
-
 
         actual = evaluateQuery("process: creationDate lte 2011-12-03T10:15:30").getFullElasticQuery();
         assertNull(actual);
 
-
         actual = evaluateQuery("process: creationDate gt 2011-12-03T10:15:30").getFullElasticQuery();
         assertNull(actual);
-
 
         actual = evaluateQuery("process: creationDate gte 2011-12-03T10:15:30").getFullElasticQuery();
         assertNull(actual);
@@ -811,7 +1023,6 @@ public class QueryLangTest {
         // elastic query should be always null
         // not comparison
         String actual = evaluateQuery(String.format("process: id not eq '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
-        assertNull(actual);
         assertNull(actual);
 
         actual = evaluateQuery(String.format("process: id neq '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
@@ -847,7 +1058,6 @@ public class QueryLangTest {
         actual = evaluateQuery(String.format("process: id eq '%s' and not (title eq 'test' or title eq 'test1')", GENERIC_OBJECT_ID)).getFullElasticQuery();
         assertNull(actual);
 
-
         // nested parenthesis comparison
         actual = evaluateQuery(String.format("process: id eq '%s' and (title eq 'test' or (title eq 'test1' and identifier eq 'test'))", GENERIC_OBJECT_ID)).getFullElasticQuery();
         assertNull(actual);
@@ -865,8 +1075,27 @@ public class QueryLangTest {
         expected = String.format("stringId:%s", GENERIC_OBJECT_ID);
         assertEquals(expected, actual);
 
-        actual = evaluateQuery(String.format("case: id in ('%s', '%s')", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullElasticQuery();
+        LoggedUser systemUser = userService.getSystem().transformToLoggedUser();
+        actual = evaluateQuery("case: id neq loggedUser.id").getFullElasticQuery();
+        expected = String.format("NOT stringId:%s", systemUser.getId());
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery(String.format("case: id in ('%s', '%s', loggedUser.id, loggedUser.username, loggedUser.fullname)",
+                GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullElasticQuery();
+        expected = String.format("stringId:(%s OR %s OR %s)", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID, systemUser.getId());
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery(String.format("case: id in ('%s', '%s', loggedUser.username, loggedUser.fullname)",
+                GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullElasticQuery();
         expected = String.format("stringId:(%s OR %s)", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID);
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("case: id eq null").getFullElasticQuery();
+        expected = "!(_exists_:stringId)";
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("case: id neq null").getFullElasticQuery();
+        expected = "_exists_:stringId";
         assertEquals(expected, actual);
 
         // processId comparison
@@ -876,6 +1105,14 @@ public class QueryLangTest {
 
         actual = evaluateQuery(String.format("case: processId in ('%s', '%s')", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullElasticQuery();
         expected = String.format("processId:(%s OR %s)", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID);
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("case: processId not neq null").getFullElasticQuery(); // double negation -> eq null
+        expected = "!(_exists_:processId)";
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("case: processId not eq null").getFullElasticQuery();
+        expected = "_exists_:processId";
         assertEquals(expected, actual);
 
         // processIdentifier comparison
@@ -892,25 +1129,41 @@ public class QueryLangTest {
         expected = "author:test";
         assertEquals(expected, actual);
 
+        actual = evaluateQuery("case: author eq loggedUser.id").getFullElasticQuery();
+        expected = String.format("author:%s", systemUser.getId());
+        assertEquals(expected, actual);
+
         actual = evaluateQuery("case: author contains 'test'").getFullElasticQuery();
         expected = "author:*test*";
         assertEquals(expected, actual);
 
-        actual = evaluateQuery(String.format("case: author in ('%s', '%s')", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullElasticQuery();
-        expected = String.format("author:(%s OR %s)", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID);
+        actual = evaluateQuery("case: author contains loggedUser.id").getFullElasticQuery();
+        expected = String.format("author:*%s*", systemUser.getId());
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery(String.format("case: author in ('%s', '%s', loggedUser.id)", GENERIC_OBJECT_ID,
+                GENERIC_OBJECT_ID)).getFullElasticQuery();
+        expected = String.format("author:(%s OR %s OR %s)", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID, new ObjectId(systemUser.getId()));
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("case: author eq null").getFullElasticQuery();
+        expected = "!(_exists_:author)";
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("case: author neq null").getFullElasticQuery();
+        expected = "_exists_:author";
         assertEquals(expected, actual);
 
         // places comparison
         checkNumberComparisonElastic("case", "places.p1.marking", "places.p1.marking");
 
         // task state comparison
-//        TODO: fix
-//        actual = evaluateQuery("case: tasks.t1.state eq enabled").getFullElasticQuery();
-//        expected = String.format("tasks.t1.state:%s", State.ENABLED);
-//        assertEquals(expected, actual);
-//        actual = evaluateQuery("case: tasks.t1.state eq disabled").getFullElasticQuery();
-//        expected = String.format("tasks.t1.state:%s", State.DISABLED);
-//        assertEquals(expected, actual);
+        actual = evaluateQuery("case: tasks.t1.state eq enabled").getFullElasticQuery();
+        expected = "taskIds:t1";
+        assertEquals(expected, actual);
+        actual = evaluateQuery("case: tasks.t1.state eq disabled").getFullElasticQuery();
+        expected = "NOT taskIds:t1";
+        assertEquals(expected, actual);
 
         // task userId comparison
         actual = evaluateQuery("case: tasks.t1.userId eq 'test'").getFullElasticQuery();
@@ -925,23 +1178,102 @@ public class QueryLangTest {
         expected = String.format("tasks.t1.userId:(%s OR %s)", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID);
         assertEquals(expected, actual);
 
+        actual = evaluateQuery("case: tasks.t1.userId eq null").getFullElasticQuery();
+        expected = "!(_exists_:tasks.t1.userId)";
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("case: tasks.t1.userId neq null").getFullElasticQuery();
+        expected = "_exists_:tasks.t1.userId";
+        assertEquals(expected, actual);
+
         // data value comparison
-        checkStringComparisonElastic("case", "data.field1.value", "dataSet.field1.textValue");
+        checkStringComparisonElastic("case", "data.field1.value", "dataSet.field1.fulltextValue");
 
         checkNumberComparisonElastic("case", "data.field2.value", "dataSet.field2.numberValue");
 
         checkDateComparisonElastic("case", "data.field3.value", "dataSet.field3.timestampValue");
 
+        actual = evaluateQuery("case: data.field1.value eq 'somxthing'*").getFullElasticQuery();
+        expected = "dataSet.field1.fulltextValue:somxthing~AUTO";
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("case: data.field1.value neq 'somxthing'*").getFullElasticQuery();
+        expected = "NOT dataSet.field1.fulltextValue:somxthing~AUTO";
+        assertEquals(expected, actual);
+
         actual = evaluateQuery("case: data.field1.value eq true").getFullElasticQuery();
         expected = "dataSet.field1.booleanValue:true";
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("case: data.field1.value eq loggedUser.anonymous").getFullElasticQuery();
+        expected = "dataSet.field1.booleanValue:false";
         assertEquals(expected, actual);
 
         actual = evaluateQuery("case: data.field1.value eq false").getFullElasticQuery();
         expected = "dataSet.field1.booleanValue:false";
         assertEquals(expected, actual);
 
+        actual = evaluateQuery("case: data.field1.value eq null").getFullElasticQuery();
+        expected = "!(_exists_:dataSet.field1.fulltextValue)";
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("case: data.field1.value neq null").getFullElasticQuery();
+        expected = "_exists_:dataSet.field1.fulltextValue";
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("case: data.field1.value eq ''").getFullElasticQuery();
+        expected = "dataSet.field1.fulltextValue.keyword:\"\"";
+        assertEquals(expected, actual);
+
         // data options comparison
         checkStringComparisonElastic("case", "data.field1.options", "dataSet.field1.options");
+
+        actual = evaluateQuery("cases: title in ('test1' : loggedUser.username)").getFullElasticQuery();
+        expected = String.format("(title:>test1 AND title:<%s)", systemUser.getUsername());
+
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("cases: title in (loggedUser.username : 'test1')").getFullElasticQuery();
+        expected = String.format("(title:>%s AND title:<test1)", systemUser.getUsername());
+
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("cases: title in (loggedUser.username : loggedUser.fullName)").getFullElasticQuery();
+        expected = String.format("(title:>%s AND title:<%s)", systemUser.getUsername(), "\"" + systemUser.getFullName() + "\"");
+
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("case: title eq null").getFullElasticQuery();
+        expected = "!(_exists_:title)";
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("case: title neq null").getFullElasticQuery();
+        expected = "_exists_:title";
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("case: title eq 'white space test 1'").getFullElasticQuery();
+        expected = "title.keyword:\"white space test 1\"";
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("case: title eq 'white\tspace\ttest\t1'").getFullElasticQuery();
+        expected = "title.keyword:\"white\tspace\ttest\t1\"";
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("case: title eq 'somxthing'*").getFullElasticQuery();
+        expected = "title:somxthing~AUTO";
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("case: title not eq 'somxthing anxthing'*").getFullElasticQuery();
+        expected = "NOT title:(somxthing~AUTO AND anxthing~AUTO)";
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("case: title not eq 'somxthing anxthing     everxthing    '*").getFullElasticQuery();
+        expected = "NOT title:(somxthing~AUTO AND anxthing~AUTO AND everxthing~AUTO)";
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("case: title eq 'needsTo/BeEscaped'").getFullElasticQuery();
+        expected = "title.keyword:needsTo\\/BeEscaped";
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -957,40 +1289,40 @@ public class QueryLangTest {
 
         // and comparison
         actual = evaluateQuery(String.format("case: id eq '%s' and title eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
-        expected = String.format("stringId:%s AND title:test", GENERIC_OBJECT_ID);
+        expected = String.format("stringId:%s AND title.keyword:test", GENERIC_OBJECT_ID);
         assertEquals(expected, actual);
 
         // and not comparison
         actual = evaluateQuery(String.format("case: id eq '%s' and title not eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
-        expected = String.format("stringId:%s AND NOT title:test", GENERIC_OBJECT_ID);
+        expected = String.format("stringId:%s AND NOT title.keyword:test", GENERIC_OBJECT_ID);
         assertEquals(expected, actual);
 
         actual = evaluateQuery(String.format("case: id eq '%s' and title != 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
-        expected = String.format("stringId:%s AND NOT title:test", GENERIC_OBJECT_ID);
+        expected = String.format("stringId:%s AND NOT title.keyword:test", GENERIC_OBJECT_ID);
         assertEquals(expected, actual);
 
         // or comparison
         actual = evaluateQuery(String.format("case: id eq '%s' or title eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
-        expected = String.format("stringId:%s OR title:test", GENERIC_OBJECT_ID);
+        expected = String.format("stringId:%s OR title.keyword:test", GENERIC_OBJECT_ID);
         assertEquals(expected, actual);
 
         // or not comparison
         actual = evaluateQuery(String.format("case: id eq '%s' or title not eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
-        expected = String.format("stringId:%s OR NOT title:test", GENERIC_OBJECT_ID);
+        expected = String.format("stringId:%s OR NOT title.keyword:test", GENERIC_OBJECT_ID);
         assertEquals(expected, actual);
 
         actual = evaluateQuery(String.format("case: id eq '%s' or title neq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
-        expected = String.format("stringId:%s OR NOT title:test", GENERIC_OBJECT_ID);
+        expected = String.format("stringId:%s OR NOT title.keyword:test", GENERIC_OBJECT_ID);
         assertEquals(expected, actual);
 
         // parenthesis comparison
         actual = evaluateQuery(String.format("case: id eq '%s' and (title eq 'test' or title eq 'test1')", GENERIC_OBJECT_ID)).getFullElasticQuery();
-        expected = String.format("stringId:%s AND (title:test OR title:test1)", GENERIC_OBJECT_ID);
+        expected = String.format("stringId:%s AND (title.keyword:test OR title.keyword:test1)", GENERIC_OBJECT_ID);
         assertEquals(expected, actual);
 
         // nested parenthesis comparison
         actual = evaluateQuery(String.format("case: id eq '%s' and (title eq 'test' or (title eq 'test1' and processIdentifier eq 'test'))", GENERIC_OBJECT_ID)).getFullElasticQuery();
-        expected = String.format("stringId:%s AND (title:test OR (title:test1 AND processIdentifier:test))", GENERIC_OBJECT_ID);
+        expected = String.format("stringId:%s AND (title.keyword:test OR (title.keyword:test1 AND processIdentifier:test))", GENERIC_OBJECT_ID);
         assertEquals(expected, actual);
     }
 
@@ -998,26 +1330,56 @@ public class QueryLangTest {
     public void testSimpleElasticTaskQuery() {
         // without comparison
         String actual = evaluateQuery("tasks").getFullElasticQuery();
-        assertEquals("*", actual);
+        String expected = "*";
+        assertEquals(expected, actual);
 
         // elastic query should be always null
         // id comparison
         actual = evaluateQuery(String.format("task: id eq '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
-        assertNull(actual);
+        expected = String.format("stringId:%s", GENERIC_OBJECT_ID);
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("task: id eq null").getFullElasticQuery();
+        expected = "!(_exists_:stringId)";
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("task: id neq null").getFullElasticQuery();
+        expected = "_exists_:stringId";
+        assertEquals(expected, actual);
 
         // transitionId comparison
         actual = evaluateQuery("task: transitionId eq 'test'").getFullElasticQuery();
-        assertNull(actual);
+        expected = "transitionId:test";
+        assertEquals(expected, actual);
 
         actual = evaluateQuery("task: transitionId contains 'test'").getFullElasticQuery();
-        assertNull(actual);
+        expected = "transitionId:*test*";
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("task: transitionId eq null").getFullElasticQuery();
+        expected = "!(_exists_:transitionId)";
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("task: transitionId neq null").getFullElasticQuery();
+        expected = "_exists_:transitionId";
+        assertEquals(expected, actual);
 
         // title comparison
         actual = evaluateQuery("task: title eq 'test'").getFullElasticQuery();
-        assertNull(actual);
+        expected = "title.keyword:test";
+        assertEquals(expected, actual);
 
         actual = evaluateQuery("task: title contains 'test'").getFullElasticQuery();
-        assertNull(actual);
+        expected = "title:*test*";
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("task: title eq null").getFullElasticQuery();
+        expected = "!(_exists_:title)";
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("task: title neq null").getFullElasticQuery();
+        expected = "_exists_:title";
+        assertEquals(expected, actual);
 
         // state comparison
         actual = evaluateQuery("task: state eq enabled").getFullElasticQuery();
@@ -1028,24 +1390,54 @@ public class QueryLangTest {
 
         // userId comparison
         actual = evaluateQuery("task: userId eq 'test'").getFullElasticQuery();
-        assertNull(actual);
+        expected = "userId:test";
+        assertEquals(expected, actual);
 
         actual = evaluateQuery("task: userId contains 'test'").getFullElasticQuery();
-        assertNull(actual);
+        expected = "userId:*test*";
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("task: userId eq null").getFullElasticQuery();
+        expected = "!(_exists_:userId)";
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("task: userId neq null").getFullElasticQuery();
+        expected = "_exists_:userId";
+        assertEquals(expected, actual);
 
         // caseId comparison
         actual = evaluateQuery("task: caseId eq 'test'").getFullElasticQuery();
-        assertNull(actual);
+        expected = "caseId:test";
+        assertEquals(expected, actual);
 
         actual = evaluateQuery("task: caseId contains 'test'").getFullElasticQuery();
-        assertNull(actual);
+        expected = "caseId:*test*";
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("task: caseId eq null").getFullElasticQuery();
+        expected = "!(_exists_:caseId)";
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("task: caseId neq null").getFullElasticQuery();
+        expected = "_exists_:caseId";
+        assertEquals(expected, actual);
 
         // processId comparison
         actual = evaluateQuery("task: processId eq 'test'").getFullElasticQuery();
-        assertNull(actual);
+        expected = "processId:test";
+        assertEquals(expected, actual);
 
         actual = evaluateQuery("task: processId contains 'test'").getFullElasticQuery();
-        assertNull(actual);
+        expected = "processId:*test*";
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("task: processId eq null").getFullElasticQuery();
+        expected = "!(_exists_:processId)";
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery("task: processId neq null").getFullElasticQuery();
+        expected = "_exists_:processId";
+        assertEquals(expected, actual);
 
         // lastAssign comparison
         actual = evaluateQuery("task: lastAssign eq 2011-12-03T10:15:30").getFullElasticQuery();
@@ -1085,44 +1477,55 @@ public class QueryLangTest {
         // elastic query should be always null
         // not comparison
         String actual = evaluateQuery(String.format("task: id not eq '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
-        assertNull(actual);
+        String expected = String.format("NOT stringId:%s", GENERIC_OBJECT_ID);
+        assertEquals(expected, actual);
 
         actual = evaluateQuery(String.format("task: id neq '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
-        assertNull(actual);
+        expected = String.format("NOT stringId:%s", GENERIC_OBJECT_ID);
+        assertEquals(expected, actual);
 
         // and comparison
         actual = evaluateQuery(String.format("task: id eq '%s' and title eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
-        assertNull(actual);
+        expected = String.format("stringId:%s AND title.keyword:test", GENERIC_OBJECT_ID);
+        assertEquals(expected, actual);
 
         // and not comparison
         actual = evaluateQuery(String.format("task: id eq '%s' and title not eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
-        assertNull(actual);
+        expected = String.format("stringId:%s AND NOT title.keyword:test", GENERIC_OBJECT_ID);
+        assertEquals(expected, actual);
 
         actual = evaluateQuery(String.format("task: id eq '%s' and title != 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
-        assertNull(actual);
+        expected = String.format("stringId:%s AND NOT title.keyword:test", GENERIC_OBJECT_ID);
+        assertEquals(expected, actual);
 
         // or comparison
         actual = evaluateQuery(String.format("task: id eq '%s' or title eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
-        assertNull(actual);
+        expected = String.format("stringId:%s OR title.keyword:test", GENERIC_OBJECT_ID);
+        assertEquals(expected, actual);
 
         // or not comparison
         actual = evaluateQuery(String.format("task: id eq '%s' or title not eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
-        assertNull(actual);
+        expected = String.format("stringId:%s OR NOT title.keyword:test", GENERIC_OBJECT_ID);
+        assertEquals(expected, actual);
 
         actual = evaluateQuery(String.format("task: id eq '%s' or title neq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
-        assertNull(actual);
+        expected = String.format("stringId:%s OR NOT title.keyword:test", GENERIC_OBJECT_ID);
+        assertEquals(expected, actual);
 
         // parenthesis comparison
         actual = evaluateQuery(String.format("task: id eq '%s' and (title eq 'test' or title eq 'test1')", GENERIC_OBJECT_ID)).getFullElasticQuery();
-        assertNull(actual);
+        expected = String.format("stringId:%s AND (title.keyword:test OR title.keyword:test1)", GENERIC_OBJECT_ID);
+        assertEquals(expected, actual);
 
         // parenthesis not comparison
         actual = evaluateQuery(String.format("task: id eq '%s' and not (title eq 'test' or title eq 'test1')", GENERIC_OBJECT_ID)).getFullElasticQuery();
-        assertNull(actual);
+        expected = String.format("stringId:%s AND NOT (title.keyword:test OR title.keyword:test1)", GENERIC_OBJECT_ID);
+        assertEquals(expected, actual);
 
         // nested parenthesis comparison
         actual = evaluateQuery(String.format("task: id eq '%s' and (title eq 'test' or (title eq 'test1' and processId eq 'test'))", GENERIC_OBJECT_ID)).getFullElasticQuery();
-        assertNull(actual);
+        expected = String.format("stringId:%s AND (title.keyword:test OR (title.keyword:test1 AND processId:test))", GENERIC_OBJECT_ID);
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -1696,6 +2099,8 @@ public class QueryLangTest {
         assertThrows(IllegalArgumentException.class, () -> evaluateQuery("process email eq 'test'"));
         assertThrows(IllegalArgumentException.class, () -> evaluateQuery("process page 2"));
         assertThrows(IllegalArgumentException.class, () -> evaluateQuery("process:"));
+        assertThrows(IllegalArgumentException.class, () -> evaluateQuery("process: identifier gt null"));
+        assertThrows(IllegalArgumentException.class, () -> evaluateQuery("process: identifier contains null"));
     }
 
     @Test
@@ -1715,6 +2120,10 @@ public class QueryLangTest {
         assertThrows(IllegalArgumentException.class, () -> evaluateQuery("case email eq 'test'"));
         assertThrows(IllegalArgumentException.class, () -> evaluateQuery("case page 2"));
         assertThrows(IllegalArgumentException.class, () -> evaluateQuery("case:"));
+        assertThrows(IllegalArgumentException.class, () -> evaluateQuery("case: creationDate eq loggedUser.id"));
+        assertThrows(IllegalArgumentException.class, () -> evaluateQuery("case: processIdentifier eq loggedUser.anonymous"));
+        assertThrows(IllegalArgumentException.class, () -> evaluateQuery("case: processIdentifier lt null"));
+        assertThrows(IllegalArgumentException.class, () -> evaluateQuery("case: title contains null"));
     }
 
     @Test
@@ -1735,6 +2144,8 @@ public class QueryLangTest {
         assertThrows(IllegalArgumentException.class, () -> evaluateQuery("task email eq 'test'"));
         assertThrows(IllegalArgumentException.class, () -> evaluateQuery("task page 2"));
         assertThrows(IllegalArgumentException.class, () -> evaluateQuery("task:"));
+        assertThrows(IllegalArgumentException.class, () -> evaluateQuery("task: id gte null"));
+        assertThrows(IllegalArgumentException.class, () -> evaluateQuery("task: userId in (null, 'test')"));
     }
 
     @Test
@@ -1840,6 +2251,25 @@ public class QueryLangTest {
         expected = stringPath.gt("test1").and(stringPath.loe("test2")).not();
 
         compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("%s: %s eq null", resource, attribute)).getFullMongoQuery();
+        expected = stringPath.isNull();
+
+        if (stringPath.toString().contains(".defaultValue")) {
+            assertEquals(actual.toString(), expected.toString().replaceAll(".defaultValue", ""));
+        } else {
+            compareMongoQueries(mongoDbUtils, actual, expected);
+        }
+
+        actual = evaluateQuery(String.format("%s: %s neq null", resource, attribute)).getFullMongoQuery();
+        expected = stringPath.isNotNull();
+
+        if (stringPath.toString().contains(".defaultValue")) {
+            assertEquals(actual.toString(), expected.toString().replaceAll(".defaultValue", ""));
+        } else {
+            compareMongoQueries(mongoDbUtils, actual, expected);
+        }
+
     }
 
     private static void checkDateComparison(MongoDbUtils<?> mongoDbUtils, String resource, String attribute, DateTimePath<LocalDateTime> dateTimePath) {
@@ -1924,16 +2354,27 @@ public class QueryLangTest {
         expected = dateTimePath.gt(date4).and(dateTimePath.loe(date5)).not();
 
         compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("%s: %s eq null", resource, attribute)).getFullMongoQuery();
+        expected = dateTimePath.isNull();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("%s: %s neq null", resource, attribute)).getFullMongoQuery();
+        expected = dateTimePath.isNotNull();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
     }
 
     private static void checkStringComparisonElastic(String resource, String attribute, String resultAttribute) {
         String actual = evaluateQuery(String.format("%s: %s eq 'test'", resource, attribute)).getFullElasticQuery();
-        String expected = String.format("%s:test", resultAttribute);
+        String expectedWithKeyword = String.format("%s.keyword:test", resultAttribute);
+        String expectedWithoutKeyword = String.format("%s:test", resultAttribute);
 
-        assertEquals(expected, actual);
+        assertTrue(actual.equals(expectedWithKeyword) || actual.equals(expectedWithoutKeyword));
 
         actual = evaluateQuery(String.format("%s: %s contains 'test'", resource, attribute)).getFullElasticQuery();
-        expected = String.format("%s:*test*", resultAttribute);
+        String expected = String.format("%s:*test*", resultAttribute);
 
         assertEquals(expected, actual);
 
@@ -1979,6 +2420,16 @@ public class QueryLangTest {
 
         actual = evaluateQuery(String.format("%s: %s not in ('test1' : 'test2']", resource, attribute)).getFullElasticQuery();
         expected = String.format("NOT (%s:>test1 AND %s:<=test2)", resultAttribute, resultAttribute);
+
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery(String.format("%s: %s eq null", resource, attribute)).getFullElasticQuery();
+        expected = String.format("!(_exists_:%s)", resultAttribute);
+
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery(String.format("%s: %s neq null", resource, attribute)).getFullElasticQuery();
+        expected = String.format("_exists_:%s", resultAttribute);
 
         assertEquals(expected, actual);
     }
@@ -2031,6 +2482,17 @@ public class QueryLangTest {
 
         actual = evaluateQuery(String.format("%s: %s not in (1 : 2]", resource, attribute)).getFullElasticQuery();
         expected = String.format("NOT (%s:>1 AND %s:<=2)", resultAttribute, resultAttribute);
+
+        assertEquals(expected, actual);
+
+        String resultAttributeWithFulltextValue = resultAttribute.replaceAll(".numberValue", ".fulltextValue");
+        actual = evaluateQuery(String.format("%s: %s eq null", resource, attribute)).getFullElasticQuery();
+        expected = String.format("!(_exists_:%s)", resultAttributeWithFulltextValue);
+
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery(String.format("%s: %s neq null", resource, attribute)).getFullElasticQuery();
+        expected = String.format("_exists_:%s", resultAttributeWithFulltextValue);
 
         assertEquals(expected, actual);
     }
@@ -2115,6 +2577,17 @@ public class QueryLangTest {
 
         actual = evaluateQuery(String.format("%s: %s not in (2011-12-03 : 2011-12-03]", resource, attribute)).getFullElasticQuery();
         expected = String.format("NOT (%s:>%s AND %s:<=%s)", resultAttribute, Timestamp.valueOf(date4).getTime(), resultAttribute, Timestamp.valueOf(date5).getTime());
+
+        assertEquals(expected, actual);
+
+        String resultAttributeWithFulltextValue = resultAttribute.replaceAll(".timestampValue", ".fulltextValue");
+        actual = evaluateQuery(String.format("%s: %s eq null", resource, attribute)).getFullElasticQuery();
+        expected = String.format("!(_exists_:%s)", resultAttributeWithFulltextValue);
+
+        assertEquals(expected, actual);
+
+        actual = evaluateQuery(String.format("%s: %s not eq null", resource, attribute)).getFullElasticQuery();
+        expected = String.format("_exists_:%s", resultAttributeWithFulltextValue);
 
         assertEquals(expected, actual);
     }

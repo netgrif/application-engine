@@ -73,6 +73,10 @@ public class TaskSearchServiceTest {
         assertNotNull(result);
         assertEquals(testTaskId, result.getStringId());
 
+        result = taskSearchService.searchOne("id eq '" + testTaskId + "'");
+        assertNotNull(result);
+        assertEquals(testTaskId, result.getStringId());
+
         login(mockService.mockLoggedUser());
         result = taskSearchService.searchOne("task: id eq '" + testTaskId + "'");
         assertNull(result);
@@ -89,6 +93,11 @@ public class TaskSearchServiceTest {
         assertThrows(IllegalArgumentException.class, () -> taskSearchService.searchAll("processes: identifier eq 'query_lang_test'"));
 
         Page<Task> result = taskSearchService.searchAll("tasks: id eq '" + testTaskId + "'");
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+        assertEquals(testTaskId, result.getContent().get(0).getStringId());
+
+        result = taskSearchService.searchAll("id eq '" + testTaskId + "'");
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
         assertEquals(testTaskId, result.getContent().get(0).getStringId());
@@ -112,6 +121,9 @@ public class TaskSearchServiceTest {
         long result = taskSearchService.count("task: id eq '" + testTaskId + "'");
         assertEquals(1, result);
 
+        result = taskSearchService.count("id eq '" + testTaskId + "'");
+        assertEquals(1, result);
+
         login(mockService.mockLoggedUser());
         result = taskSearchService.count("task: id eq '" + testTaskId + "'");
         assertEquals(0, result);
@@ -130,6 +142,9 @@ public class TaskSearchServiceTest {
         assertThrows(IllegalArgumentException.class, () -> taskSearchService.exists("process: identifier eq 'query_lang_test'"));
 
         boolean result = taskSearchService.exists("task: id eq '" + testTaskId + "'");
+        assertTrue(result);
+
+        result = taskSearchService.exists("id eq '" + testTaskId + "'");
         assertTrue(result);
 
         login(mockService.mockLoggedUser());

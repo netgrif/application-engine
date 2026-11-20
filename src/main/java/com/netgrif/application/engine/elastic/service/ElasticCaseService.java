@@ -396,7 +396,11 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         // TODO: improvement? wildcard does not scale good
         //String searchText = elasticsearchProperties.isAnalyzerEnabled() ? request.fullText : "*" + request.fullText + "*";
         String searchText = "*" + request.fullText + "*";
-        QueryBuilder fullTextQuery = queryStringQuery(searchText).fields(iElasticCasePrioritySearch.fullTextFields());
+        Map<String, Float> finalFullTextFieldsMap = new HashMap<>(iElasticCasePrioritySearch.fullTextFields());
+        if (request.fullTextFields != null) {
+            request.fullTextFields.forEach(finalFullTextFieldsMap::putIfAbsent);
+        }
+        QueryBuilder fullTextQuery = queryStringQuery(searchText).fields(finalFullTextFieldsMap);
         query.must(fullTextQuery);
     }
 

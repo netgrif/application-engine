@@ -2,7 +2,7 @@
     <id>dashboard_item</id>
     <version>1.0.0</version>
     <initials>DBI</initials>
-    <title>Dashboard item</title>
+    <title name="model_title">Dashboard item</title>
     <icon>crop_square</icon>
     <defaultRole>true</defaultRole>
     <anonymousRole>false</anonymousRole>
@@ -231,7 +231,6 @@
         <id>icon_color</id>
         <title name="icon_color">Icon color</title>
         <desc name="icon_color_desc">Icon color of item. Valid CSS property value font-color.</desc>
-        <init>#0790ff</init>
         <event type="set">
             <id>icon_color_set</id>
             <actions phase="post">
@@ -284,7 +283,6 @@
         <id>font_color</id>
         <title name="font_color">Font color</title>
         <desc name="font_color_desc">Font color of item name. Valid CSS property value font-color.</desc>
-        <init>#0790ff</init>
     </data>
     <data type="text" immediate="true">
         <id>font_weight</id>
@@ -393,6 +391,7 @@
 
     <!-- I18NS -->
     <i18n locale="sk">
+        <i18nString name="model_title">Položka panelu</i18nString>
         <i18nString name="item_id">ID položky panelu</i18nString>
         <i18nString name="item_id_desc">Unikátny identifikátor položky panelu</i18nString>
         <i18nString name="menu_items_list">Existujúce menu položky</i18nString>
@@ -420,6 +419,7 @@
         <i18nString name="configuration_label">Konfigurácia položky panelu</i18nString>
     </i18n>
     <i18n locale="de">
+        <i18nString name="model_title">Dashboard-Element</i18nString>
         <i18nString name="item_id">Dashboard-Element-ID</i18nString>
         <i18nString name="item_id_desc">Eindeutiger Bezeichner des Dashboard-Elements</i18nString>
         <i18nString name="menu_items_list">Vorhandene Menüpunkte</i18nString>

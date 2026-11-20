@@ -2,7 +2,7 @@
     <id>single_task_view_configuration</id>
     <version>1.0.0</version>
     <initials>TST</initials>
-    <title>Single task view configuration</title>
+    <title name="model_title">Single task view configuration</title>
     <icon>check_box_outline_blank</icon>
     <defaultRole>true</defaultRole>
     <anonymousRole>false</anonymousRole>
@@ -79,6 +79,7 @@
         <i18nString name="task_filter">Filter</i18nString>
         <i18nString name="task_filter_desc">Použi PFQL query</i18nString>
         <i18nString name="filter_settings">Filter</i18nString>
+        <i18nString name="model_title">Konfigurácia zobrazenia jednej úlohy</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="view_configuration_type">Wählen Sie einen Ansichtstyp</i18nString>
@@ -88,6 +89,7 @@
         <i18nString name="task_filter">Filter</i18nString>
         <i18nString name="task_filter_desc">Verwenden Sie PFQL Query</i18nString>
         <i18nString name="filter_settings">Filter</i18nString>
+        <i18nString name="model_title">Konfiguration der Einzelaufgabenansicht</i18nString>
     </i18n>
 
     <transition>

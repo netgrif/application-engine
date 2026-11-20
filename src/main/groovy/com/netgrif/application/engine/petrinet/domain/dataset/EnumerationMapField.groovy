@@ -11,12 +11,12 @@ class EnumerationMapField extends MapOptionsField<I18nString, String> {
         super()
     }
 
-    EnumerationMapField(Map<String, I18nString> choices) {
-        super(choices)
+    EnumerationMapField(Map<String, I18nString> options) {
+        super(options)
     }
 
-    EnumerationMapField(Map<String, I18nString> choices, String defaultValue) {
-        super(choices)
+    EnumerationMapField(Map<String, I18nString> options, String defaultValue) {
+        super(options)
         this.defaultValue = defaultValue
     }
 
@@ -45,6 +45,22 @@ class EnumerationMapField extends MapOptionsField<I18nString, String> {
         super.setDefaultValue(defaultValue)
     }
 
+    /**
+     * Returns the internationalized string value corresponding to the currently selected option key.
+     * <p>
+     * This method retrieves the {@link I18nString} from the options map that corresponds to the
+     * current value of this field.
+     * </p>
+     *
+     * @return the {@link I18nString} object representing the internationalized value of the selected
+     *         option, or {@code null} if the field's value is null or if no matching option exists.
+     */
+    I18nString getI18nValue() {
+        if (this.getValue() == null) {
+            return null;
+        }
+        return this.options?.get(this.getValue())
+    }
 
     @Override
     Field clone() {

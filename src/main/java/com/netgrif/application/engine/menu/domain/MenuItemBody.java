@@ -10,9 +10,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Class, that holds configurable attributes of menu item.
@@ -26,11 +24,13 @@ public class MenuItemBody {
 
     private String menuIcon = "filter_none";
     private I18nString menuName;
+    private List<String> allowedAuthorities = List.of("ROLE_USER");
     private Map<String, I18nString> allowedRoles = new HashMap<>();
     private Map<String, I18nString> bannedRoles = new HashMap<>();
     private boolean useCustomView = false;
     private String customViewSelector;
     private boolean isAutoSelect = false;
+    private boolean isFolder = false;
 
     private boolean useTabbedView = true;
     private String tabIcon;
@@ -109,15 +109,28 @@ public class MenuItemBody {
     }
 
     public void setView(ViewBody viewBody) {
-        if (viewBody != null) {
-            this.view = viewBody;
-            MenuItemViewType viewType = viewBody.getViewType();
-            if (viewType.isTabbed() != viewType.isUntabbed()) {
-                // if isTabbed == isUntabbed we cannot determine the result value
-                this.useTabbedView = viewType.isTabbed();
-            }
+        if (viewBody == null) {
+            return;
+        }
+        if (this.isFolder) {
+            throw new IllegalArgumentException("Folder cannot have view");
+        }
+        this.view = viewBody;
+        MenuItemViewType viewType = viewBody.getViewType();
+        if (viewType.getViewType() == ViewType.ONLY_TABBED) {
+            this.useTabbedView = true;
+        } else if (viewType.getViewType() == ViewType.ONLY_UNTABBED) {
+            this.useTabbedView = false;
         }
     }
+
+    public void setIsFolder(boolean isFolder) {
+        if (isFolder && this.view != null) {
+            throw new IllegalArgumentException("Folder cannot have view");
+        }
+        this.isFolder = isFolder;
+    }
+
 
     /**
      * @return true if the menu item contains view
@@ -184,9 +197,11 @@ public class MenuItemBody {
         outcome.putDataSetEntry(MenuItemConstants.FIELD_CUSTOM_VIEW_SELECTOR, FieldType.TEXT,
                 this.customViewSelector);
         outcome.putDataSetEntry(MenuItemConstants.FIELD_IS_AUTO_SELECT, FieldType.BOOLEAN, this.isAutoSelect);
+        outcome.putDataSetEntry(MenuItemConstants.FIELD_ALLOWED_AUTHORITIES, FieldType.MULTICHOICE_MAP, this.allowedAuthorities);
         outcome.putDataSetEntryOptions(MenuItemConstants.FIELD_ALLOWED_ROLES, FieldType.MULTICHOICE_MAP, this.allowedRoles);
         outcome.putDataSetEntryOptions(MenuItemConstants.FIELD_BANNED_ROLES, FieldType.MULTICHOICE_MAP, this.bannedRoles);
         outcome.putDataSetEntry(MenuItemConstants.FIELD_CONFIGURATION_TEMPLATES, FieldType.ENUMERATION_MAP, this.configurationTemplateIdentifier);
+        outcome.putDataSetEntry(MenuItemConstants.FIELD_IS_FOLDER, FieldType.BOOLEAN, this.isFolder);
 
         outcome = toDataSetWithView(viewCase, outcome);
 
@@ -203,6 +218,7 @@ public class MenuItemBody {
         ToDataSetOutcome outcome = new ToDataSetOutcome();
         outcome.putDataSetEntry(MenuItemConstants.FIELD_USE_TABBED_VIEW, FieldType.BOOLEAN, this.useTabbedView);
         outcome.putDataSetEntry(MenuItemConstants.FIELD_USE_CUSTOM_VIEW, FieldType.BOOLEAN, this.useCustomView);
+        outcome.putDataSetEntry(MenuItemConstants.FIELD_IS_FOLDER, FieldType.BOOLEAN, this.isFolder);
         return toDataSetWithView(viewCase, outcome);
     }
 

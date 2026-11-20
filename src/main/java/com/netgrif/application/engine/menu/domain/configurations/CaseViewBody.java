@@ -22,9 +22,12 @@ public class CaseViewBody extends ViewBody {
     private boolean showCreateCaseButton = true;
     private String bannedNetsInCreation;
     private boolean showMoreMenu = false;
+    private List<String> fullTextFields;
     private boolean allowHeaderTableMode = true;
     private List<String> headersMode = new ArrayList<>(List.of("sort", "edit", "search"));
     private String headersDefaultMode = "sort";
+    private String headersSortModeActive;
+    private String headersSortModeDirection = "desc";
     private List<String> defaultHeaders;
     private boolean headerModeChangeable = true;
     private boolean useDefaultHeaders = true;
@@ -76,12 +79,20 @@ public class CaseViewBody extends ViewBody {
                 this.bannedNetsInCreation);
         outcome.putDataSetEntry(CaseViewConstants.FIELD_SHOW_MORE_MENU, FieldType.BOOLEAN,
                 this.showMoreMenu);
+        if (this.fullTextFields != null) {
+            outcome.putDataSetEntry(CaseViewConstants.FIELD_FULLTEXT_FIELDS, FieldType.STRING_COLLECTION,
+                    this.fullTextFields);
+        }
         outcome.putDataSetEntry(CaseViewConstants.FIELD_ALLOW_HEADER_TABLE_MODE, FieldType.BOOLEAN,
                 this.allowHeaderTableMode);
         outcome.putDataSetEntry(CaseViewConstants.FIELD_HEADERS_MODE, FieldType.MULTICHOICE_MAP,
                 this.headersMode == null ? new ArrayList<>() : this.headersMode);
         outcome.putDataSetEntry(CaseViewConstants.FIELD_HEADERS_DEFAULT_MODE, FieldType.ENUMERATION_MAP,
                 this.headersDefaultMode);
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_HEADERS_SORT_MODE_ACTIVE, FieldType.TEXT,
+                this.headersSortModeActive);
+        outcome.putDataSetEntry(CaseViewConstants.FIELD_HEADERS_SORT_MODE_DIRECTION, FieldType.ENUMERATION_MAP,
+                this.headersSortModeDirection);
         if (this.defaultHeaders != null) {
             outcome.putDataSetEntry(CaseViewConstants.FIELD_DEFAULT_HEADERS, FieldType.STRING_COLLECTION,
                     this.defaultHeaders);
