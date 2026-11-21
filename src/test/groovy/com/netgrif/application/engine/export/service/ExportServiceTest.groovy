@@ -90,7 +90,7 @@ class ExportServiceTest {
     @Test
     @Order(3)
     void testCaseElasticExport() {
-        Thread.sleep(5000)  //Elastic wait
+        testHelper.waitForAsync()  //Elastic wait
         String exportTask = mainCase.tasks.find { it.transition == "t2" }.task
         taskService.assignTask(userService.findByEmail("super@netgrif.com", false).transformToLoggedUser(), exportTask)
         File csvFile = new File("src/test/resources/csv/case_elastic_export.csv")
@@ -121,10 +121,10 @@ class ExportServiceTest {
     @Order(1)
     @Disabled("Github action")
     void testTaskElasticExport() {
-        Thread.sleep(10000)  //Elastic wait
+        testHelper.waitForAsync()  //Elastic wait
         String exportTask = mainCase.tasks.find { it.transition == "t4" }.task
         taskService.assignTask(userService.findByEmail("super@netgrif.com", false).transformToLoggedUser(), exportTask)
-        Thread.sleep(20000)  //Elastic wait
+        testHelper.waitForAsync()  //Elastic wait
 
         def processId = petriNetService.getNewestVersionByIdentifier("export_test").stringId
         def taskRequest = new ElasticTaskSearchRequest()

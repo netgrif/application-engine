@@ -7,6 +7,8 @@ import com.netgrif.application.engine.menu.domain.MenuItemConstants;
 import com.netgrif.application.engine.startup.SuperCreator;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.export.web.requestbodies.FilteredCasesRequest;
+import com.netgrif.application.engine.TestHelper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +37,14 @@ public class XlsExportServiceTest {
 
     @Autowired
     private SuperCreator superCreator;
+
+    @Autowired
+    private TestHelper testHelper;
+
+    @BeforeEach
+    void before() {
+        testHelper.truncateDbs();
+    }
 
     @Test
     void shouldCreateXlsxFile() throws Exception {

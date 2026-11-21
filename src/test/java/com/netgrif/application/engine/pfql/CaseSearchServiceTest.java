@@ -98,7 +98,7 @@ public class CaseSearchServiceTest {
         logout();
 
         setData(Map.of(QUERY_FIELD_ID, Map.of("value", "xxx", "type", FieldType.TEXT.getName())));
-        Thread.sleep(2000);
+        testHelper.waitForAsync();
         result = caseSearchService.searchOne("case: data." + QUERY_FIELD_ID + ".value eq 'xxx'");
         assertNotNull(result);
         assertNotNull(result.getPetriNet());
@@ -133,7 +133,7 @@ public class CaseSearchServiceTest {
         logout();
 
         setData(Map.of(QUERY_FIELD_ID, Map.of("value", "xxx", "type", FieldType.TEXT.getName())));
-        Thread.sleep(2000);
+        testHelper.waitForAsync();
         result = caseSearchService.searchAll("cases: data." + QUERY_FIELD_ID + ".value eq 'xxx'");
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
@@ -165,7 +165,7 @@ public class CaseSearchServiceTest {
         assertEquals(1, result);
 
         setData(Map.of(QUERY_FIELD_ID, Map.of("value", "xxx", "type", FieldType.TEXT.getName())));
-        Thread.sleep(2000);
+        testHelper.waitForAsync();
         result = caseSearchService.count("cases: data." + QUERY_FIELD_ID + ".value eq 'xxx'");
         assertEquals(1, result);
 
@@ -193,7 +193,7 @@ public class CaseSearchServiceTest {
         assertTrue(result);
 
         setData(Map.of(QUERY_FIELD_ID, Map.of("value", "xxx", "type", FieldType.TEXT.getName())));
-        Thread.sleep(2000);
+        testHelper.waitForAsync();
         result = caseSearchService.exists("cases: data." + QUERY_FIELD_ID + ".value eq 'xxx'");
         assertTrue(result);
 

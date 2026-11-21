@@ -41,11 +41,6 @@ public class RegistrationServiceTest {
     }
 
 
-    @AfterEach
-    public void cleanUp() {
-        repository.deleteAll();
-    }
-
     @Test
 //    @WithMockUser(username = "myUser", roles = { "myAuthority" })
     public void testRegisterUser() throws InvalidUserTokenException {

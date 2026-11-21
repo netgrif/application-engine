@@ -115,7 +115,7 @@ class ElasticSearchViewPermissionTest {
 
         CaseSearchRequest caseSearchRequest = new CaseSearchRequest()
         caseSearchRequest.process = [new CaseSearchRequest.PetriNet("vpt")] as List
-        sleep(4000)
+        testHelper.waitForAsync()
         Page<Case> casePage = elasticCaseService.search([caseSearchRequest] as List, testUser.transformToLoggedUser(), PageRequest.of(0, 20), LocaleContextHolder.getLocale(), false)
 
         assert casePage.getContent() != null
@@ -163,7 +163,7 @@ class ElasticSearchViewPermissionTest {
                 ]
         ] as Map)).getCase()
         case_ = workflowService.save(case_)
-        sleep(4000)
+        testHelper.waitForAsync()
 
         CaseSearchRequest caseSearchRequest = new CaseSearchRequest()
         caseSearchRequest.process = [new CaseSearchRequest.PetriNet(netWithUserRefs.getIdentifier())] as List
@@ -184,7 +184,7 @@ class ElasticSearchViewPermissionTest {
                 ]
         ] as Map)).getCase()
         case_ = workflowService.save(case_)
-        sleep(4000)
+        testHelper.waitForAsync()
 
         CaseSearchRequest caseSearchRequest = new CaseSearchRequest()
         caseSearchRequest.process = [new CaseSearchRequest.PetriNet(netWithUserRefs.getIdentifier())] as List
@@ -207,7 +207,7 @@ class ElasticSearchViewPermissionTest {
                 ]
         ] as Map)).getCase()
         case_ = workflowService.save(case_)
-        sleep(4000)
+        testHelper.waitForAsync()
 
         CaseSearchRequest caseSearchRequest = new CaseSearchRequest()
         caseSearchRequest.process = [new CaseSearchRequest.PetriNet(netWithUserRefs.getIdentifier())] as List

@@ -1,11 +1,13 @@
 package com.netgrif.application.engine.action
 
 
+import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.slf4j.Logger
@@ -33,6 +35,14 @@ class ConcurrencyTest {
 
     @Autowired
     private SuperCreator superCreator
+
+    @Autowired
+    private TestHelper testHelper
+
+    @BeforeEach
+    void before() {
+        testHelper.truncateDbs()
+    }
 
     @Test
     void test() {

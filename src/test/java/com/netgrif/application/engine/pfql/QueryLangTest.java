@@ -22,6 +22,7 @@ import com.querydsl.core.types.dsl.DateTimePath;
 import com.querydsl.core.types.dsl.StringPath;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,11 +67,14 @@ public class QueryLangTest {
     @Autowired
     private IUserService userService;
 
+    @BeforeEach
+    public void beforeEach() {
+        testHelper.truncateDbs();
+    }
+
     @Test
     @SuppressWarnings("unchecked")
     public void testSearchService() throws InterruptedException {
-        testHelper.truncateDbs();
-
         Optional<PetriNet> optionalPetriNet = helper.createNet("/pfql.xml");
         assertNotNull(optionalPetriNet);
 
@@ -85,7 +89,7 @@ public class QueryLangTest {
             helper.createCase(String.format("Test %02d", i), process, params);
         }
 
-        Thread.sleep(2000);
+        testHelper.waitForAsync();
 
         Object cases = searchService.search("cases: processIdentifier eq 'query_test' page 1 size 5 sort by title desc");
         assertNotNull(cases);

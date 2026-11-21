@@ -147,7 +147,7 @@ class QueryDSLViewPermissionTest {
                 ]
         ] as Map)).getCase()
         case_ = workflowService.save(case_)
-        sleep(4000)
+        testHelper.waitForAsync()
 
         Page<Case> casePage = workflowService.search(["petriNet": ["identifier": netWithUserRefs.getIdentifier()], "fullText": "VPT"] as Map,
                 PageRequest.of(0, 20), testUser.transformToLoggedUser(), LocaleContextHolder.getLocale())
@@ -167,7 +167,7 @@ class QueryDSLViewPermissionTest {
                 ]
         ] as Map)).getCase()
         case_ = workflowService.save(case_)
-        sleep(4000)
+        testHelper.waitForAsync()
 
         TaskSearchRequest request = new TaskSearchRequest()
         request.process = [new com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.PetriNet(netWithUserRefs.getStringId())]
@@ -205,7 +205,7 @@ class QueryDSLViewPermissionTest {
                 ]
         ] as Map)).getCase()
         case_ = workflowService.save(case_)
-        sleep(4000)
+        testHelper.waitForAsync()
 
         Page<Case> casePage = workflowService.search(["petriNet": ["identifier": netWithUserRefs.getIdentifier()], "fullText": "VPT"] as Map,
                 PageRequest.of(0, 20), testUser.transformToLoggedUser(), LocaleContextHolder.getLocale())
@@ -228,7 +228,7 @@ class QueryDSLViewPermissionTest {
         ProcessRole negViewRole = this.net.getRoles().values().find(v -> v.getImportId() == "view_neg_role")
         userService.addRole(testUser, negViewRole.getStringId())
         case_ = workflowService.save(case_)
-        sleep(4000)
+        testHelper.waitForAsync()
 
         Page<Case> casePage = workflowService.search(["petriNet": ["identifier": netWithUserRefs.getIdentifier()], "fullText": "VPT"] as Map,
                 PageRequest.of(0, 20), testUser.transformToLoggedUser(), LocaleContextHolder.getLocale())

@@ -353,7 +353,7 @@ class TaskAuthorizationServiceTest {
                 ]
         ] as Map)).getCase()
         workflowService.save(case_)
-        sleep(4000)
+        testHelper.waitForAsync()
 
         assert taskAuthorizationService.canCallAssign(testUser.transformToLoggedUser(), taskId)
         workflowService.deleteCase(case_.stringId)
@@ -370,7 +370,7 @@ class TaskAuthorizationServiceTest {
                 ]
         ] as Map)).getCase()
         workflowService.save(case_)
-        sleep(4000)
+        testHelper.waitForAsync()
 
         assert !taskAuthorizationService.canCallAssign(testUser.transformToLoggedUser(), taskId)
         workflowService.deleteCase(case_.stringId)
@@ -389,7 +389,7 @@ class TaskAuthorizationServiceTest {
                 ]
         ] as Map)).getCase()
         workflowService.save(case_)
-        sleep(4000)
+        testHelper.waitForAsync()
 
         assert taskAuthorizationService.canCallAssign(testUser.transformToLoggedUser(), taskId)
         userService.removeRole(testUser, positiveRole.getStringId())
@@ -433,7 +433,7 @@ class TaskAuthorizationServiceTest {
                 ]
         ] as Map)).getCase()
         workflowService.save(case_)
-        sleep(4000)
+        testHelper.waitForAsync()
 
         taskService.assignTask(testUser.transformToLoggedUser(), taskId)
         assert taskAuthorizationService.canCallFinish(testUser.transformToLoggedUser(), taskId)
@@ -451,7 +451,7 @@ class TaskAuthorizationServiceTest {
                 ]
         ] as Map)).getCase()
         workflowService.save(case_)
-        sleep(4000)
+        testHelper.waitForAsync()
 
         taskService.assignTask(testUser.transformToLoggedUser(), taskId)
         assert !taskAuthorizationService.canCallFinish(testUser.transformToLoggedUser(), taskId)
@@ -471,7 +471,7 @@ class TaskAuthorizationServiceTest {
                 ]
         ] as Map)).getCase()
         workflowService.save(case_)
-        sleep(4000)
+        testHelper.waitForAsync()
 
         taskService.assignTask(testUser.transformToLoggedUser(), taskId)
         assert taskAuthorizationService.canCallFinish(testUser.transformToLoggedUser(), taskId)

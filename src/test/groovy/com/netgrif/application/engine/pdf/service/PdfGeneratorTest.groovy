@@ -192,7 +192,7 @@ class PdfGeneratorTest {
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(testCase, "1", pdfResource)
 
-        File file = new File(pdfOutputFolder + "/out_" + TESTING_DATA[2] + "_.pdf")
+        File file = new File(pdfOutputFolder + "/out_page_number_.pdf")
         assert file.exists()
     }
 
@@ -217,7 +217,7 @@ class PdfGeneratorTest {
         pdfGenerator.addCustomField(pdf, pdfResource)
         pdfGenerator.generatePdf(testCase, "1", pdfResource)
 
-        File file = new File(pdfOutputFolder + "/out_" + TESTING_DATA[2] + "_.pdf")
+        File file = new File(pdfOutputFolder + "/out_custom_field.pdf")
         assert file.exists()
     }
 

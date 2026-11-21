@@ -60,7 +60,7 @@ class MongoDbRunner extends AbstractOrderedCommandLineRunner {
         }
     }
 
-    private void resolveIndexes() {
+    void resolveIndexes() {
         MappingContext<? extends MongoPersistentEntity<?>, MongoPersistentProperty> mappingContext = mongoTemplate.getConverter().getMappingContext()
         IndexResolver resolver = new MongoPersistentEntityIndexResolver(mappingContext)
         mappingContext.getPersistentEntities()

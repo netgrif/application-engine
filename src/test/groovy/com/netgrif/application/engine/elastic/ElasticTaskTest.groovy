@@ -135,10 +135,9 @@ class ElasticTaskTest {
 
         ElasticTask indexedTask = elasticTaskRepository.findByTaskId("TestTask")
         assert indexedTask != null
-        CountDownLatch latch = new CountDownLatch(1)
         elasticTaskService.removeByPetriNetId("Process")
 
-        latch.await(10, TimeUnit.SECONDS)
+        testHelper.waitForAsync()
         ElasticTask deletedTask = elasticTaskRepository.findByTaskId("TestTask")
         assert deletedTask == null
     }

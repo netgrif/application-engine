@@ -79,15 +79,19 @@ public class MenuItemServiceTest {
     @Test
     public void ensureDatabaseIndexesTest() {
         mongoTemplate.getDb().drop();
+        try {
+            MongoCollection<Case> collection = mongoTemplate.getDb().getCollection("case", Case.class);
+            long indexCountBefore = collection.listIndexes().into(new java.util.ArrayList<>()).size();
+            assertEquals(0, indexCountBefore, "Expected no indexes after dropping database");
 
-        MongoCollection<Case> collection = mongoTemplate.getDb().getCollection("case", Case.class);
-        long indexCountBefore = collection.listIndexes().into(new java.util.ArrayList<>()).size();
-        assertEquals(0, indexCountBefore, "Expected no indexes after dropping database");
+            menuItemService.ensureDatabaseIndexes();
 
-        menuItemService.ensureDatabaseIndexes();
-
-        long indexCountAfter = collection.listIndexes().into(new java.util.ArrayList<>()).size();
-        assertTrue(indexCountAfter > indexCountBefore, "Expected indexes to be created after calling ensureDatabaseIndexes");
+            long indexCountAfter = collection.listIndexes().into(new java.util.ArrayList<>()).size();
+            assertTrue(indexCountAfter > indexCountBefore, "Expected indexes to be created after calling ensureDatabaseIndexes");
+        } finally {
+            // the dropped DB would otherwise leak into the next test class, which may not reset it
+            testHelper.truncateDbs();
+        }
     }
 
     @Test
@@ -718,7 +722,7 @@ public class MenuItemServiceTest {
         assertDoesNotThrow(() -> workflowService.findOne(tabbedTaskViewId));
 
         workflowService.deleteCase(testFolder);
-        Thread.sleep(2000);
+        testHelper.waitForAsync();
         netgrifFolder = workflowService.findOne(netgrifFolderId);
         List<String> updatedChildIds = MenuItemUtils.getCaseIdsFromCaseRef(netgrifFolder, MenuItemConstants.FIELD_CHILD_ITEM_IDS);
         assertNotNull(updatedChildIds);

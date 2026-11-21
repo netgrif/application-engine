@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.workflow
 
+import com.netgrif.application.engine.TestHelper
+
 import com.netgrif.application.engine.petrinet.domain.DataGroup
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
@@ -42,11 +44,15 @@ class TaskRefPropagationTest {
     @Autowired
     private ITaskService taskService
 
+    @Autowired
+    private TestHelper testHelper
+
     PetriNet netParent
     PetriNet netChild
 
     @BeforeEach
     void beforeAll() {
+        testHelper.truncateDbs()
         def parent = petriNetService.importPetriNet(new FileInputStream("src/test/resources/taskRef_propagation_test_parent.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         def child = petriNetService.importPetriNet(new FileInputStream("src/test/resources/taskRef_propagation_test_child.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
 

@@ -205,7 +205,7 @@ class ImpersonationServiceTest {
         assert workflowAuthorizationService.canCallDelete(userService.loggedUserFromContext, testCase.stringId)
         def testTask1 = loadTask(testCase, "t1")
 
-        sleep(8000) // elastic
+        testHelper.waitForAsync() // elastic
 
         def caseReq = new CaseSearchRequest()
         caseReq.process = [new CaseSearchRequest.PetriNet(testCase.processIdentifier)]
@@ -233,7 +233,7 @@ class ImpersonationServiceTest {
     @Test
     void testAuthorization() {
         def config = setup()
-        sleep(4000) // elastic
+        testHelper.waitForAsync() // elastic
 
         def logged = userService.loggedUser.transformToLoggedUser()
         assert impersonationAuthorizationService.canImpersonate(logged, config.stringId)
@@ -241,7 +241,7 @@ class ImpersonationServiceTest {
 
         config.dataSet["valid_to"].value = LocalDateTime.now().minusMinutes(1)
         workflowService.save(config)
-        sleep(4000)
+        testHelper.waitForAsync()
 
         assert !impersonationAuthorizationService.canImpersonate(logged, config.stringId)
         assert !impersonationAuthorizationService.canImpersonateUser(logged, user2.stringId)

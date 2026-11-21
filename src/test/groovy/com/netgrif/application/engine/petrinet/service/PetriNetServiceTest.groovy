@@ -115,7 +115,7 @@ class PetriNetServiceTest {
         assert testNetOptional.getNet() != null
         assert petriNetRepository.count() == processCount + 1
         PetriNet testNet = testNetOptional.getNet()
-        Thread.sleep(5000)
+        testHelper.waitForAsync()
         ElasticPetriNet elasticTestNet = elasticPetriNetRepository.findByStringId(testNet.stringId)
         assert elasticTestNet != null && elasticTestNet.getUriNodeId() == uriService.getRoot().id
         assert testNet.getUriNodeId() == uriService.getRoot().id
@@ -138,7 +138,7 @@ class PetriNetServiceTest {
 
         petriNetService.deletePetriNet(testNet.stringId, superCreator.getLoggedSuper())
         assert petriNetRepository.count() == processCount
-        Thread.sleep(5000)
+        testHelper.waitForAsync()
         assert elasticPetriNetRepository.findByStringId(testNet.stringId) == null
         assert caseRepository.findAllByProcessIdentifier(testNetOptional.getNet().getImportId()).size() == 0
         assert taskRepository.count() == taskCount
@@ -163,7 +163,7 @@ class PetriNetServiceTest {
         petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper(), myNode.id)
         petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper(), myNode.id)
 
-        Thread.sleep(2000)
+        testHelper.waitForAsync()
 
         List<PetriNet> petriNets = petriNetService.findAllByUriNodeId(myNode.id)
         assert petriNets.size() == 2
