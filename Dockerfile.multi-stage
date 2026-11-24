@@ -55,6 +55,7 @@ RUN groupadd --gid "${NETGRIF_GID}" netgrif \
 
 COPY --from=build --chown=0:0 --chmod=0444 /nae/application-engine/target/app-exec.jar app.jar
 COPY --from=build --chown=0:0 /nae/application-engine/src/main/resources src/main/resources
+COPY LICENSE.txt THIRD-PARTY.txt ./
 
 RUN find src/main/resources -type d -exec chmod 0555 {} + \
     && find src/main/resources -type f -exec chmod 0444 {} +
