@@ -31,6 +31,7 @@ RUN groupadd --gid "${NETGRIF_GID}" netgrif \
 
 COPY --chown=0:0 --chmod=0444 application-engine/target/app-exec.jar app.jar
 COPY --chown=0:0 application-engine/src/main/resources src/main/resources
+COPY LICENSE.txt THIRD-PARTY.txt ./
 
 RUN find src/main/resources -type d -exec chmod 0555 {} + \
     && find src/main/resources -type f -exec chmod 0444 {} +
