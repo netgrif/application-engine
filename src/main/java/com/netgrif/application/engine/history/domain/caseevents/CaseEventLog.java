@@ -6,6 +6,8 @@ import com.netgrif.application.engine.workflow.domain.Case;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.bson.types.ObjectId;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.util.Map;
 
@@ -13,12 +15,16 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = true)
 public abstract class CaseEventLog extends PetriNetEventLog {
 
+    @Field(type = FieldType.Keyword)
     protected String caseId;
 
+    @Field(type = FieldType.Keyword)
     protected String caseTitle;
 
+    @Field(type = FieldType.Flattened)
     private Map<String, Integer> activePlaces;
 
+    @Field(type = FieldType.Flattened)
     private Map<String, Integer> consumedTokens;
 
     protected CaseEventLog() {

@@ -4,8 +4,9 @@ import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.DataField;
 import lombok.EqualsAndHashCode;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.Map;
 
@@ -13,7 +14,7 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = true)
 public class CreateCaseEventLog extends CaseEventLog {
 
-    @Field("dataSetValues")
+    @Field(type = FieldType.Flattened)
     private Map<String, DataField> dataSetValues;
 
     public CreateCaseEventLog() {
