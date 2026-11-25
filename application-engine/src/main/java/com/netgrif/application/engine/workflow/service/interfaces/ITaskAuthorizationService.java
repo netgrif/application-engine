@@ -1,36 +1,33 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
-import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.RolePermission;
 import com.netgrif.application.engine.petrinet.domain.throwable.IllegalTaskStateException;
 import com.netgrif.application.engine.objects.workflow.domain.Task;
 
 public interface ITaskAuthorizationService {
-    Boolean userHasAtLeastOneRolePermission(LoggedUser loggedUser, String taskId, RolePermission... permissions);
+    Boolean userHasAtLeastOneRolePermission(AbstractUser loggedUser, String taskId, RolePermission... permissions);
 
     Boolean userHasAtLeastOneRolePermission(AbstractUser user, Task task, RolePermission... permissions);
 
-    Boolean userHasUserListPermission(LoggedUser loggedUser, String taskId, RolePermission... permissions);
+    Boolean userHasUserListPermission(AbstractUser loggedUser, String taskId, RolePermission... permissions);
 
     Boolean userHasUserListPermission(AbstractUser user, Task task, RolePermission... permissions);
-
-    boolean isAssignee(LoggedUser loggedUser, String taskId);
 
     boolean isAssignee(AbstractUser user, String taskId);
 
     boolean isAssignee(AbstractUser user, Task task);
 
-    boolean canCallAssign(LoggedUser loggedUser, String taskId);
+    boolean canCallAssign(AbstractUser loggedUser, String taskId);
 
-    boolean canCallDelegate(LoggedUser loggedUser, String taskId);
+    boolean canCallDelegate(AbstractUser loggedUser, String taskId);
 
-    boolean canCallFinish(LoggedUser loggedUser, String taskId) throws IllegalTaskStateException;
+    boolean canCallFinish(AbstractUser loggedUser, String taskId) throws IllegalTaskStateException;
 
-    boolean canCallCancel(LoggedUser loggedUser, String taskId) throws IllegalTaskStateException;
+    boolean canCallCancel(AbstractUser loggedUser, String taskId) throws IllegalTaskStateException;
 
-    boolean canCallSaveData(LoggedUser loggedUser, String taskId);
+    boolean canCallSaveData(AbstractUser loggedUser, String taskId);
 
-    boolean canCallSaveFile(LoggedUser loggedUser, String taskId);
+    boolean canCallSaveFile(AbstractUser loggedUser, String taskId);
 
 }

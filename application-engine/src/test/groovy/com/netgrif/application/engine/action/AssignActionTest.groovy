@@ -2,6 +2,7 @@ package com.netgrif.application.engine.action
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl
+import com.netgrif.application.engine.auth.context.OriginFilter
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser
@@ -93,6 +94,7 @@ class AssignActionTest {
         mvc = MockMvcBuilders
                 .webAppContextSetup(wac)
                 .apply(springSecurity())
+                .addFilters(new OriginFilter())
                 .build()
 
         createMainAndSecondaryNet()

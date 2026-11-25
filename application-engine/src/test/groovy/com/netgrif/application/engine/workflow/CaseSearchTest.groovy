@@ -2,6 +2,7 @@ package com.netgrif.application.engine.workflow
 
 import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.auth.context.OriginFilter
 import com.netgrif.application.engine.objects.auth.constants.UserConstants
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet
 import com.netgrif.application.engine.objects.petrinet.domain.VersionType
@@ -74,6 +75,7 @@ class CaseSearchTest {
         mvc = MockMvcBuilders
                 .webAppContextSetup(wac)
                 .apply(springSecurity())
+                .addFilters(new OriginFilter())
                 .build()
 
         PetriNet net = getNet()

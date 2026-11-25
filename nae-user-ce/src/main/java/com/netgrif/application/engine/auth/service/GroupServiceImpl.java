@@ -5,6 +5,7 @@ import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties;
 import com.netgrif.application.engine.auth.config.GroupConfigurationProperties;
 import com.netgrif.application.engine.auth.provider.CollectionNameProvider;
 import com.netgrif.application.engine.auth.repository.GroupRepository;
+import com.netgrif.application.engine.objects.annotations.Authorize;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.objects.auth.domain.Group;
@@ -96,6 +97,9 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "GROUP_DELETE")
+    @Authorize(authority = "GROUP_DELETE_OWN", expression = "@userService.getLoggedUser().getUsername().equals(#group.getOwnerUsername())")
     public void delete(Group group) {
         if (!groupRepository.existsById(group.getStringId())) {
             log.error("Group [{}] does not exist", group.getStringId());
@@ -210,6 +214,9 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "GROUP_CREATE")
+    @Authorize(authority = "GROUP_CREATE_OWN", expression = "@userService.getLoggedUser().getUsername().equals(#groupOwner.getUsername())")
     public Group create(String identifier, String title, AbstractUser groupOwner) {
         if (identifier == null || identifier.isBlank()) {
             throw new IllegalArgumentException("Group identifier cannot be null or blank.");
@@ -287,11 +294,12 @@ public class GroupServiceImpl implements GroupService {
         return addUser(group, user);
     }
 
-    @Override
+    @Override@Authorize(authority = "ADMIN")
+    @Authorize(authority = "GROUP_ADD_USER")
+    @Authorize(authority = "GROUP_ADD_USER_OWN", expression = "@userService.getLoggedUser().getUsername().equals(#group.getOwnerUsername())")
     public Group addUser(Group group, AbstractUser user) {
         Assert.notNull(user, "User cannot be null");
         Assert.notNull(group, "Group cannot be null");
-
         log.info("Adding user [{}] to group [{}]", user.getStringId(), group.getStringId());
         user.addGroupId(group.getStringId());
         group.addMemberId(user.getStringId());
@@ -311,6 +319,9 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "GROUP_REMOVE_USER")
+    @Authorize(authority = "GROUP_REMOVE_USER_OWN", expression = "@userService.getLoggedUser().getUsername().equals(#group.getOwnerUsername())")
     public Group removeUser(Group group, AbstractUser user) {
         Assert.notNull(user, "User cannot be null");
         Assert.notNull(group, "Group cannot be null");
@@ -449,6 +460,9 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "GROUP_ADD_SUBGROUP")
+    @Authorize(authority = "GROUP_ADD_SUBGROUP_OWN", expression = "@userService.getLoggedUser().getUsername().equals(#parentGroup.getOwnerUsername())")
     public Pair<Group, Group> addSubgroup(Group parentGroup, Group childGroup) {
         Assert.notNull(parentGroup, "Parent group cannot be null");
         Assert.notNull(childGroup, "Child group cannot be null");

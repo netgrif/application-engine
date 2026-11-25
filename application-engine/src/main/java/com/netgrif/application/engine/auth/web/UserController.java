@@ -7,6 +7,7 @@ import com.netgrif.application.engine.auth.web.requestbodies.PreferencesRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.UserCreateRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.UserSearchRequestBody;
 import com.netgrif.application.engine.auth.web.responsebodies.PreferencesResource;
+import com.netgrif.application.engine.objects.annotations.Authorize;
 import com.netgrif.application.engine.auth.web.responsebodies.UserDto;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
@@ -28,7 +29,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -54,7 +54,8 @@ public class UserController {
     private final RealmService realmService;
     private final UserFactory userFactory;
 
-    @PreAuthorize("@authorizationServiceImpl.hasAuthority('ADMIN')")
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "USER_CREATE")
     @Operation(summary = "Create a new user", description = "Creates a new user in the realm specified by id.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "User successfully created"),
@@ -172,7 +173,8 @@ public class UserController {
         return ResponseEntity.ok(userFactory.getUser(user, locale));
     }
 
-    @PreAuthorize("@authorizationServiceImpl.hasAuthority('ADMIN')")
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "ROLE_ASSIGN_TO_USER")
     @Operation(summary = "Assign roles to the user", description = "Caller must have the ADMIN role", security = {@SecurityRequirement(name = "X-Auth-Token")})
     @PutMapping(value = "/{realmId}/{id}/roles", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponses(value = {
@@ -194,7 +196,6 @@ public class UserController {
         }
     }
 
-    @PreAuthorize("@authorizationServiceImpl.hasAuthority('ADMIN')")
     @Operation(summary = "Get all authorities of the system",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "X-Auth-Token")})
@@ -208,7 +209,8 @@ public class UserController {
         return ResponseEntity.ok(authorityService.findAll(Pageable.unpaged()).stream().toList());
     }
 
-    @PreAuthorize("@authorizationServiceImpl.hasAuthority('ADMIN')")
+    @Authorize(authority = "ADMIN")
+    @Authorize(authority = "AUTHORITY_ASSIGN_TO_USER")
     @Operation(summary = "Assign authority to the user",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "X-Auth-Token")})
