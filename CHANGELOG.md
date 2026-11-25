@@ -7,6 +7,11 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Full Changelog: [https://github.com/netgrif/application-engine/commits/v7.0.0](https://github.com/netgrif/application-engine/commits/v7.0.0)
 
+## [7.1.1](https://github.com/netgrif/application-engine/releases/tag/v7.1.1) (2026-11-26)
+
+### Changed
+- [NAE-2506] Persistence of time triggers of tasks
+
 ## [7.1.0](https://github.com/netgrif/application-engine/releases/tag/v7.1.0) (2026-11-05)
 
 ### Added
