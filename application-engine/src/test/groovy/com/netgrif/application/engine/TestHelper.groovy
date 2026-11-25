@@ -99,19 +99,19 @@ class TestHelper {
             actionsCacheService.clearGlobalFunctionCache()
             petriNetService.evictAllCaches()
 
-            defaultRoleRunner.run()
-            elasticsearchRunner.run()
-            defaultRealmRunner.run()
-            anonymousRoleRunner.run()
-            systemUserRunner.run()
-            groupRunner.run()
-            filterRunner.run()
-            menuProcessRunner.run()
-            impersonationRunner.run()
-            superCreator.run()
-            finisherRunner.run()
-        }
+        defaultRoleRunner.run()
+        anonymousRoleRunner.run()
+        elasticsearchRunner.run()
+        defaultRealmRunner.run()
+        systemUserRunner.run()
+        groupRunner.run()
+        filterRunner.run()
+        menuProcessRunner.run()
+        impersonationRunner.run()
+        superCreator.run()
+        finisherRunner.run()
     }
+}
 
     private void clearMongoCollections() {
         int attempts = 0

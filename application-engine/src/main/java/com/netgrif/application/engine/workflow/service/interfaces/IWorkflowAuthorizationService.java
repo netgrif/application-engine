@@ -8,9 +8,9 @@ import com.netgrif.application.engine.objects.workflow.domain.Case;
 
 public interface IWorkflowAuthorizationService {
 
-    boolean canCallDelete(LoggedUser user, String caseId);
+    boolean canCallDelete(AbstractUser user, String caseId);
 
-    boolean canCallCreate(LoggedUser user, String netId);
+    boolean canCallCreate(AbstractUser user, String netId);
 
     Boolean userHasAtLeastOneRolePermission(AbstractUser user, PetriNet net, ProcessRolePermission... permissions);
 

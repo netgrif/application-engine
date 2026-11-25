@@ -43,4 +43,10 @@ public class AuthBeansConfiguration {
     public UserFactory userFactory() {
         return new UserFactoryImpl();
     }
+
+    @Bean
+    @ConditionalOnMissingBean(AnonymousUserRefService.class)
+    public AnonymousUserRefService anonymousUserRefService() {
+        return new AnonymousUserRefServiceImpl();
+    }
 }

@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.elastic.service;
 
 import com.netgrif.application.engine.objects.auth.domain.ActorRef;
+import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.objects.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
@@ -33,6 +34,9 @@ class ElasticCaseMappingServiceTest {
     }
 
     private Case mockCase(boolean partial, Set<String> immediateFields, Map<String, DataField> dataSet) {
+        Authority authority = mock(Authority.class);
+        when(authority.getStringId()).thenReturn(new ObjectId().toString());
+        when(authority.getName()).thenReturn("USER");
         Case c = mock(Case.class);
         when(c.getStringId()).thenReturn("case-1");
         when(c.get_id()).thenReturn(new ProcessResourceId("process", new ObjectId()));
@@ -42,7 +46,7 @@ class ElasticCaseMappingServiceTest {
         when(c.getTitle()).thenReturn("Test Case");
         when(c.getLastModified()).thenReturn(LocalDateTime.now());
         when(c.getCreationDate()).thenReturn(LocalDateTime.now());
-        when(c.getAuthor()).thenReturn(new ActorRef("user-1", "netgrif", "Test User", "testuser"));
+        when(c.getAuthor()).thenReturn(new ActorRef("user-1", "netgrif", "Test User", "testuser", Set.of(authority.getStringId())));
         when(c.getImmediateDataFields()).thenReturn(immediateFields);
         when(c.isPartiallyLoaded()).thenReturn(partial);
         when(c.getDataSet()).thenReturn(dataSet);
