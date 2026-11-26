@@ -4,6 +4,7 @@ import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl;
 import com.netgrif.application.engine.auth.repository.AuthorityRepository;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.objects.auth.dto.AuthoritySearchDto;
+import com.netgrif.application.engine.objects.utils.TtlCache;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +24,13 @@ import java.util.stream.Collectors;
 
 @Slf4j
 public class AuthorityServiceImpl implements AuthorityService {
+
+    /**
+     * Authorities are resolved by id every time a user, group or logged user is converted (one query per authority),
+     * so they are cached briefly. They are only ever created by this service, so entries cannot go stale except by
+     * deletion outside of it, which the TTL bounds.
+     */
+    private final TtlCache<String, Authority> authorityByIdCache = new TtlCache<>(Duration.ofSeconds(30), 1_000);
 
     private AuthorityRepository authorityRepository;
     private MongoTemplate mongoTemplate;
@@ -50,7 +59,11 @@ public class AuthorityServiceImpl implements AuthorityService {
 
     @Override
     public Authority getOne(String s) {
-        return authorityRepository.findById(s).orElseThrow(() -> new IllegalArgumentException("Authority with id " + s + " not found"));
+        Authority authority = authorityByIdCache.get(s, id -> authorityRepository.findById(id).orElse(null));
+        if (authority == null) {
+            throw new IllegalArgumentException("Authority with id " + s + " not found");
+        }
+        return authority;
     }
 
     @Override

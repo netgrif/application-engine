@@ -18,6 +18,7 @@ import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepos
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.application.engine.objects.utils.TtlCache;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -32,6 +33,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -59,6 +61,12 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     private ProcessRole defaultRole;
     private ProcessRole anonymousRole;
 
+    /**
+     * Roles are resolved by id every time a user, group or logged user is converted (one query per role), so they are
+     * cached briefly. Writes done through this service clear the cache; the TTL bounds staleness for writes done elsewhere.
+     */
+    private final TtlCache<String, ProcessRole> roleByIdCache = new TtlCache<>(Duration.ofSeconds(30), 10_000);
+
     public ProcessRoleService(ProcessRoleRepository processRoleRepository,
                               PetriNetRepository netRepository,
                               ApplicationEventPublisher publisher, RoleActionsRunner roleActionsRunner,
@@ -80,6 +88,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
 
     @Override
     public ProcessRole save(ProcessRole processRole) {
+        roleByIdCache.clear();
         return processRoleRepository.save(processRole);
     }
 
@@ -100,17 +109,20 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
         }
         Optional<ProcessRole> processRole = processRoleRepository.findByCompositeId(compositeId);
         processRole.ifPresent(processRoleRepository::delete);
+        roleByIdCache.clear();
     }
 
     @Override
     public void deleteAll(Collection<String> collection) {
         Set<ProcessRole> processRoles = processRoleRepository.findAllByIdsSet(collection);
         processRoleRepository.deleteAll(processRoles);
+        roleByIdCache.clear();
     }
 
     @Override
     public void deleteAll() {
         processRoleRepository.deleteAll();
+        roleByIdCache.clear();
     }
 
 
@@ -198,6 +210,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
 
     @Override
     public List<ProcessRole> saveAll(Collection<ProcessRole> entities) {
+        roleByIdCache.clear();
         return entities.stream().map(processRole -> {
             if (!processRole.isGlobal() || findAllByImportId(processRole.getImportId(), Pageable.ofSize(1)).isEmpty()) {
                 return processRoleRepository.save(processRole);
@@ -344,8 +357,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
 
     @Override
     public ProcessRole findById(String id) {
-        ObjectId objectId = extractObjectId(id);
-        return processRoleRepository.findByIdObjectId(objectId).orElse(null);
+        return roleByIdCache.get(id, key -> processRoleRepository.findByIdObjectId(extractObjectId(key)).orElse(null));
     }
 
     @Override
@@ -416,12 +428,14 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
         log.info("[{}]: Deleting all roles of Petri net {} version {}", net.getStringId(), net.getIdentifier(),
                 net.getVersion().toString());
         this.processRoleRepository.deleteAllBy_idIn(deletedRoleIds);
+        roleByIdCache.clear();
     }
 
     @Override
     public void clearCache() {
         this.defaultRole = null;
         this.anonymousRole = null;
+        this.roleByIdCache.clear();
     }
 
     @Override
@@ -457,6 +471,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
         } while (realms.hasNext());
         log.info("Deleting global role with import ID [{}] and object ID [{}]", processRole.getImportId(), processRole.getStringId());
         this.processRoleRepository.delete(processRole);
+        roleByIdCache.clear();
     }
 
     protected boolean isRoleReferenced(ProcessRole processRole) {

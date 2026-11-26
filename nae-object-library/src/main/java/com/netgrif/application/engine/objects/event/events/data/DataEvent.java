@@ -18,12 +18,20 @@ public abstract class DataEvent extends Event {
 
     public DataEvent(Object source, AbstractUser user) {
         super(source);
-        this.user = ActorTransformer.toLoggedUser(user);
+        this.user = resolveLoggedUser(user);
     }
 
     public DataEvent(Object source, EventPhase eventPhase, AbstractUser user) {
         super(source, eventPhase);
-        this.user = ActorTransformer.toLoggedUser(user);
+        this.user = resolveLoggedUser(user);
+    }
+
+    /**
+     * Converting an {@link AbstractUser} to a {@link LoggedUser} resolves groups, roles and authorities from the
+     * database. A user that is already a {@link LoggedUser} is reused so callers can convert once and publish many events.
+     */
+    private static LoggedUser resolveLoggedUser(AbstractUser user) {
+        return user instanceof LoggedUser loggedUser ? loggedUser : ActorTransformer.toLoggedUser(user);
     }
 
 }
