@@ -69,6 +69,31 @@ class TtlCacheTest {
     }
 
     @Test
+    void doesNotPublishValueLoadedAcrossClear() {
+        TtlCache<String, String> cache = new TtlCache<>(Duration.ofMinutes(1), 10);
+
+        // the clear happens while the loader is still running, i.e. the loaded value may predate the change
+        assertEquals("stale", cache.get("k", key -> {
+            cache.clear();
+            return "stale";
+        }));
+
+        assertEquals("fresh", cache.get("k", key -> "fresh"));
+    }
+
+    @Test
+    void doesNotPublishValueLoadedAcrossInvalidate() {
+        TtlCache<String, String> cache = new TtlCache<>(Duration.ofMinutes(1), 10);
+
+        assertEquals("stale", cache.get("k", key -> {
+            cache.invalidate("k");
+            return "stale";
+        }));
+
+        assertEquals("fresh", cache.get("k", key -> "fresh"));
+    }
+
+    @Test
     void nonPositiveTtlOrMaxSizeDisablesCaching() {
         AtomicInteger loads = new AtomicInteger();
 

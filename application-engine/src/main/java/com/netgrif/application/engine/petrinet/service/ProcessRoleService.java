@@ -91,8 +91,11 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
 
     @Override
     public ProcessRole save(ProcessRole processRole) {
-        roleByIdCache.clear();
-        return processRoleRepository.save(processRole);
+        try {
+            return processRoleRepository.save(processRole);
+        } finally {
+            roleByIdCache.clear();
+        }
     }
 
     @Override
@@ -213,13 +216,16 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
 
     @Override
     public List<ProcessRole> saveAll(Collection<ProcessRole> entities) {
-        roleByIdCache.clear();
-        return entities.stream().map(processRole -> {
-            if (!processRole.isGlobal() || findAllByImportId(processRole.getImportId(), Pageable.ofSize(1)).isEmpty()) {
-                return processRoleRepository.save(processRole);
-            }
-            return null;
-        }).filter(Objects::nonNull).collect(Collectors.toList());
+        try {
+            return entities.stream().map(processRole -> {
+                if (!processRole.isGlobal() || findAllByImportId(processRole.getImportId(), Pageable.ofSize(1)).isEmpty()) {
+                    return processRoleRepository.save(processRole);
+                }
+                return null;
+            }).filter(Objects::nonNull).collect(Collectors.toList());
+        } finally {
+            roleByIdCache.clear();
+        }
     }
 
     @Override
