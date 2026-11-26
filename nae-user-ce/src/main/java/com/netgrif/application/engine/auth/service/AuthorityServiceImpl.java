@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.adapter.spring.auth.domain.AuthorityImpl;
+import com.netgrif.application.engine.auth.config.AuthCacheProperties;
 import com.netgrif.application.engine.auth.repository.AuthorityRepository;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.objects.auth.dto.AuthoritySearchDto;
@@ -16,7 +17,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -28,12 +28,17 @@ public class AuthorityServiceImpl implements AuthorityService {
     /**
      * Authorities are resolved by id every time a user, group or logged user is converted (one query per authority),
      * so they are cached briefly. They are only ever created by this service, so entries cannot go stale except by
-     * deletion outside of it, which the TTL bounds.
+     * deletion outside of it, which the TTL bounds. Configured by {@link AuthCacheProperties}.
      */
-    private final TtlCache<String, Authority> authorityByIdCache = new TtlCache<>(Duration.ofSeconds(30), 1_000);
+    private TtlCache<String, Authority> authorityByIdCache;
 
     private AuthorityRepository authorityRepository;
     private MongoTemplate mongoTemplate;
+
+    @Autowired
+    public void setAuthCacheProperties(AuthCacheProperties authCacheProperties) {
+        this.authorityByIdCache = new TtlCache<>(authCacheProperties.getAuthority().getTtl(), authCacheProperties.getAuthority().getMaxSize());
+    }
 
     @Autowired
     public void setAuthorityRepository(AuthorityRepository authorityRepository) {

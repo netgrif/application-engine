@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.objects.utils;
 
+import com.netgrif.application.engine.objects.auth.domain.Authority;
+
 import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,15 +16,13 @@ import java.util.function.Function;
  * </p>
  * <p>
  * {@code null} loader results are never cached. When the cache reaches its maximum size it is cleared as a whole.
+ * A time to live or maximum size of zero or less disables caching: the loader is called on every {@link #get}.
  * </p>
  *
  * @param <K> key type
  * @param <V> value type
  */
 public class TtlCache<K, V> {
-
-    private record Entry<V>(V value, long expiresAtNanos) {
-    }
 
     private final Map<K, Entry<V>> entries = new ConcurrentHashMap<>();
     private final long ttlNanos;
@@ -38,6 +38,9 @@ public class TtlCache<K, V> {
      * The loader may return {@code null}, which is returned to the caller but not cached.
      */
     public V get(K key, Function<K, V> loader) {
+        if (ttlNanos <= 0 || maxSize <= 0) {
+            return loader.apply(key);
+        }
         long now = System.nanoTime();
         Entry<V> entry = entries.get(key);
         if (entry != null && now - entry.expiresAtNanos() < 0) {
@@ -61,5 +64,8 @@ public class TtlCache<K, V> {
 
     public void clear() {
         entries.clear();
+    }
+
+    private record Entry<V>(V value, long expiresAtNanos) {
     }
 }

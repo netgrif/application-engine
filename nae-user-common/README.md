@@ -88,6 +88,7 @@ providing your own service implementations.
 | Class                          | Purpose                                                                                                                                                      |
 |--------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `GroupConfigurationProperties` | `@ConfigurationProperties(prefix = "netgrif.engine.group")` — enables/disables default user groups and the shared system group; configures their identifiers |
+| `AuthCacheProperties`          | `@ConfigurationProperties(prefix = "netgrif.engine.auth.cache")` — TTL and maximum size of the in-memory caches of process roles and authorities resolved by id |
 | `JacksonConfiguration`         | Registers `AuthMethodConfigDeserializer` as a Jackson `Module` bean so `AuthMethodConfig` polymorphic deserialization works out-of-the-box                   |
 
 ---
@@ -99,6 +100,13 @@ providing your own service implementations.
 | `netgrif.engine.group.defaultEnabled`         | `true`                 | Create a personal default group for each new user |
 | `netgrif.engine.group.systemEnabled`          | `true`                 | Add each new user to the shared system group      |
 | `netgrif.engine.group.defaultGroupIdentifier` | `Default system group` | Identifier of the shared system group             |
+
+| Property                                          | Default | Description                                                                                          |
+|---------------------------------------------------|---------|------------------------------------------------------------------------------------------------------|
+| `netgrif.engine.auth.cache.process-role.ttl`      | `30s`   | How long a process role resolved by id stays cached. Zero or negative disables the cache             |
+| `netgrif.engine.auth.cache.process-role.max-size` | `10000` | Maximum number of cached process roles; the cache is cleared as a whole when the limit is reached    |
+| `netgrif.engine.auth.cache.authority.ttl`         | `30s`   | How long an authority resolved by id stays cached. Zero or negative disables the cache               |
+| `netgrif.engine.auth.cache.authority.max-size`    | `1000`  | Maximum number of cached authorities; the cache is cleared as a whole when the limit is reached      |
 
 ---
 

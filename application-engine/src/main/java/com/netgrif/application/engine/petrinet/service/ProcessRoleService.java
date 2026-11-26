@@ -4,6 +4,7 @@ import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.RoleN
 import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.RoleNotGlobalException;
 import com.netgrif.application.engine.adapter.spring.petrinet.domain.roles.RoleReferencedException;
 import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties;
+import com.netgrif.application.engine.auth.config.AuthCacheProperties;
 import com.netgrif.application.engine.auth.service.*;
 import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.objects.event.events.user.UserRoleChangeEvent;
@@ -33,7 +34,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -64,14 +64,17 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     /**
      * Roles are resolved by id every time a user, group or logged user is converted (one query per role), so they are
      * cached briefly. Writes done through this service clear the cache; the TTL bounds staleness for writes done elsewhere.
+     * Configured by {@link AuthCacheProperties}.
      */
-    private final TtlCache<String, ProcessRole> roleByIdCache = new TtlCache<>(Duration.ofSeconds(30), 10_000);
+    private final TtlCache<String, ProcessRole> roleByIdCache;
 
     public ProcessRoleService(ProcessRoleRepository processRoleRepository,
                               PetriNetRepository netRepository,
                               ApplicationEventPublisher publisher, RoleActionsRunner roleActionsRunner,
                               @Lazy IPetriNetService petriNetService, @Lazy UserService userService, ISecurityContextService securityContextService, @Lazy GroupService groupService,
-                              @Lazy RealmService realmService, @Lazy PaginationProperties paginationProperties, @Lazy IWorkflowService workflowService, @Lazy ITaskService taskService) {
+                              @Lazy RealmService realmService, @Lazy PaginationProperties paginationProperties, @Lazy IWorkflowService workflowService, @Lazy ITaskService taskService,
+                              AuthCacheProperties authCacheProperties) {
+        this.roleByIdCache = new TtlCache<>(authCacheProperties.getProcessRole().getTtl(), authCacheProperties.getProcessRole().getMaxSize());
         this.processRoleRepository = processRoleRepository;
         this.netRepository = netRepository;
         this.publisher = publisher;

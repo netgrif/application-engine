@@ -69,6 +69,21 @@ class TtlCacheTest {
     }
 
     @Test
+    void nonPositiveTtlOrMaxSizeDisablesCaching() {
+        AtomicInteger loads = new AtomicInteger();
+
+        TtlCache<String, String> zeroTtl = new TtlCache<>(Duration.ZERO, 10);
+        zeroTtl.get("k", key -> "v" + loads.incrementAndGet());
+        zeroTtl.get("k", key -> "v" + loads.incrementAndGet());
+
+        TtlCache<String, String> zeroSize = new TtlCache<>(Duration.ofMinutes(1), 0);
+        zeroSize.get("k", key -> "v" + loads.incrementAndGet());
+        zeroSize.get("k", key -> "v" + loads.incrementAndGet());
+
+        assertEquals(4, loads.get());
+    }
+
+    @Test
     void clearsWholeCacheWhenMaxSizeIsReached() {
         TtlCache<String, String> cache = new TtlCache<>(Duration.ofMinutes(1), 2);
         AtomicInteger loads = new AtomicInteger();
