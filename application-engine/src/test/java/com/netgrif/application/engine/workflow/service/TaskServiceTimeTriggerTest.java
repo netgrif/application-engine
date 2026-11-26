@@ -45,6 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
@@ -458,7 +459,7 @@ class TaskServiceTimeTriggerTest {
     }
 
     @Test
-    void warnsOnceWhenTaskHasMultipleTimeTriggersDuringTaskScheduling() {
+    void schedulesEveryTimeTriggerOfTheTaskWithoutDroppingAnyAndWarnsAboutTheCount() {
         Task task = task();
         when(task.getTriggers()).thenReturn(List.of(
                 new DateTimeTrigger("2025-01-15T12:34:00"),
@@ -480,10 +481,61 @@ class TaskServiceTimeTriggerTest {
 
         long warnCount = appender.list.stream()
                 .filter(event -> event.getLevel().equals(Level.WARN))
+                .filter(event -> event.getFormattedMessage().contains("[" + TASK_ID + "]"))
+                .filter(event -> event.getFormattedMessage().contains("[" + CASE_ID + "]"))
                 .filter(event -> event.getFormattedMessage().contains("has [2] time triggers"))
                 .count();
         assertEquals(1, warnCount);
-        verify(timeTriggerSchedulingService, times(2)).schedule(eq(task), any(LocalDateTime.class));
+        verify(timeTriggerSchedulingService).schedule(task, LocalDateTime.of(2025, 1, 15, 12, 34));
+        verify(timeTriggerSchedulingService).schedule(task, LocalDateTime.of(2025, 1, 16, 12, 34));
+    }
+
+    @Test
+    void doesNotWarnWhenTaskHasASingleTimeTrigger() {
+        Task task = task();
+        when(task.getTriggers()).thenReturn(List.of(new DateTimeTrigger("2025-01-15T12:34:00")));
+
+        Logger logger = (Logger) LoggerFactory.getLogger(TaskService.class);
+        ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        appender.start();
+        logger.addAppender(appender);
+
+        try {
+            ReflectionTestUtils.invokeMethod(service, "scheduleTimeTriggers", task, caseForScheduling());
+        } finally {
+            logger.detachAppender(appender);
+            appender.stop();
+        }
+
+        assertTrue(appender.list.stream().noneMatch(event -> event.getLevel().equals(Level.WARN)));
+        verify(timeTriggerSchedulingService).schedule(eq(task), any(LocalDateTime.class));
+    }
+
+    @Test
+    void logsErrorWithTaskAndCaseIdWhenSchedulingTheTimeTriggerFails() {
+        Task task = task();
+        Case useCase = caseForScheduling();
+        LocalDateTime dueAt = LocalDateTime.of(2025, 2, 3, 4, 5);
+        when(timeTriggerSchedulingService.schedule(task, dueAt)).thenReturn(false);
+
+        Logger logger = (Logger) LoggerFactory.getLogger(TaskService.class);
+        ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        appender.start();
+        logger.addAppender(appender);
+
+        try {
+            service.scheduleTaskExecution(task, dueAt, useCase);
+        } finally {
+            logger.detachAppender(appender);
+            appender.stop();
+        }
+
+        long errorCount = appender.list.stream()
+                .filter(event -> event.getLevel().equals(Level.ERROR))
+                .filter(event -> event.getFormattedMessage().contains("[" + TASK_ID + "]"))
+                .filter(event -> event.getFormattedMessage().contains("[" + CASE_ID + "]"))
+                .count();
+        assertEquals(1, errorCount);
     }
 
     @Test
@@ -570,7 +622,7 @@ class TaskServiceTimeTriggerTest {
     }
 
     @Test
-    void unschedulingSendsOnlyTasksWithTimeTrigger() {
+    void unschedulingSendsEveryDeletedTaskIdRegardlessOfTriggers() {
         List<Task> tasks = List.of(
                 timeTriggeredTask("task-1"),
                 taskWithTriggers("task-auto", List.of(new AutoTrigger())),
@@ -579,16 +631,16 @@ class TaskServiceTimeTriggerTest {
 
         service.delete(tasks, CASE_ID, true);
 
-        verify(timeTriggerSchedulingService).unscheduleAll(List.of("task-1", "task-2"));
+        verify(timeTriggerSchedulingService).unscheduleAll(List.of("task-1", "task-auto", "task-none", "task-2"));
     }
 
     @Test
-    void unschedulingTasksWithoutTimeTriggerSendsEmptyCollection() {
+    void unschedulingTasksWithoutTimeTriggerStillSendsTheirIds() {
         List<Task> tasks = List.of(taskWithTriggers("task-auto", List.of(new AutoTrigger())), taskWithTriggers("task-none", List.of()));
 
         service.delete(tasks, CASE_ID, true);
 
-        verify(timeTriggerSchedulingService).unscheduleAll(List.of());
+        verify(timeTriggerSchedulingService).unscheduleAll(List.of("task-auto", "task-none"));
     }
 
     @Test
@@ -600,7 +652,7 @@ class TaskServiceTimeTriggerTest {
 
         var order = inOrder(taskRepository, timeTriggerSchedulingService);
         order.verify(taskRepository).findAllByProcessId(PROCESS_ID);
-        order.verify(timeTriggerSchedulingService).unscheduleAll(List.of("task-1", "task-2"));
+        order.verify(timeTriggerSchedulingService).unscheduleAll(List.of("task-1", "task-auto", "task-2"));
         order.verify(taskRepository).deleteAllByProcessId(PROCESS_ID);
     }
 

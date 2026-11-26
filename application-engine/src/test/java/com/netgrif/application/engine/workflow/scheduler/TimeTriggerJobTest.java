@@ -154,12 +154,64 @@ class TimeTriggerJobTest {
     @Test
     void recordsScheduleFailedWhenRedeliveryCannotBeWritten() {
         givenRetryableExecutionFailure();
-        when(schedulingService.scheduleRedelivery(CASE_ID, TASK_ID, TRANSITION_ID, DUE_AT, 1)).thenReturn(false);
+        when(schedulingService.scheduleRedelivery(CASE_ID, TASK_ID, TRANSITION_ID, DUE_AT, 1)).thenReturn(TimeTriggerRedeliveryResult.FAILED);
 
         job.execute(context);
 
         verify(metrics).scheduleFailed();
         verify(metrics, never()).redelivered();
+    }
+
+    @Test
+    void skipsExecutionOfARetryWhenTheCanonicalJobWasRescheduledToAnotherDueAt() {
+        jobData.put("attempts", 1);
+        stubContextJobData();
+        when(schedulingService.isSuperseded(TASK_ID, DUE_AT)).thenReturn(true);
+
+        job.execute(context);
+
+        verify(taskService, never()).executeTimeTrigger(any(), any());
+        verify(metrics, never()).executed(any());
+        verify(metrics, never()).failed();
+        verify(metrics, never()).redelivered();
+        verify(schedulingService, never()).scheduleRedelivery(any(), any(), any(), anyLong(), anyInt());
+    }
+
+    @Test
+    void executesARetryWhenTheCanonicalJobIsNotSuperseded() {
+        jobData.put("attempts", 1);
+        stubContextJobData();
+        when(schedulingService.isSuperseded(TASK_ID, DUE_AT)).thenReturn(false);
+        when(taskService.executeTimeTrigger(TASK_ID, DUE_AT)).thenReturn(TimeTriggerOutcome.FIRED);
+        when(context.getFireTime()).thenReturn(new Date(DUE_AT));
+
+        job.execute(context);
+
+        verify(taskService).executeTimeTrigger(TASK_ID, DUE_AT);
+        verify(metrics).executed(TimeTriggerOutcome.FIRED);
+    }
+
+    @Test
+    void doesNotCheckForSupersessionOnTheFirstExecution() {
+        stubContextJobData();
+        when(taskService.executeTimeTrigger(TASK_ID, DUE_AT)).thenReturn(TimeTriggerOutcome.SKIPPED_ASSIGNED);
+
+        job.execute(context);
+
+        verify(schedulingService, never()).isSuperseded(any(), anyLong());
+        verify(taskService).executeTimeTrigger(TASK_ID, DUE_AT);
+    }
+
+    @Test
+    void doesNotRecordRedeliveredNorScheduleFailedWhenRedeliveryIsSuperseded() {
+        givenRetryableExecutionFailure();
+        when(schedulingService.scheduleRedelivery(CASE_ID, TASK_ID, TRANSITION_ID, DUE_AT, 1)).thenReturn(TimeTriggerRedeliveryResult.SUPERSEDED);
+
+        job.execute(context);
+
+        verify(metrics, never()).redelivered();
+        verify(metrics, never()).scheduleFailed();
+        verify(metrics, never()).failed();
     }
 
     @Test
@@ -170,7 +222,7 @@ class TimeTriggerJobTest {
         doThrow(new TimeTriggerRetryableException("execution failed", new IllegalStateException("execution failed")))
                 .when(taskService)
                 .executeTimeTrigger(TASK_ID, DUE_AT);
-        when(schedulingService.scheduleRedelivery(CASE_ID, TASK_ID, TRANSITION_ID, DUE_AT, 3)).thenReturn(true);
+        when(schedulingService.scheduleRedelivery(CASE_ID, TASK_ID, TRANSITION_ID, DUE_AT, 3)).thenReturn(TimeTriggerRedeliveryResult.SCHEDULED);
 
         assertDoesNotThrow(() -> job.execute(context));
 

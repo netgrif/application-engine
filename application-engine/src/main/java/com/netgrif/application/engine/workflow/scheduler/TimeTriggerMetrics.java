@@ -4,6 +4,7 @@ import com.netgrif.application.engine.workflow.service.TimeTriggerOutcome;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.stereotype.Component;
 
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -20,7 +21,7 @@ public class TimeTriggerMetrics {
     }
 
     public void executed(TimeTriggerOutcome outcome) {
-        registry.counter("netgrif.engine.time_trigger.executed", "outcome", outcome.name().toLowerCase()).increment();
+        registry.counter("netgrif.engine.time_trigger.executed", "outcome", outcome.name().toLowerCase(Locale.ROOT)).increment();
     }
 
     public void failed() {

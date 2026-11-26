@@ -734,13 +734,15 @@ public class TaskService implements ITaskService {
 
     protected void scheduleTaskExecution(Task task, LocalDateTime time, Case useCase) {
         log.info("[{}]: Task {} scheduled to run at {}", useCase.getStringId(), task.getTitle(), time);
-        timeTriggerSchedulingService.schedule(task, time);
+        if (!timeTriggerSchedulingService.schedule(task, time)) {
+            log.error("Failed to schedule time trigger of task [{}] of transition [{}] in case [{}] to run at {}", task.getStringId(), task.getTransitionId(), useCase.getStringId(), time);
+        }
     }
 
     private void scheduleTimeTriggers(Task task, Case useCase) {
         long timeTriggerCount = task.getTriggers().stream().filter(TimeTrigger.class::isInstance).count();
         if (timeTriggerCount > 1) {
-            log.warn("Task [{}] in case [{}] has [{}] time triggers but only one job is scheduled per task", task.getStringId(), task.getCaseId(), timeTriggerCount);
+            log.warn("Task [{}] in case [{}] has [{}] time triggers, all of them are scheduled", task.getStringId(), task.getCaseId(), timeTriggerCount);
         }
         for (Trigger trigger : task.getTriggers()) {
             if (trigger instanceof TimeTrigger timeTrigger) {
@@ -1078,11 +1080,7 @@ public class TaskService implements ITaskService {
     }
 
     private void unscheduleTimeTriggers(List<Task> tasks) {
-        List<String> timeTriggeredTaskIds = tasks.stream()
-                .filter(task -> task.getTriggers().stream().anyMatch(TimeTrigger.class::isInstance))
-                .map(Task::getStringId)
-                .toList();
-        timeTriggerSchedulingService.unscheduleAll(timeTriggeredTaskIds);
+        timeTriggerSchedulingService.unscheduleAll(tasks.stream().map(Task::getStringId).toList());
     }
 
     @Override

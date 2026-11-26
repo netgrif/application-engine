@@ -37,6 +37,11 @@ public class TimeTriggerJob implements Job {
         String taskId = data.getString("taskId");
         String transitionId = data.getString("transitionId");
 
+        if (isSupersededRedelivery(data, taskId)) {
+            log.info("Time trigger redelivery for task [{}] of transition [{}] in case [{}] skipped, the time trigger was rescheduled", taskId, transitionId, caseId);
+            return;
+        }
+
         try {
             Long dueAt = data.containsKey("dueAt") ? data.getLong("dueAt") : null;
             TimeTriggerOutcome outcome = taskService.executeTimeTrigger(taskId, dueAt);
@@ -61,6 +66,11 @@ public class TimeTriggerJob implements Job {
         }
     }
 
+    private boolean isSupersededRedelivery(JobDataMap data, String taskId) {
+        boolean isRedelivery = data.containsKey("attempts") && data.getIntValue("attempts") > 0;
+        return isRedelivery && data.containsKey("dueAt") && schedulingService.isSuperseded(taskId, data.getLongValue("dueAt"));
+    }
+
     private void redeliver(JobDataMap data, String caseId, String taskId, String transitionId) {
         int attempts = data.containsKey("attempts") ? data.getIntValue("attempts") : 0;
         if (attempts + 1 >= timeTriggerProperties.getRedeliver().getMaxAttempts()) {
@@ -69,11 +79,13 @@ public class TimeTriggerJob implements Job {
             return;
         }
 
-        if (schedulingService.scheduleRedelivery(caseId, taskId, transitionId, data.getLongValue("dueAt"), attempts + 1)) {
+        TimeTriggerRedeliveryResult result = schedulingService.scheduleRedelivery(caseId, taskId, transitionId, data.getLongValue("dueAt"), attempts + 1);
+        if (result == TimeTriggerRedeliveryResult.SCHEDULED) {
             metrics.redelivered();
             log.info("Time trigger redelivery scheduled for task [{}] of transition [{}] in case [{}] (attempt [{}])", taskId, transitionId, caseId, attempts + 1);
-        } else {
+        } else if (result == TimeTriggerRedeliveryResult.FAILED) {
             metrics.scheduleFailed();
+            log.error("Time trigger redelivery could not be stored for task [{}] of transition [{}] in case [{}] (attempt [{}]), the time trigger will not be redelivered", taskId, transitionId, caseId, attempts + 1);
         }
     }
 }

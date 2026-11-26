@@ -11,6 +11,7 @@ import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -35,7 +36,7 @@ class TimeTriggerQuartzConfigurationTest {
         Properties properties = quartzProperties();
 
         assertEquals("netgrif_onloadcode", properties.getProperty("org.quartz.scheduler.instanceName"));
-        assertEquals("netgrif_quartz", properties.getProperty("org.quartz.jobStore.collectionPrefix"));
+        assertEquals("netgrif_quartz_", properties.getProperty("org.quartz.jobStore.collectionPrefix"));
         assertEquals(
                 "com.netgrif.quartz.mongodb.cluster.NoOpErrorHandler",
                 properties.getProperty("org.quartz.jobStore.checkInErrorHandler")
@@ -56,6 +57,15 @@ class TimeTriggerQuartzConfigurationTest {
         assertEquals("10000", properties.getProperty("org.quartz.jobStore.misfireThreshold"));
         assertEquals("1200000", properties.getProperty("org.quartz.jobStore.triggerTimeoutMillis"));
         assertEquals("1200000", properties.getProperty("org.quartz.jobStore.jobTimeoutMillis"));
+    }
+
+    @Test
+    void readsCollectionPrefixAndWriteConcernTimeoutOnlyFromJobStoreProperties() throws Exception {
+        Properties properties = quartzProperties();
+
+        assertNull(properties.getProperty("org.quartz.scheduler.collectionPrefix"));
+        assertNull(properties.getProperty("org.quartz.scheduler.mongoOptionWriteConcernTimeoutMillis"));
+        assertEquals("10000", properties.getProperty("org.quartz.jobStore.mongoOptionWriteConcernTimeoutMillis"));
     }
 
     private Properties quartzProperties() throws Exception {

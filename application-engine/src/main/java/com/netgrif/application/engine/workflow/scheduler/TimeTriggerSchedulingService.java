@@ -4,6 +4,7 @@ import com.netgrif.application.engine.configuration.properties.TimeTriggerProper
 import com.netgrif.application.engine.objects.workflow.domain.Task;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobBuilder;
+import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.ObjectAlreadyExistsException;
@@ -41,7 +42,7 @@ public class TimeTriggerSchedulingService {
     @Autowired
     private TimeTriggerProperties timeTriggerProperties;
 
-    public void schedule(Task task, LocalDateTime startDate) {
+    public boolean schedule(Task task, LocalDateTime startDate) {
         long dueAt = toEpochMillis(startDate);
         JobDetail jobDetail = buildJobDetail(task, dueAt);
         SimpleTrigger trigger = buildTrigger(task.getStringId(), dueAt);
@@ -49,11 +50,13 @@ public class TimeTriggerSchedulingService {
         try {
             if (scheduleWithRetry(jobDetail, trigger)) {
                 metrics.scheduled();
-            } else {
-                metrics.scheduleFailed();
+                return true;
             }
+            metrics.scheduleFailed();
+            return false;
         } catch (ObjectAlreadyExistsException e) {
             log.info("Time trigger for task [{}] is already scheduled", task.getStringId());
+            return true;
         }
     }
 
@@ -62,6 +65,14 @@ public class TimeTriggerSchedulingService {
         long dueAt = toEpochMillis(startDate);
         JobDetail jobDetail = buildJobDetail(task, dueAt);
         SimpleTrigger trigger = buildTrigger(taskId, dueAt);
+
+        try {
+            deleteRetryJobs(taskId);
+        } catch (SchedulerException e) {
+            log.error("Failed to delete pending time trigger redeliveries of task [{}] in case [{}] before reschedule", taskId, task.getCaseId(), e);
+            metrics.scheduleFailed();
+            return false;
+        }
 
         try {
             scheduler.addJob(jobDetail, true, true);
@@ -76,7 +87,6 @@ public class TimeTriggerSchedulingService {
                 scheduler.deleteJob(jobDetail.getKey());
                 scheduler.scheduleJob(jobDetail, trigger);
             }
-            deleteRetryJobs(taskId);
             metrics.scheduled();
             return true;
         } catch (SchedulerException e) {
@@ -116,7 +126,17 @@ public class TimeTriggerSchedulingService {
                 .build();
     }
 
-    public boolean scheduleRedelivery(String caseId, String taskId, String transitionId, long dueAt, int attempt) {
+    public TimeTriggerRedeliveryResult scheduleRedelivery(String caseId, String taskId, String transitionId, long dueAt, int attempt) {
+        try {
+            if (isSupersededByReschedule(taskId, dueAt)) {
+                log.info("Time trigger redelivery for task [{}] of transition [{}] in case [{}] superseded by a reschedule (attempt [{}])", taskId, transitionId, caseId, attempt);
+                return TimeTriggerRedeliveryResult.SUPERSEDED;
+            }
+        } catch (SchedulerException e) {
+            log.error("Failed to read time trigger job of task [{}] in case [{}] before redelivery", taskId, caseId, e);
+            return TimeTriggerRedeliveryResult.FAILED;
+        }
+
         String retryKey = taskId + "#r" + attempt;
         long delay = timeTriggerProperties.getRedeliver().getDelay().toMillis();
         JobDetail jobDetail = jobBuilder(retryKey, caseId, taskId, transitionId, dueAt)
@@ -124,11 +144,29 @@ public class TimeTriggerSchedulingService {
                 .build();
         SimpleTrigger trigger = buildTrigger(retryKey, System.currentTimeMillis() + delay);
         try {
-            return scheduleWithRetry(jobDetail, trigger);
+            return scheduleWithRetry(jobDetail, trigger) ? TimeTriggerRedeliveryResult.SCHEDULED : TimeTriggerRedeliveryResult.FAILED;
         } catch (ObjectAlreadyExistsException e) {
             log.info("Time trigger redelivery for task [{}] of transition [{}] in case [{}] already scheduled (attempt [{}])", taskId, transitionId, caseId, attempt);
-            return true;
+            return TimeTriggerRedeliveryResult.SCHEDULED;
         }
+    }
+
+    public boolean isSuperseded(String taskId, long dueAt) {
+        try {
+            return isSupersededByReschedule(taskId, dueAt);
+        } catch (SchedulerException e) {
+            log.warn("Failed to read time trigger job of task [{}] to check for a reschedule, assuming it is not superseded", taskId, e);
+            return false;
+        }
+    }
+
+    private boolean isSupersededByReschedule(String taskId, long dueAt) throws SchedulerException {
+        JobDetail canonicalJob = scheduler.getJobDetail(new JobKey(taskId, GROUP));
+        if (canonicalJob == null) {
+            return false;
+        }
+        JobDataMap canonicalData = canonicalJob.getJobDataMap();
+        return !canonicalData.containsKey("dueAt") || canonicalData.getLong("dueAt") != dueAt;
     }
 
     private void deleteRetryJobs(String taskId) throws SchedulerException {

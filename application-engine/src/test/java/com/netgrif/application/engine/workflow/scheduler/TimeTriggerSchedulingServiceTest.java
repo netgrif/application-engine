@@ -136,7 +136,7 @@ class TimeTriggerSchedulingServiceTest {
                 .when(scheduler)
                 .scheduleJob(any(JobDetail.class), any(Trigger.class));
 
-        assertDoesNotThrow(() -> service.schedule(task(), LocalDateTime.of(2025, 1, 15, 12, 34)));
+        assertTrue(service.schedule(task(), LocalDateTime.of(2025, 1, 15, 12, 34)));
 
         verify(scheduler, times(1)).scheduleJob(any(JobDetail.class), any(Trigger.class));
         verify(metrics, never()).scheduled();
@@ -148,7 +148,7 @@ class TimeTriggerSchedulingServiceTest {
                 .thenThrow(new SchedulerException("scheduler unavailable"))
                 .thenReturn(new Date());
 
-        service.schedule(task(), LocalDateTime.of(2025, 1, 15, 12, 34));
+        assertTrue(service.schedule(task(), LocalDateTime.of(2025, 1, 15, 12, 34)));
 
         verify(scheduler, times(2)).scheduleJob(any(JobDetail.class), any(Trigger.class));
         verify(metrics, times(1)).scheduled();
@@ -161,7 +161,7 @@ class TimeTriggerSchedulingServiceTest {
                 .thenThrow(new SchedulerException("second scheduler failure"))
                 .thenReturn(new Date());
 
-        service.schedule(task(), LocalDateTime.of(2025, 1, 15, 12, 34));
+        assertTrue(service.schedule(task(), LocalDateTime.of(2025, 1, 15, 12, 34)));
 
         verify(scheduler, times(3)).scheduleJob(any(JobDetail.class), any(Trigger.class));
         verify(metrics, times(1)).scheduled();
@@ -173,7 +173,7 @@ class TimeTriggerSchedulingServiceTest {
                 .when(scheduler)
                 .scheduleJob(any(JobDetail.class), any(Trigger.class));
 
-        assertDoesNotThrow(() -> service.schedule(task(), LocalDateTime.of(2025, 1, 15, 12, 34)));
+        assertFalse(service.schedule(task(), LocalDateTime.of(2025, 1, 15, 12, 34)));
 
         verify(scheduler, times(3)).scheduleJob(any(JobDetail.class), any(Trigger.class));
         verify(metrics, never()).scheduled();
@@ -182,7 +182,7 @@ class TimeTriggerSchedulingServiceTest {
 
     @Test
     void doesNotRecordScheduleFailedWhenSchedulingSucceeds() throws Exception {
-        service.schedule(task(), LocalDateTime.of(2025, 1, 15, 12, 34));
+        assertTrue(service.schedule(task(), LocalDateTime.of(2025, 1, 15, 12, 34)));
 
         verify(metrics).scheduled();
         verify(metrics, never()).scheduleFailed();
@@ -253,7 +253,7 @@ class TimeTriggerSchedulingServiceTest {
         long dueAt = 1_735_000_000_000L;
         long before = System.currentTimeMillis();
 
-        assertTrue(service.scheduleRedelivery(CASE_ID, TASK_ID, TRANSITION_ID, dueAt, 3));
+        assertEquals(TimeTriggerRedeliveryResult.SCHEDULED, service.scheduleRedelivery(CASE_ID, TASK_ID, TRANSITION_ID, dueAt, 3));
 
         ArgumentCaptor<JobDetail> jobCaptor = ArgumentCaptor.forClass(JobDetail.class);
         ArgumentCaptor<Trigger> triggerCaptor = ArgumentCaptor.forClass(Trigger.class);
@@ -284,7 +284,7 @@ class TimeTriggerSchedulingServiceTest {
                 .thenThrow(new SchedulerException("second scheduler failure"))
                 .thenReturn(new Date());
 
-        assertTrue(service.scheduleRedelivery(CASE_ID, TASK_ID, TRANSITION_ID, 1L, 1));
+        assertEquals(TimeTriggerRedeliveryResult.SCHEDULED, service.scheduleRedelivery(CASE_ID, TASK_ID, TRANSITION_ID, 1L, 1));
 
         verify(scheduler, times(3)).scheduleJob(any(JobDetail.class), any(Trigger.class));
     }
@@ -295,7 +295,7 @@ class TimeTriggerSchedulingServiceTest {
                 .when(scheduler)
                 .scheduleJob(any(JobDetail.class), any(Trigger.class));
 
-        assertFalse(service.scheduleRedelivery(CASE_ID, TASK_ID, TRANSITION_ID, 1L, 1));
+        assertEquals(TimeTriggerRedeliveryResult.FAILED, service.scheduleRedelivery(CASE_ID, TASK_ID, TRANSITION_ID, 1L, 1));
 
         verify(scheduler, times(3)).scheduleJob(any(JobDetail.class), any(Trigger.class));
     }
@@ -306,9 +306,81 @@ class TimeTriggerSchedulingServiceTest {
                 .when(scheduler)
                 .scheduleJob(any(JobDetail.class), any(Trigger.class));
 
-        assertTrue(service.scheduleRedelivery(CASE_ID, TASK_ID, TRANSITION_ID, 1L, 1));
+        assertEquals(TimeTriggerRedeliveryResult.SCHEDULED, service.scheduleRedelivery(CASE_ID, TASK_ID, TRANSITION_ID, 1L, 1));
 
         verify(scheduler, times(1)).scheduleJob(any(JobDetail.class), any(Trigger.class));
+    }
+
+    @Test
+    void scheduleRedeliveryIsSupersededWhenCanonicalJobWasRescheduledToAnotherDueAt() throws Exception {
+        givenCanonicalJobWithDueAt(2L);
+
+        assertEquals(TimeTriggerRedeliveryResult.SUPERSEDED, service.scheduleRedelivery(CASE_ID, TASK_ID, TRANSITION_ID, 1L, 2));
+
+        verify(scheduler, never()).scheduleJob(any(JobDetail.class), any(Trigger.class));
+    }
+
+    @Test
+    void scheduleRedeliverySchedulesWhenCanonicalJobHasTheSameDueAt() throws Exception {
+        givenCanonicalJobWithDueAt(1L);
+
+        assertEquals(TimeTriggerRedeliveryResult.SCHEDULED, service.scheduleRedelivery(CASE_ID, TASK_ID, TRANSITION_ID, 1L, 2));
+
+        verify(scheduler).scheduleJob(any(JobDetail.class), any(Trigger.class));
+    }
+
+    @Test
+    void scheduleRedeliverySchedulesWhenCanonicalJobAlreadyCompleted() throws Exception {
+        when(scheduler.getJobDetail(new JobKey(TASK_ID, "timeTriggers"))).thenReturn(null);
+
+        assertEquals(TimeTriggerRedeliveryResult.SCHEDULED, service.scheduleRedelivery(CASE_ID, TASK_ID, TRANSITION_ID, 1L, 2));
+
+        verify(scheduler).scheduleJob(any(JobDetail.class), any(Trigger.class));
+    }
+
+    @Test
+    void scheduleRedeliveryFailsWhenCanonicalJobCannotBeRead() throws Exception {
+        when(scheduler.getJobDetail(new JobKey(TASK_ID, "timeTriggers"))).thenThrow(new SchedulerException("scheduler unavailable"));
+
+        assertEquals(TimeTriggerRedeliveryResult.FAILED, service.scheduleRedelivery(CASE_ID, TASK_ID, TRANSITION_ID, 1L, 2));
+
+        verify(scheduler, never()).scheduleJob(any(JobDetail.class), any(Trigger.class));
+    }
+
+    private void givenCanonicalJobWithDueAt(long dueAt) throws SchedulerException {
+        JobDetail canonicalJob = mock(JobDetail.class);
+        JobDataMap canonicalData = new JobDataMap();
+        canonicalData.put("dueAt", dueAt);
+        when(canonicalJob.getJobDataMap()).thenReturn(canonicalData);
+        when(scheduler.getJobDetail(new JobKey(TASK_ID, "timeTriggers"))).thenReturn(canonicalJob);
+    }
+
+    @Test
+    void isSupersededWhenCanonicalJobHasAnotherDueAt() throws Exception {
+        givenCanonicalJobWithDueAt(2L);
+
+        assertTrue(service.isSuperseded(TASK_ID, 1L));
+    }
+
+    @Test
+    void isNotSupersededWhenCanonicalJobHasTheSameDueAt() throws Exception {
+        givenCanonicalJobWithDueAt(1L);
+
+        assertFalse(service.isSuperseded(TASK_ID, 1L));
+    }
+
+    @Test
+    void isNotSupersededWhenCanonicalJobIsAbsent() throws Exception {
+        when(scheduler.getJobDetail(new JobKey(TASK_ID, "timeTriggers"))).thenReturn(null);
+
+        assertFalse(service.isSuperseded(TASK_ID, 1L));
+    }
+
+    @Test
+    void isNotSupersededWhenCanonicalJobCannotBeRead() throws Exception {
+        when(scheduler.getJobDetail(new JobKey(TASK_ID, "timeTriggers"))).thenThrow(new SchedulerException("scheduler unavailable"));
+
+        assertFalse(service.isSuperseded(TASK_ID, 1L));
     }
 
     @Test
@@ -388,7 +460,7 @@ class TimeTriggerSchedulingServiceTest {
         assertFalse(result);
         verify(scheduler, never()).rescheduleJob(any(TriggerKey.class), any(Trigger.class));
         verify(scheduler, never()).scheduleJob(any(JobDetail.class), any(Trigger.class));
-        verify(scheduler, never()).deleteJob(any(JobKey.class));
+        verify(scheduler, never()).deleteJob(new JobKey(TASK_ID, "timeTriggers"));
         assertEquals(1, registry.get("netgrif.engine.time_trigger.schedule_failed").counter().count());
         assertNull(registry.find("netgrif.engine.time_trigger.scheduled").counter());
     }
@@ -415,7 +487,7 @@ class TimeTriggerSchedulingServiceTest {
 
         assertFalse(result);
         verify(scheduler, never()).scheduleJob(any(JobDetail.class), any(Trigger.class));
-        verify(scheduler, never()).deleteJob(any(JobKey.class));
+        verify(scheduler, never()).deleteJob(new JobKey(TASK_ID, "timeTriggers"));
         verify(metrics).scheduleFailed();
         verify(metrics, never()).scheduled();
     }
@@ -435,8 +507,7 @@ class TimeTriggerSchedulingServiceTest {
     }
 
     @Test
-    void rescheduleReturnsFalseWhenClearingRetryJobsFails() throws Exception {
-        when(scheduler.rescheduleJob(any(TriggerKey.class), any(Trigger.class))).thenReturn(new Date());
+    void rescheduleReturnsFalseAndLeavesTheCanonicalJobUntouchedWhenClearingRetryJobsFails() throws Exception {
         doThrow(new SchedulerException("scheduler unavailable"))
                 .when(scheduler)
                 .deleteJob(any(JobKey.class));
@@ -444,8 +515,25 @@ class TimeTriggerSchedulingServiceTest {
         boolean result = service.reschedule(task(), LocalDateTime.of(2025, 1, 15, 12, 34));
 
         assertFalse(result);
+        verify(scheduler, never()).addJob(any(JobDetail.class), eq(true), eq(true));
+        verify(scheduler, never()).rescheduleJob(any(TriggerKey.class), any(Trigger.class));
+        verify(scheduler, never()).scheduleJob(any(JobDetail.class), any(Trigger.class));
         verify(metrics).scheduleFailed();
         verify(metrics, never()).scheduled();
+    }
+
+    @Test
+    void rescheduleDeletesPendingRetryJobsBeforeReplacingTheCanonicalJob() throws Exception {
+        when(scheduler.rescheduleJob(any(TriggerKey.class), any(Trigger.class))).thenReturn(new Date());
+
+        assertTrue(service.reschedule(task(), LocalDateTime.of(2025, 1, 15, 12, 34)));
+
+        InOrder inOrder = inOrder(scheduler);
+        for (int attempt = 1; attempt <= DEFAULT_MAX_ATTEMPTS; attempt++) {
+            inOrder.verify(scheduler).deleteJob(new JobKey(TASK_ID + "#r" + attempt, "timeTriggers"));
+        }
+        inOrder.verify(scheduler).addJob(any(JobDetail.class), eq(true), eq(true));
+        inOrder.verify(scheduler).rescheduleJob(any(TriggerKey.class), any(Trigger.class));
     }
 
     @Test
