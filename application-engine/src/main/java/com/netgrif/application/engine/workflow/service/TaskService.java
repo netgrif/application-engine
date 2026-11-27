@@ -650,27 +650,14 @@ public class TaskService implements ITaskService {
                 log.info("Cannot execute time trigger: task [{}] of transition [{}] in case [{}] is already finished", taskId, task.getTransitionId(), task.getCaseId());
                 return TimeTriggerOutcome.SKIPPED_ALREADY_FINISHED;
             }
-            Case useCase;
-            try {
-                useCase = workflowService.findOne(task.getCaseId());
-            } catch (IllegalArgumentException e) {
-                throw new TimeTriggerRetryableException("Cannot execute time trigger: case [" + task.getCaseId() + "] of task [" + taskId + "] does not exist", e);
-            }
+            Case useCase = findCaseOfTimeTriggeredTask(taskId, task);
             Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
             if (transition == null) {
                 log.info("Cannot execute time trigger: transition [{}] of task [{}] in case [{}] does not exist", task.getTransitionId(), taskId, task.getCaseId());
                 return TimeTriggerOutcome.SKIPPED_TRANSITION_MISSING;
             }
             if (task.getFinishDate() == null && task.getUserId() != null && task.getUserId().equals(userService.getSystem().getStringId())) {
-                log.warn("Time trigger: task [{}] of transition [{}] in case [{}] is assigned to the system user by an interrupted execution, finishing it", taskId, task.getTransitionId(), task.getCaseId());
-                try {
-                    dataService.getData(taskId);
-                    finishTask(TaskParams.with().task(task).build());
-                } catch (Exception e) {
-                    log.error("Time trigger resume failed for task [{}] of transition [{}] in case [{}]", taskId, task.getTransitionId(), task.getCaseId(), e);
-                    return TimeTriggerOutcome.RESUME_FAILED;
-                }
-                return TimeTriggerOutcome.RESUMED;
+                return resumeInterruptedTimeTrigger(taskId, task);
             }
             if (!isExecutable(transition, useCase.getPetriNet())) {
                 log.info("Cannot execute time trigger: transition [{}] of task [{}] in case [{}] is not executable", task.getTransitionId(), taskId, task.getCaseId());
@@ -680,14 +667,38 @@ public class TaskService implements ITaskService {
                 log.info("Cannot execute time trigger: task [{}] of transition [{}] in case [{}] is assigned to a user", taskId, task.getTransitionId(), task.getCaseId());
                 return TimeTriggerOutcome.SKIPPED_ASSIGNED;
             }
-            try {
-                performTransition(task, useCase);
-            } catch (TransitionNotExecutableException e) {
-                throw new RuntimeException(e);
-            }
+            performTransitionUnchecked(task, useCase);
             return TimeTriggerOutcome.FIRED;
         } catch (TransientDataAccessException e) {
             throw new TimeTriggerRetryableException("Cannot execute time trigger: transient data access failure for task [" + taskId + "]", e);
+        }
+    }
+
+    private Case findCaseOfTimeTriggeredTask(String taskId, Task task) {
+        try {
+            return workflowService.findOne(task.getCaseId());
+        } catch (IllegalArgumentException e) {
+            throw new TimeTriggerRetryableException("Cannot execute time trigger: case [" + task.getCaseId() + "] of task [" + taskId + "] does not exist", e);
+        }
+    }
+
+    private TimeTriggerOutcome resumeInterruptedTimeTrigger(String taskId, Task task) {
+        log.warn("Time trigger: task [{}] of transition [{}] in case [{}] is assigned to the system user by an interrupted execution, finishing it", taskId, task.getTransitionId(), task.getCaseId());
+        try {
+            dataService.getData(taskId);
+            finishTask(TaskParams.with().task(task).build());
+        } catch (Exception e) {
+            log.error("Time trigger resume failed for task [{}] of transition [{}] in case [{}]", taskId, task.getTransitionId(), task.getCaseId(), e);
+            return TimeTriggerOutcome.RESUME_FAILED;
+        }
+        return TimeTriggerOutcome.RESUMED;
+    }
+
+    private void performTransitionUnchecked(Task task, Case useCase) {
+        try {
+            performTransition(task, useCase);
+        } catch (TransitionNotExecutableException e) {
+            throw new RuntimeException(e);
         }
     }
 

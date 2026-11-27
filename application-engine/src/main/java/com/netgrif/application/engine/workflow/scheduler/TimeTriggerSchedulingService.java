@@ -15,7 +15,6 @@ import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -35,14 +34,15 @@ public class TimeTriggerSchedulingService {
     private static final int MAX_SCHEDULING_ATTEMPTS = 3;
     private static final long SCHEDULING_RETRY_DELAY_MS = 50;
 
-    @Autowired
-    private Scheduler scheduler;
+    private final Scheduler scheduler;
+    private final TimeTriggerMetrics metrics;
+    private final TimeTriggerProperties timeTriggerProperties;
 
-    @Autowired
-    private TimeTriggerMetrics metrics;
-
-    @Autowired
-    private TimeTriggerProperties timeTriggerProperties;
+    public TimeTriggerSchedulingService(Scheduler scheduler, TimeTriggerMetrics metrics, TimeTriggerProperties timeTriggerProperties) {
+        this.scheduler = scheduler;
+        this.metrics = metrics;
+        this.timeTriggerProperties = timeTriggerProperties;
+    }
 
     public boolean schedule(Task task, LocalDateTime startDate) {
         long dueAt = toEpochMillis(startDate);

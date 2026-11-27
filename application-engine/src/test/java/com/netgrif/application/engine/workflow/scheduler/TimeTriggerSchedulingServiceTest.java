@@ -19,7 +19,6 @@ import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -69,10 +68,7 @@ class TimeTriggerSchedulingServiceTest {
     @BeforeEach
     void setUp() {
         properties = new TimeTriggerProperties();
-        service = new TimeTriggerSchedulingService();
-        ReflectionTestUtils.setField(service, "scheduler", scheduler);
-        ReflectionTestUtils.setField(service, "metrics", metrics);
-        ReflectionTestUtils.setField(service, "timeTriggerProperties", properties);
+        service = new TimeTriggerSchedulingService(scheduler, metrics, properties);
     }
 
     @Test
@@ -182,7 +178,7 @@ class TimeTriggerSchedulingServiceTest {
     }
 
     @Test
-    void doesNotRecordScheduleFailedWhenSchedulingSucceeds() throws Exception {
+    void doesNotRecordScheduleFailedWhenSchedulingSucceeds() {
         assertTrue(service.schedule(task(), LocalDateTime.of(2025, Month.JANUARY, 15, 12, 34)));
 
         verify(metrics).scheduled();
@@ -192,7 +188,7 @@ class TimeTriggerSchedulingServiceTest {
     @Test
     void incrementsScheduleFailedCounterWhenAttemptsAreExhausted() throws Exception {
         SimpleMeterRegistry registry = new SimpleMeterRegistry();
-        ReflectionTestUtils.setField(service, "metrics", new TimeTriggerMetrics(registry));
+        service = new TimeTriggerSchedulingService(scheduler, new TimeTriggerMetrics(registry), properties);
         doThrow(new SchedulerException("scheduler unavailable"))
                 .when(scheduler)
                 .scheduleJob(any(JobDetail.class), any(Trigger.class));
@@ -230,7 +226,7 @@ class TimeTriggerSchedulingServiceTest {
     }
 
     @Test
-    void unscheduleAllDoesNothingForEmptyCollection() throws Exception {
+    void unscheduleAllDoesNothingForEmptyCollection() {
         service.unscheduleAll(List.of());
 
         verifyNoInteractions(scheduler);
@@ -451,7 +447,7 @@ class TimeTriggerSchedulingServiceTest {
     @Test
     void rescheduleReturnsFalseRecordsFailureAndSkipsRescheduleWhenAddJobFails() throws Exception {
         SimpleMeterRegistry registry = new SimpleMeterRegistry();
-        ReflectionTestUtils.setField(service, "metrics", new TimeTriggerMetrics(registry));
+        service = new TimeTriggerSchedulingService(scheduler, new TimeTriggerMetrics(registry), properties);
         doThrow(new SchedulerException("scheduler unavailable"))
                 .when(scheduler)
                 .addJob(any(JobDetail.class), eq(true), eq(true));
@@ -540,7 +536,7 @@ class TimeTriggerSchedulingServiceTest {
     @Test
     void rescheduleIncrementsMetricCountersOnRealRegistry() throws Exception {
         SimpleMeterRegistry registry = new SimpleMeterRegistry();
-        ReflectionTestUtils.setField(service, "metrics", new TimeTriggerMetrics(registry));
+        service = new TimeTriggerSchedulingService(scheduler, new TimeTriggerMetrics(registry), properties);
         when(scheduler.rescheduleJob(any(TriggerKey.class), any(Trigger.class)))
                 .thenReturn(new Date())
                 .thenThrow(new SchedulerException("scheduler unavailable"));
