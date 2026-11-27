@@ -41,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -121,6 +122,21 @@ class ProcessRoleServiceCacheTest {
 
         assertSame(role, processRoleService.findById(role.getStringId()));
 
+        verify(processRoleRepository, times(1)).findByIdObjectId(roleObjectId);
+    }
+
+    @Test
+    void exposedCacheIsTheOneUsedByFindById() {
+        // subclasses (e.g. cluster services) populate and clear the same cache through the protected getter
+        processRoleService.getRoleByIdCache().get(role.getStringId(), id -> role);
+
+        assertSame(role, processRoleService.findById(role.getStringId()));
+
+        verify(processRoleRepository, never()).findByIdObjectId(any());
+
+        processRoleService.getRoleByIdCache().clear();
+        when(processRoleRepository.findByIdObjectId(roleObjectId)).thenReturn(Optional.of(role));
+        assertSame(role, processRoleService.findById(role.getStringId()));
         verify(processRoleRepository, times(1)).findByIdObjectId(roleObjectId);
     }
 

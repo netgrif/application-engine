@@ -24,6 +24,7 @@ import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import lombok.AccessLevel;
 import lombok.Getter;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -64,8 +65,10 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     /**
      * Roles are resolved by id every time a user, group or logged user is converted (one query per role), so they are
      * cached briefly. Writes done through this service clear the cache; the TTL bounds staleness for writes done elsewhere.
-     * Configured by {@link AuthCacheProperties}.
+     * Configured by {@link AuthCacheProperties}. Exposed to subclasses, which must clear it after any write that does
+     * not go through this class.
      */
+    @Getter(AccessLevel.PROTECTED)
     private final InvalidationSafeCache<String, ProcessRole> roleByIdCache;
 
     public ProcessRoleService(ProcessRoleRepository processRoleRepository,

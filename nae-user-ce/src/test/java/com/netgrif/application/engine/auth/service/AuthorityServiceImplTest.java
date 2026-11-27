@@ -16,6 +16,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -76,6 +77,17 @@ class AuthorityServiceImplTest {
         authorityService.getOne(AUTHORITY_ID);
 
         verify(authorityRepository, times(2)).findById(AUTHORITY_ID);
+    }
+
+    @Test
+    void exposedCacheIsTheOneUsedByGetOne() {
+        // subclasses (e.g. cluster services) populate and clear the same cache through the protected getter
+        Authority authority = new AuthorityImpl("ROLE_TEST");
+        authorityService.getAuthorityByIdCache().get(AUTHORITY_ID, id -> authority);
+
+        assertSame(authority, authorityService.getOne(AUTHORITY_ID));
+
+        verify(authorityRepository, never()).findById(AUTHORITY_ID);
     }
 
     @Test

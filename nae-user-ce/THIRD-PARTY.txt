@@ -1,8 +1,9 @@
 
-Lists of 139 third-party dependencies.
+Lists of 140 third-party dependencies.
      (EPL-2.0) (LGPL-2.1-only) Logback Classic Module (ch.qos.logback:logback-classic:1.5.38 - http://logback.qos.ch/logback-classic)
      (EPL-2.0) (LGPL-2.1-only) Logback Core Module (ch.qos.logback:logback-core:1.5.38 - http://logback.qos.ch/logback-core)
      (The Apache Software License, Version 2.0) Jackson-annotations (com.fasterxml.jackson.core:jackson-annotations:2.21 - https://github.com/FasterXML/jackson)
+     (Apache License, Version 2.0) Caffeine cache (com.github.ben-manes.caffeine:caffeine:3.2.4 - https://github.com/ben-manes/caffeine)
      (Apache-2.0) Gson (com.google.code.gson:gson:2.13.2 - https://github.com/google/gson)
      (Apache 2.0) error-prone annotations (com.google.errorprone:error_prone_annotations:2.41.0 - https://errorprone.info/error_prone_annotations)
      (The Apache Software License, Version 2.0) ZXing Core (com.google.zxing:core:3.1.0 - http://github.com/zxing/zxing/core)
