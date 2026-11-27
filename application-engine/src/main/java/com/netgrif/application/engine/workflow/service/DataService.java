@@ -4,7 +4,9 @@ package com.netgrif.application.engine.workflow.service;
 import com.netgrif.application.engine.auth.service.GroupService;
 import com.netgrif.application.engine.configuration.properties.DataConfigurationProperties;
 import com.netgrif.application.engine.objects.auth.domain.AbstractUser;
+import com.netgrif.application.engine.objects.auth.domain.ActorTransformer;
 import com.netgrif.application.engine.objects.auth.domain.Group;
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.workflow.domain.EventNotExecutableException;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
@@ -152,7 +154,8 @@ public class DataService implements IDataService {
     @Override
     public GetDataEventOutcome getData(Task task, Case useCase, Map<String, String> params, boolean eventsEnabled) {
         log.info("[{}]: Getting data of task {} [{}]", useCase.getStringId(), task.getTransitionId(), task.getStringId());
-        AbstractUser user = userService.getLoggedOrSystem();
+        // converted once: every GetDataEvent below would otherwise re-resolve groups and roles from the database
+        LoggedUser user = ActorTransformer.toLoggedUser(userService.getLoggedOrSystem());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
         Set<String> fieldsIds = transition.getDataSet().keySet();
