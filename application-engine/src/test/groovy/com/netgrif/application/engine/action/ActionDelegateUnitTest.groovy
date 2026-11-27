@@ -10,12 +10,18 @@ import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.acti
 import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.runner.Expression
 import com.netgrif.application.engine.objects.workflow.domain.DataField
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId
+import com.netgrif.application.engine.objects.workflow.domain.Task
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner
+import com.netgrif.application.engine.workflow.scheduler.TimeTriggerSchedulingService
 import com.netgrif.application.engine.workflow.service.InitValueExpressionEvaluator
+import com.netgrif.application.engine.workflow.service.TaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.Test
+
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 import static org.junit.jupiter.api.Assertions.*
 import static org.mockito.ArgumentMatchers.*
@@ -221,6 +227,85 @@ class ActionDelegateUnitTest {
 
         verify(workflowService).save(foreignCase)
         verifyNoMoreInteractions(workflowService)
+    }
+
+    @Test
+    void scheduleExecutionAcceptsDateLocalDateTimeAndString() {
+        def delegate = new ActionDelegate()
+        def schedulingService = mock(TimeTriggerSchedulingService)
+        def taskService = mock(TaskService)
+        def task = mock(Task)
+        def expected = LocalDateTime.of(2030, 5, 17, 10, 30, 0)
+        delegate.@timeTriggerSchedulingService = schedulingService
+        delegate.@taskService = taskService
+        when(taskService.findOptionalById("task-id")).thenReturn(Optional.of(task))
+        when(schedulingService.reschedule(task, expected)).thenReturn(true)
+
+        def fromDate = Date.from(expected.atZone(ZoneId.systemDefault()).toInstant())
+
+        assertTrue(delegate.scheduleExecution("task-id", fromDate))
+        assertTrue(delegate.scheduleExecution("task-id", expected))
+        assertTrue(delegate.scheduleExecution("task-id", "2030-05-17T10:30:00"))
+
+        verify(schedulingService, times(3)).reschedule(task, expected)
+    }
+
+    @Test
+    void scheduleExecutionReturnsFalseWithoutReschedulingWhenTaskDoesNotExist() {
+        def delegate = new ActionDelegate()
+        def schedulingService = mock(TimeTriggerSchedulingService)
+        def taskService = mock(TaskService)
+        delegate.@timeTriggerSchedulingService = schedulingService
+        delegate.@taskService = taskService
+        when(taskService.findOptionalById("task-id")).thenReturn(Optional.empty())
+
+        assertFalse(delegate.scheduleExecution("task-id", LocalDateTime.of(2030, 5, 17, 10, 30, 0)))
+
+        verify(taskService).findOptionalById("task-id")
+        verify(taskService, never()).findOne(anyString())
+        verifyNoInteractions(schedulingService)
+    }
+
+    @Test
+    void scheduleExecutionReturnsFalseWhenSchedulingServiceFailsToReschedule() {
+        def delegate = new ActionDelegate()
+        def schedulingService = mock(TimeTriggerSchedulingService)
+        def taskService = mock(TaskService)
+        def task = mock(Task)
+        def dueAt = LocalDateTime.of(2030, 5, 17, 10, 30, 0)
+        delegate.@timeTriggerSchedulingService = schedulingService
+        delegate.@taskService = taskService
+        when(taskService.findOptionalById("task-id")).thenReturn(Optional.of(task))
+        when(schedulingService.reschedule(task, dueAt)).thenReturn(false)
+
+        assertFalse(delegate.scheduleExecution("task-id", dueAt))
+
+        verify(schedulingService).reschedule(task, dueAt)
+    }
+
+    @Test
+    void scheduleExecutionReturnsFalseWhenValueCannotBeConverted() {
+        def delegate = new ActionDelegate()
+        def schedulingService = mock(TimeTriggerSchedulingService)
+        delegate.@timeTriggerSchedulingService = schedulingService
+        delegate.@taskService = mock(TaskService)
+
+        assertFalse(delegate.scheduleExecution("task-id", null))
+        assertFalse(delegate.scheduleExecution("task-id", "not a date"))
+
+        verifyNoInteractions(schedulingService)
+    }
+
+    @Test
+    void scheduleExecutionReturnsFalseForUnsupportedValueTypeWithoutThrowing() {
+        def delegate = new ActionDelegate()
+        def schedulingService = mock(TimeTriggerSchedulingService)
+        delegate.@timeTriggerSchedulingService = schedulingService
+        delegate.@taskService = mock(TaskService)
+
+        assertFalse(delegate.scheduleExecution("task-id", 42))
+
+        verifyNoInteractions(schedulingService)
     }
 
     private ActionDelegate delegateWithDataService() {

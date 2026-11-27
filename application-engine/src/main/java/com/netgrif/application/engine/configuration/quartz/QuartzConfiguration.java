@@ -64,6 +64,7 @@ public class QuartzConfiguration {
     @Bean
     public SchedulerFactoryBean schedulerFactoryBean() throws Exception {
         Properties properties = new Properties();
+        properties.putAll(quartzProperties());
         if (mongoProperties.getHost() != null && !mongoProperties.getHost().equals("null")) {
             properties.setProperty("org.quartz.jobStore.mongoUri", "mongodb://" + mongoProperties.getHost() + ":27017/");
         } else if (mongoProperties.getUri() != null && !mongoProperties.getUri().equals("null")) {
@@ -75,11 +76,12 @@ public class QuartzConfiguration {
         properties.setProperty("org.quartz.jobStore.isClustered", "true");
         properties.setProperty("org.quartz.threadPool.threadCount", "1");
         properties.setProperty("org.quartz.scheduler.instanceName", "netgrif_onloadcode");
+        properties.setProperty("org.quartz.jobStore.checkInErrorHandler", "com.netgrif.quartz.mongodb.cluster.NoOpErrorHandler");
+        properties.setProperty("org.quartz.jobStore.jobDataAsBase64", "false");
         SchedulerFactoryBean schedulerFactory = new SchedulerFactoryBean();
         schedulerFactory.setApplicationContext(applicationContext);
         schedulerFactory.setAutoStartup(false);
         schedulerFactory.setApplicationContextSchedulerContextKey("applicationContext");
-        schedulerFactory.setQuartzProperties(quartzProperties());
         schedulerFactory.setQuartzProperties(properties);
         jobFactory.setApplicationContext(applicationContext);
         schedulerFactory.setJobFactory(jobFactory);
