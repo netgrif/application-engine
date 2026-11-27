@@ -42,6 +42,8 @@ public interface TaskRepository extends MongoRepository<Task, String>, QuerydslP
 
     void deleteAllByCaseId(String caseId);
 
+    List<Task> findAllByProcessId(String processId);
+
     void deleteAllByProcessId(String processId);
 
     @Query("{ '_id.objectId': ?0 }")

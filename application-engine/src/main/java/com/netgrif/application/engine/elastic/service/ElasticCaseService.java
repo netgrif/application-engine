@@ -519,14 +519,13 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
      */
 
     protected void buildCaseIdQuery(CaseSearchRequest request, BoolQuery.Builder query) {
+        if (request == null || (request.id == null && request.stringId == null)) {
+            return;
+        }
         List<String> validIds = Stream.concat(
                 Optional.ofNullable(request.stringId).orElse(Collections.emptyList()).stream(),
                 Optional.ofNullable(request.id).orElse(Collections.emptyList()).stream()
         ).filter(id -> id != null && !id.isBlank()).toList();
-
-        if (validIds.isEmpty()) {
-            return;
-        }
 
         TermsQueryField ids = new TermsQueryField.Builder()
                 .value(validIds.stream().map(FieldValue::of).collect(Collectors.toList()))

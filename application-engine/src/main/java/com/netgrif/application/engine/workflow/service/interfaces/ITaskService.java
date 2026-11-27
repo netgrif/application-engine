@@ -13,6 +13,7 @@ import com.netgrif.application.engine.objects.workflow.domain.eventoutcomes.task
 import com.netgrif.application.engine.workflow.domain.outcomes.ReloadTaskOutcome;
 import com.netgrif.application.engine.workflow.params.DelegateTaskParams;
 import com.netgrif.application.engine.workflow.params.TaskParams;
+import com.netgrif.application.engine.workflow.service.TimeTriggerOutcome;
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
 import org.springframework.data.domain.Page;
@@ -23,6 +24,8 @@ import java.util.*;
 public interface ITaskService {
 
     ReloadTaskOutcome reloadTasks(Case useCase, boolean lazyCaseSave);
+
+    TimeTriggerOutcome executeTimeTrigger(String taskId, Long dueAtMillis);
 
     Task findOne(String taskId);
 

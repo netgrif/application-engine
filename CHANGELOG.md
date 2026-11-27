@@ -5,7 +5,42 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-- Full Changelog: [https://github.com/netgrif/application-engine/commits/v7.0.0](https://github.com/netgrif/application-engine/commits/v7.0.0)
+- Full Changelog: [https://github.com/netgrif/application-engine/commits/v7.1.1](https://github.com/netgrif/application-engine/commits/v7.1.1)
+
+## [7.1.1](https://github.com/netgrif/application-engine/releases/tag/v7.1.1) (2026-11-27)
+
+### Changed
+- [NAE-2506] Persistence of time triggers of tasks
+- [NAE-2512] Performance improvement on GET DATA
+- [NAE-2511] CaseRef value with empty caseId
+
+## [7.1.0](https://github.com/netgrif/application-engine/releases/tag/v7.1.0) (2026-11-05)
+
+### Added
+- [NAE-2494] Data projections
+- [NAE-2487] Add Column Configuration and Sorting to Menu Item
+- [NAE-2502] Dashboard items: updateDashboardItem fails
+- [NAE-2286] Group API
+
+### Changed
+- [NAE-2451] Optimize and Reduce Outcome Size
+
+## [7.0.3](https://github.com/netgrif/application-engine/releases/tag/v7.0.3) (2026-09-02)
+
+### Changed
+- [NAE-2478] Persist Sorting in User Preference Data
+- [NAE-2479] Setting order to menu item
+
+## [7.0.2](https://github.com/netgrif/application-engine/releases/tag/v7.0.2) (2026-08-04)
+
+### Changed
+- [NAE-2464] Release 7.0.1 Bugfixes
+
+## [7.0.1](https://github.com/netgrif/application-engine/releases/tag/v7.0.1) (2026-07-02)
+
+### Changed
+- [NAE-2452] Post-release bugfixes
+- [NAE-2417] Fix dependency vulnerabilities
 
 ## [7.0.0](https://github.com/netgrif/application-engine/releases/tag/v7.0.0) (2024-11-22)
 

@@ -37,6 +37,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
+import com.netgrif.application.engine.objects.workflow.domain.triggers.TimeTrigger;
 import com.netgrif.application.engine.objects.workflow.domain.triggers.Trigger;
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
 import lombok.Getter;
@@ -1001,6 +1002,14 @@ public class Importer {
         Trigger trigger = triggerFactory.buildTrigger(importTrigger);
 
         transition.addTrigger(trigger);
+        validateSingleTimeTrigger(transition);
+    }
+
+    protected void validateSingleTimeTrigger(Transition transition) {
+        long timeTriggerCount = transition.getTriggers().stream().filter(TimeTrigger.class::isInstance).count();
+        if (timeTriggerCount > 1) {
+            throw new IllegalArgumentException("Transition [" + transition.getImportId() + "] declares [" + timeTriggerCount + "] time triggers, only one time trigger per transition is supported.");
+        }
     }
 
     protected void createPlace(com.netgrif.application.engine.objects.importer.model.Place importPlace) {
