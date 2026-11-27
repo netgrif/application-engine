@@ -1,7 +1,11 @@
 package com.netgrif.application.engine.objects.workflow.domain.triggers;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.TemporalAccessor;
 
 /**
  * Time trigger that will execute task at specified date and time in specified format (e.g. '2011-12-03T10:15:30').
@@ -21,7 +25,14 @@ public class DateTimeTrigger extends TimeTrigger {
      */
     public DateTimeTrigger(String timeString) throws DateTimeParseException {
         super(timeString);
-        startDate = LocalDateTime.parse(timeString);
+        startDate = parseStartDate(timeString);
+    }
+
+    private static LocalDateTime parseStartDate(String timeString) throws DateTimeParseException {
+        TemporalAccessor parsed = DateTimeFormatter.ISO_DATE_TIME.parseBest(timeString, OffsetDateTime::from, LocalDateTime::from);
+        return parsed instanceof OffsetDateTime offsetDateTime
+                ? offsetDateTime.atZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime()
+                : (LocalDateTime) parsed;
     }
 
     @Override
