@@ -77,6 +77,7 @@
         <jackson.version>3.1.8</jackson.version>
         <jackson.version.jsr310>3.1.8</jackson.version.jsr310>
         <spring.boot.version>4.1.2</spring.boot.version>
+        <caffeine.version>3.2.4</caffeine.version>
         <springdoc.version>3.0.3</springdoc.version>
 
         <mapstruct.version>1.6.3</mapstruct.version>

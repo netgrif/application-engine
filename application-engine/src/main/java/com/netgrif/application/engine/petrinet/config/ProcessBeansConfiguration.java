@@ -2,6 +2,7 @@ package com.netgrif.application.engine.petrinet.config;
 
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.adapter.spring.utils.PaginationProperties;
+import com.netgrif.application.engine.auth.config.AuthCacheProperties;
 import com.netgrif.application.engine.auth.service.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.RoleActionsRunner;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
@@ -33,7 +34,8 @@ public class ProcessBeansConfiguration {
                                                  @Lazy RealmService realmService,
                                                  @Lazy PaginationProperties paginationProperties,
                                                  @Lazy IWorkflowService workflowService,
-                                                 @Lazy ITaskService taskService
+                                                 @Lazy ITaskService taskService,
+                                                 AuthCacheProperties authCacheProperties
                                                  ) {
         return new com.netgrif.application.engine.petrinet.service.ProcessRoleService(
                 processRoleRepository,
@@ -47,7 +49,8 @@ public class ProcessBeansConfiguration {
                 realmService,
                 paginationProperties,
                 workflowService,
-                taskService
+                taskService,
+                authCacheProperties
         );
     }
 
