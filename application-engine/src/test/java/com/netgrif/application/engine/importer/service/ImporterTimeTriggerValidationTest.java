@@ -28,18 +28,22 @@ class ImporterTimeTriggerValidationTest {
 
     @Test
     void acceptsSingleTimeTriggerNextToOtherTriggers() throws Exception {
-        assertDoesNotThrow(() -> importer.addTrigger(transition, trigger(TriggerType.AUTO)));
-        assertDoesNotThrow(() -> importer.addTrigger(transition, timeTrigger("PT2M")));
+        Trigger autoTrigger = trigger(TriggerType.AUTO);
+        Trigger timeTrigger = timeTrigger("PT2M");
+
+        assertDoesNotThrow(() -> importer.addTrigger(transition, autoTrigger));
+        assertDoesNotThrow(() -> importer.addTrigger(transition, timeTrigger));
 
         assertEquals(2, transition.getTriggers().size());
     }
 
     @Test
     void rejectsSecondTimeTriggerWithTransitionImportIdAndCount() throws Exception {
+        Trigger secondTimeTrigger = timeTrigger("PT5M");
         importer.addTrigger(transition, timeTrigger("PT2M"));
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> importer.addTrigger(transition, timeTrigger("PT5M")));
+                () -> importer.addTrigger(transition, secondTimeTrigger));
 
         assertEquals("Transition [t1] declares [2] time triggers, only one time trigger per transition is supported.", exception.getMessage());
     }

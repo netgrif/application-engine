@@ -22,6 +22,7 @@ import org.quartz.TriggerKey;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.ZoneId;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -77,7 +78,7 @@ class TimeTriggerSchedulingServiceTest {
     @Test
     void schedulesSingleDurableRecoveryJobWithOnlyScalarTaskIdentifiers() throws Exception {
         Task task = task();
-        LocalDateTime dueAt = LocalDateTime.of(2025, 1, 15, 12, 34);
+        LocalDateTime dueAt = LocalDateTime.of(2025, Month.JANUARY, 15, 12, 34);
         long expectedEpochMillis = dueAt.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
         service.schedule(task, dueAt);
@@ -117,7 +118,7 @@ class TimeTriggerSchedulingServiceTest {
     @Test
     void resolvesLocalTimeUsingTheSystemDefaultZone() throws Exception {
         Task task = task();
-        LocalDateTime dueAt = LocalDateTime.of(2025, 3, 30, 2, 30);
+        LocalDateTime dueAt = LocalDateTime.of(2025, Month.MARCH, 30, 2, 30);
         long expectedEpochMillis = dueAt.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
         service.schedule(task, dueAt);
@@ -136,7 +137,7 @@ class TimeTriggerSchedulingServiceTest {
                 .when(scheduler)
                 .scheduleJob(any(JobDetail.class), any(Trigger.class));
 
-        assertTrue(service.schedule(task(), LocalDateTime.of(2025, 1, 15, 12, 34)));
+        assertTrue(service.schedule(task(), LocalDateTime.of(2025, Month.JANUARY, 15, 12, 34)));
 
         verify(scheduler, times(1)).scheduleJob(any(JobDetail.class), any(Trigger.class));
         verify(metrics, never()).scheduled();
@@ -148,7 +149,7 @@ class TimeTriggerSchedulingServiceTest {
                 .thenThrow(new SchedulerException("scheduler unavailable"))
                 .thenReturn(new Date());
 
-        assertTrue(service.schedule(task(), LocalDateTime.of(2025, 1, 15, 12, 34)));
+        assertTrue(service.schedule(task(), LocalDateTime.of(2025, Month.JANUARY, 15, 12, 34)));
 
         verify(scheduler, times(2)).scheduleJob(any(JobDetail.class), any(Trigger.class));
         verify(metrics, times(1)).scheduled();
@@ -161,7 +162,7 @@ class TimeTriggerSchedulingServiceTest {
                 .thenThrow(new SchedulerException("second scheduler failure"))
                 .thenReturn(new Date());
 
-        assertTrue(service.schedule(task(), LocalDateTime.of(2025, 1, 15, 12, 34)));
+        assertTrue(service.schedule(task(), LocalDateTime.of(2025, Month.JANUARY, 15, 12, 34)));
 
         verify(scheduler, times(3)).scheduleJob(any(JobDetail.class), any(Trigger.class));
         verify(metrics, times(1)).scheduled();
@@ -173,7 +174,7 @@ class TimeTriggerSchedulingServiceTest {
                 .when(scheduler)
                 .scheduleJob(any(JobDetail.class), any(Trigger.class));
 
-        assertFalse(service.schedule(task(), LocalDateTime.of(2025, 1, 15, 12, 34)));
+        assertFalse(service.schedule(task(), LocalDateTime.of(2025, Month.JANUARY, 15, 12, 34)));
 
         verify(scheduler, times(3)).scheduleJob(any(JobDetail.class), any(Trigger.class));
         verify(metrics, never()).scheduled();
@@ -182,7 +183,7 @@ class TimeTriggerSchedulingServiceTest {
 
     @Test
     void doesNotRecordScheduleFailedWhenSchedulingSucceeds() throws Exception {
-        assertTrue(service.schedule(task(), LocalDateTime.of(2025, 1, 15, 12, 34)));
+        assertTrue(service.schedule(task(), LocalDateTime.of(2025, Month.JANUARY, 15, 12, 34)));
 
         verify(metrics).scheduled();
         verify(metrics, never()).scheduleFailed();
@@ -196,7 +197,7 @@ class TimeTriggerSchedulingServiceTest {
                 .when(scheduler)
                 .scheduleJob(any(JobDetail.class), any(Trigger.class));
 
-        service.schedule(task(), LocalDateTime.of(2025, 1, 15, 12, 34));
+        service.schedule(task(), LocalDateTime.of(2025, Month.JANUARY, 15, 12, 34));
 
         assertEquals(1, registry.get("netgrif.engine.time_trigger.schedule_failed").counter().count());
         assertNull(registry.find("netgrif.engine.time_trigger.scheduled").counter());
@@ -385,7 +386,7 @@ class TimeTriggerSchedulingServiceTest {
 
     @Test
     void rescheduleReplacesExistingTriggerWithoutFallbackAndClearsRetryJobs() throws Exception {
-        LocalDateTime dueAt = LocalDateTime.of(2025, 1, 15, 12, 34);
+        LocalDateTime dueAt = LocalDateTime.of(2025, Month.JANUARY, 15, 12, 34);
         long expectedEpochMillis = dueAt.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
         TriggerKey triggerKey = new TriggerKey(TASK_ID, "timeTriggers");
         when(scheduler.rescheduleJob(eq(triggerKey), any(Trigger.class))).thenReturn(new Date());
@@ -408,7 +409,7 @@ class TimeTriggerSchedulingServiceTest {
 
     @Test
     void rescheduleFallsBackToScheduleJobWhenNoExistingTrigger() throws Exception {
-        LocalDateTime dueAt = LocalDateTime.of(2025, 1, 15, 12, 34);
+        LocalDateTime dueAt = LocalDateTime.of(2025, Month.JANUARY, 15, 12, 34);
         long expectedEpochMillis = dueAt.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
         when(scheduler.rescheduleJob(any(TriggerKey.class), any(Trigger.class))).thenReturn(null);
 
@@ -429,7 +430,7 @@ class TimeTriggerSchedulingServiceTest {
 
     @Test
     void rescheduleReplacesJobDataWithNewDueAtBeforeReschedulingTrigger() throws Exception {
-        LocalDateTime dueAt = LocalDateTime.of(2025, 6, 1, 8, 15);
+        LocalDateTime dueAt = LocalDateTime.of(2025, Month.JUNE, 1, 8, 15);
         long expectedEpochMillis = dueAt.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
         when(scheduler.rescheduleJob(any(TriggerKey.class), any(Trigger.class))).thenReturn(new Date());
 
@@ -455,7 +456,7 @@ class TimeTriggerSchedulingServiceTest {
                 .when(scheduler)
                 .addJob(any(JobDetail.class), eq(true), eq(true));
 
-        boolean result = service.reschedule(task(), LocalDateTime.of(2025, 1, 15, 12, 34));
+        boolean result = service.reschedule(task(), LocalDateTime.of(2025, Month.JANUARY, 15, 12, 34));
 
         assertFalse(result);
         verify(scheduler, never()).rescheduleJob(any(TriggerKey.class), any(Trigger.class));
@@ -469,7 +470,7 @@ class TimeTriggerSchedulingServiceTest {
     void rescheduleFallbackDeletesJobBeforeSchedulingItAgain() throws Exception {
         when(scheduler.rescheduleJob(any(TriggerKey.class), any(Trigger.class))).thenReturn(null);
 
-        assertTrue(service.reschedule(task(), LocalDateTime.of(2025, 1, 15, 12, 34)));
+        assertTrue(service.reschedule(task(), LocalDateTime.of(2025, Month.JANUARY, 15, 12, 34)));
 
         InOrder inOrder = inOrder(scheduler);
         inOrder.verify(scheduler).addJob(any(JobDetail.class), eq(true), eq(true));
@@ -483,7 +484,7 @@ class TimeTriggerSchedulingServiceTest {
         when(scheduler.rescheduleJob(any(TriggerKey.class), any(Trigger.class)))
                 .thenThrow(new SchedulerException("scheduler unavailable"));
 
-        boolean result = service.reschedule(task(), LocalDateTime.of(2025, 1, 15, 12, 34));
+        boolean result = service.reschedule(task(), LocalDateTime.of(2025, Month.JANUARY, 15, 12, 34));
 
         assertFalse(result);
         verify(scheduler, never()).scheduleJob(any(JobDetail.class), any(Trigger.class));
@@ -499,7 +500,7 @@ class TimeTriggerSchedulingServiceTest {
                 .when(scheduler)
                 .scheduleJob(any(JobDetail.class), any(Trigger.class));
 
-        boolean result = service.reschedule(task(), LocalDateTime.of(2025, 1, 15, 12, 34));
+        boolean result = service.reschedule(task(), LocalDateTime.of(2025, Month.JANUARY, 15, 12, 34));
 
         assertFalse(result);
         verify(metrics).scheduleFailed();
@@ -512,7 +513,7 @@ class TimeTriggerSchedulingServiceTest {
                 .when(scheduler)
                 .deleteJob(any(JobKey.class));
 
-        boolean result = service.reschedule(task(), LocalDateTime.of(2025, 1, 15, 12, 34));
+        boolean result = service.reschedule(task(), LocalDateTime.of(2025, Month.JANUARY, 15, 12, 34));
 
         assertFalse(result);
         verify(scheduler, never()).addJob(any(JobDetail.class), eq(true), eq(true));
@@ -526,7 +527,7 @@ class TimeTriggerSchedulingServiceTest {
     void rescheduleDeletesPendingRetryJobsBeforeReplacingTheCanonicalJob() throws Exception {
         when(scheduler.rescheduleJob(any(TriggerKey.class), any(Trigger.class))).thenReturn(new Date());
 
-        assertTrue(service.reschedule(task(), LocalDateTime.of(2025, 1, 15, 12, 34)));
+        assertTrue(service.reschedule(task(), LocalDateTime.of(2025, Month.JANUARY, 15, 12, 34)));
 
         InOrder inOrder = inOrder(scheduler);
         for (int attempt = 1; attempt <= DEFAULT_MAX_ATTEMPTS; attempt++) {
@@ -544,8 +545,8 @@ class TimeTriggerSchedulingServiceTest {
                 .thenReturn(new Date())
                 .thenThrow(new SchedulerException("scheduler unavailable"));
 
-        assertTrue(service.reschedule(task(), LocalDateTime.of(2025, 1, 15, 12, 34)));
-        assertFalse(service.reschedule(task(), LocalDateTime.of(2025, 1, 15, 12, 34)));
+        assertTrue(service.reschedule(task(), LocalDateTime.of(2025, Month.JANUARY, 15, 12, 34)));
+        assertFalse(service.reschedule(task(), LocalDateTime.of(2025, Month.JANUARY, 15, 12, 34)));
 
         assertEquals(1, registry.get("netgrif.engine.time_trigger.scheduled").counter().count());
         assertEquals(1, registry.get("netgrif.engine.time_trigger.schedule_failed").counter().count());

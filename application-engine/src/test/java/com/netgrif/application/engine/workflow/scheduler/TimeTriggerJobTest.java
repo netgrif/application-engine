@@ -232,7 +232,7 @@ class TimeTriggerJobTest {
     }
 
     @Test
-    void resumeFailureRecordsFailureWithoutSchedulingRedelivery() throws Exception {
+    void resumeFailureRecordsFailureWithoutSchedulingRedelivery() {
         stubContextJobData();
         when(taskService.executeTimeTrigger(TASK_ID, DUE_AT)).thenReturn(TimeTriggerOutcome.RESUME_FAILED);
 
@@ -245,7 +245,7 @@ class TimeTriggerJobTest {
     }
 
     @Test
-    void stopsRedeliveryWhenTheConfiguredAttemptLimitIsReached() throws Exception {
+    void stopsRedeliveryWhenTheConfiguredAttemptLimitIsReached() {
         properties.getRedeliver().setMaxAttempts(2);
         jobData.put("attempts", 1);
         stubContextJobData();
@@ -263,7 +263,7 @@ class TimeTriggerJobTest {
     }
 
     @Test
-    void doesNotRetryUnexpectedRuntimeFailureAndRecordsFailure() throws Exception {
+    void doesNotRetryUnexpectedRuntimeFailureAndRecordsFailure() {
         stubContextJobData();
         doThrow(new IllegalStateException("unexpected execution failure"))
                 .when(taskService)

@@ -33,6 +33,7 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -57,7 +58,6 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -67,7 +67,7 @@ class TaskServiceTimeTriggerTest {
     private static final String CASE_ID = "case-456";
     private static final String TRANSITION_ID = "transition-789";
     private static final String PROCESS_ID = "process-321";
-    private static final LocalDateTime DUE_AT = LocalDateTime.of(2025, 1, 15, 12, 34);
+    private static final LocalDateTime DUE_AT = LocalDateTime.of(2025, Month.JANUARY, 15, 12, 34);
     private static final long DUE_AT_MILLIS = DUE_AT.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
     private TaskService service;
@@ -168,7 +168,8 @@ class TaskServiceTimeTriggerTest {
         Task task = task();
         when(task.getFinishDate()).thenReturn(DUE_AT.minusSeconds(1));
         lenient().when(task.getUserId()).thenReturn("system-user");
-        Case useCase = useCase(mock(Transition.class));
+        Transition transition = mock(Transition.class);
+        Case useCase = useCase(transition);
         doReturn(Optional.of(task)).when(service).findOptionalById(TASK_ID);
         when(workflowService.findOne(CASE_ID)).thenReturn(useCase);
         doReturn(true).when(service).isExecutable(any(), any());
@@ -219,7 +220,8 @@ class TaskServiceTimeTriggerTest {
         Task task = task();
         when(task.getFinishDate()).thenReturn(null);
         when(task.getUserId()).thenReturn("system-user");
-        Case useCase = useCase(mock(Transition.class));
+        Transition transition = mock(Transition.class);
+        Case useCase = useCase(transition);
         doReturn(Optional.of(task)).when(service).findOptionalById(TASK_ID);
         when(workflowService.findOne(CASE_ID)).thenReturn(useCase);
         doReturn(null).when(service).finishTask(any(TaskParams.class));
@@ -341,7 +343,8 @@ class TaskServiceTimeTriggerTest {
     void returnsResumeFailedWhenLoadingDataForSystemAssignedTaskFailsTransiently() throws Exception {
         Task task = task();
         when(task.getUserId()).thenReturn("system-user");
-        Case useCase = useCase(mock(Transition.class));
+        Transition transition = mock(Transition.class);
+        Case useCase = useCase(transition);
         doReturn(Optional.of(task)).when(service).findOptionalById(TASK_ID);
         when(workflowService.findOne(CASE_ID)).thenReturn(useCase);
         TransientDataAccessException dataFailure = transientFailure("data loading failed");
@@ -356,7 +359,8 @@ class TaskServiceTimeTriggerTest {
     void returnsResumeFailedWhenLoadingDataForSystemAssignedTaskFailsNonTransiently() throws Exception {
         Task task = task();
         when(task.getUserId()).thenReturn("system-user");
-        Case useCase = useCase(mock(Transition.class));
+        Transition transition = mock(Transition.class);
+        Case useCase = useCase(transition);
         doReturn(Optional.of(task)).when(service).findOptionalById(TASK_ID);
         when(workflowService.findOne(CASE_ID)).thenReturn(useCase);
         IllegalStateException dataFailure = new IllegalStateException("data loading failed");
@@ -372,7 +376,8 @@ class TaskServiceTimeTriggerTest {
     void returnsResumeFailedWhenFinishingSystemAssignedTaskFailsTransiently() throws Exception {
         Task task = task();
         when(task.getUserId()).thenReturn("system-user");
-        Case useCase = useCase(mock(Transition.class));
+        Transition transition = mock(Transition.class);
+        Case useCase = useCase(transition);
         doReturn(Optional.of(task)).when(service).findOptionalById(TASK_ID);
         when(workflowService.findOne(CASE_ID)).thenReturn(useCase);
         TransientDataAccessException finishFailure = transientFailure("finish failed");
@@ -386,7 +391,8 @@ class TaskServiceTimeTriggerTest {
     void returnsResumeFailedWhenFinishingSystemAssignedTaskFailsNonTransiently() throws Exception {
         Task task = task();
         when(task.getUserId()).thenReturn("system-user");
-        Case useCase = useCase(mock(Transition.class));
+        Transition transition = mock(Transition.class);
+        Case useCase = useCase(transition);
         doReturn(Optional.of(task)).when(service).findOptionalById(TASK_ID);
         when(workflowService.findOne(CASE_ID)).thenReturn(useCase);
         IllegalStateException finishFailure = new IllegalStateException("finish failed");
@@ -486,8 +492,8 @@ class TaskServiceTimeTriggerTest {
                 .filter(event -> event.getFormattedMessage().contains("has [2] time triggers"))
                 .count();
         assertEquals(1, warnCount);
-        verify(timeTriggerSchedulingService).schedule(task, LocalDateTime.of(2025, 1, 15, 12, 34));
-        verify(timeTriggerSchedulingService).schedule(task, LocalDateTime.of(2025, 1, 16, 12, 34));
+        verify(timeTriggerSchedulingService).schedule(task, LocalDateTime.of(2025, Month.JANUARY, 15, 12, 34));
+        verify(timeTriggerSchedulingService).schedule(task, LocalDateTime.of(2025, Month.JANUARY, 16, 12, 34));
     }
 
     @Test
@@ -515,7 +521,7 @@ class TaskServiceTimeTriggerTest {
     void logsErrorWithTaskAndCaseIdWhenSchedulingTheTimeTriggerFails() {
         Task task = task();
         Case useCase = caseForScheduling();
-        LocalDateTime dueAt = LocalDateTime.of(2025, 2, 3, 4, 5);
+        LocalDateTime dueAt = LocalDateTime.of(2025, Month.FEBRUARY, 3, 4, 5);
         when(timeTriggerSchedulingService.schedule(task, dueAt)).thenReturn(false);
 
         Logger logger = (Logger) LoggerFactory.getLogger(TaskService.class);
@@ -542,7 +548,7 @@ class TaskServiceTimeTriggerTest {
     void alwaysSchedulesThroughQuartzAndHasNoInMemoryScheduler() {
         Task task = task();
         Case useCase = caseForScheduling();
-        LocalDateTime dueAt = LocalDateTime.of(2025, 2, 3, 4, 5);
+        LocalDateTime dueAt = LocalDateTime.of(2025, Month.FEBRUARY, 3, 4, 5);
 
         service.scheduleTaskExecution(task, dueAt, useCase);
 
@@ -554,16 +560,19 @@ class TaskServiceTimeTriggerTest {
 
     @Test
     void reloadsTasksOnlyAfterSavingThemAndTheirCase() {
-        LocalDateTime dueAt = LocalDateTime.of(2025, 2, 3, 4, 5);
+        LocalDateTime dueAt = LocalDateTime.of(2025, Month.FEBRUARY, 3, 4, 5);
         Transition transition = schedulableTransition(dueAt);
         PetriNet petriNet = mock(PetriNet.class);
         when(petriNet.getTransitions()).thenReturn(new LinkedHashMap<>(Map.of(TRANSITION_ID, transition)));
         Case useCase = caseForReload(petriNet);
         when(workflowService.resolveActorRef(useCase, false)).thenReturn(useCase);
         when(workflowService.save(useCase)).thenReturn(useCase);
-        when(processRoleService.getDefaultRole()).thenReturn(mock(ProcessRole.class));
-        when(processRoleService.getAnonymousRole()).thenReturn(mock(ProcessRole.class));
-        when(userService.getLoggedOrSystem()).thenReturn(mock(AbstractUser.class));
+        ProcessRole defaultRole = mock(ProcessRole.class);
+        ProcessRole anonymousRole = mock(ProcessRole.class);
+        AbstractUser loggedOrSystemUser = mock(AbstractUser.class);
+        when(processRoleService.getDefaultRole()).thenReturn(defaultRole);
+        when(processRoleService.getAnonymousRole()).thenReturn(anonymousRole);
+        when(userService.getLoggedOrSystem()).thenReturn(loggedOrSystemUser);
         when(taskRepository.saveAll(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
         doReturn(true).when(service).isExecutable(transition, petriNet);
 
@@ -577,7 +586,7 @@ class TaskServiceTimeTriggerTest {
 
     @Test
     void doesNotScheduleTimeTriggerForTaskAutoExecutedDuringReload() {
-        LocalDateTime dueAt = LocalDateTime.of(2025, 2, 3, 4, 5);
+        LocalDateTime dueAt = LocalDateTime.of(2025, Month.FEBRUARY, 3, 4, 5);
         Transition transition = schedulableTransition(dueAt);
         when(transition.hasAutoTrigger()).thenReturn(true);
         when(transition.getTriggers()).thenReturn(List.of(new AutoTrigger(), new DateTimeTrigger(dueAt.toString())));
@@ -586,9 +595,12 @@ class TaskServiceTimeTriggerTest {
         Case useCase = caseForReload(petriNet);
         when(workflowService.resolveActorRef(useCase, false)).thenReturn(useCase);
         when(workflowService.save(useCase)).thenReturn(useCase);
-        when(processRoleService.getDefaultRole()).thenReturn(mock(ProcessRole.class));
-        when(processRoleService.getAnonymousRole()).thenReturn(mock(ProcessRole.class));
-        when(userService.getLoggedOrSystem()).thenReturn(mock(AbstractUser.class));
+        ProcessRole defaultRole = mock(ProcessRole.class);
+        ProcessRole anonymousRole = mock(ProcessRole.class);
+        AbstractUser loggedOrSystemUser = mock(AbstractUser.class);
+        when(processRoleService.getDefaultRole()).thenReturn(defaultRole);
+        when(processRoleService.getAnonymousRole()).thenReturn(anonymousRole);
+        when(userService.getLoggedOrSystem()).thenReturn(loggedOrSystemUser);
         when(taskRepository.saveAll(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
         doReturn(true).when(service).isExecutable(transition, petriNet);
         doNothing().when(service).executeTransition(any(Task.class), eq(useCase));

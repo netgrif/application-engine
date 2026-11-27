@@ -30,6 +30,8 @@ import java.util.List;
 public class TimeTriggerSchedulingService {
 
     private static final String GROUP = "timeTriggers";
+    private static final String DUE_AT_KEY = "dueAt";
+    private static final String ATTEMPTS_KEY = "attempts";
     private static final int MAX_SCHEDULING_ATTEMPTS = 3;
     private static final long SCHEDULING_RETRY_DELAY_MS = 50;
 
@@ -112,7 +114,7 @@ public class TimeTriggerSchedulingService {
                 .usingJobData("caseId", caseId)
                 .usingJobData("taskId", taskId)
                 .usingJobData("transitionId", transitionId)
-                .usingJobData("dueAt", dueAt);
+                .usingJobData(DUE_AT_KEY, dueAt);
     }
 
     private SimpleTrigger buildTrigger(String jobName, long startAtMillis) {
@@ -140,7 +142,7 @@ public class TimeTriggerSchedulingService {
         String retryKey = taskId + "#r" + attempt;
         long delay = timeTriggerProperties.getRedeliver().getDelay().toMillis();
         JobDetail jobDetail = jobBuilder(retryKey, caseId, taskId, transitionId, dueAt)
-                .usingJobData("attempts", attempt)
+                .usingJobData(ATTEMPTS_KEY, attempt)
                 .build();
         SimpleTrigger trigger = buildTrigger(retryKey, System.currentTimeMillis() + delay);
         try {
@@ -166,7 +168,7 @@ public class TimeTriggerSchedulingService {
             return false;
         }
         JobDataMap canonicalData = canonicalJob.getJobDataMap();
-        return !canonicalData.containsKey("dueAt") || canonicalData.getLong("dueAt") != dueAt;
+        return !canonicalData.containsKey(DUE_AT_KEY) || canonicalData.getLong(DUE_AT_KEY) != dueAt;
     }
 
     private void deleteRetryJobs(String taskId) throws SchedulerException {

@@ -15,6 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 @DisallowConcurrentExecution
 public class TimeTriggerJob implements Job {
 
+    private static final String DUE_AT_KEY = "dueAt";
+    private static final String ATTEMPTS_KEY = "attempts";
+
     @Autowired
     private ITaskService taskService;
 
@@ -26,9 +29,6 @@ public class TimeTriggerJob implements Job {
 
     @Autowired
     private TimeTriggerMetrics metrics;
-
-    public TimeTriggerJob() {
-    }
 
     @Override
     public void execute(JobExecutionContext context) {
@@ -43,12 +43,12 @@ public class TimeTriggerJob implements Job {
         }
 
         try {
-            Long dueAt = data.containsKey("dueAt") ? data.getLong("dueAt") : null;
+            Long dueAt = data.containsKey(DUE_AT_KEY) ? data.getLong(DUE_AT_KEY) : null;
             TimeTriggerOutcome outcome = taskService.executeTimeTrigger(taskId, dueAt);
             metrics.executed(outcome);
             if (outcome == TimeTriggerOutcome.FIRED) {
-                if (data.containsKey("dueAt")) {
-                    long lateness = context.getFireTime().getTime() - data.getLongValue("dueAt");
+                if (data.containsKey(DUE_AT_KEY)) {
+                    long lateness = context.getFireTime().getTime() - data.getLongValue(DUE_AT_KEY);
                     if (lateness >= 0) {
                         metrics.lateness(lateness);
                     } else {
@@ -67,19 +67,19 @@ public class TimeTriggerJob implements Job {
     }
 
     private boolean isSupersededRedelivery(JobDataMap data, String taskId) {
-        boolean isRedelivery = data.containsKey("attempts") && data.getIntValue("attempts") > 0;
-        return isRedelivery && data.containsKey("dueAt") && schedulingService.isSuperseded(taskId, data.getLongValue("dueAt"));
+        boolean isRedelivery = data.containsKey(ATTEMPTS_KEY) && data.getIntValue(ATTEMPTS_KEY) > 0;
+        return isRedelivery && data.containsKey(DUE_AT_KEY) && schedulingService.isSuperseded(taskId, data.getLongValue(DUE_AT_KEY));
     }
 
     private void redeliver(JobDataMap data, String caseId, String taskId, String transitionId) {
-        int attempts = data.containsKey("attempts") ? data.getIntValue("attempts") : 0;
+        int attempts = data.containsKey(ATTEMPTS_KEY) ? data.getIntValue(ATTEMPTS_KEY) : 0;
         if (attempts + 1 >= timeTriggerProperties.getRedeliver().getMaxAttempts()) {
             metrics.failed();
             log.error("Time trigger redelivery exhausted for task [{}] of transition [{}] in case [{}] after [{}] attempts", taskId, transitionId, caseId, attempts + 1);
             return;
         }
 
-        TimeTriggerRedeliveryResult result = schedulingService.scheduleRedelivery(caseId, taskId, transitionId, data.getLongValue("dueAt"), attempts + 1);
+        TimeTriggerRedeliveryResult result = schedulingService.scheduleRedelivery(caseId, taskId, transitionId, data.getLongValue(DUE_AT_KEY), attempts + 1);
         if (result == TimeTriggerRedeliveryResult.SCHEDULED) {
             metrics.redelivered();
             log.info("Time trigger redelivery scheduled for task [{}] of transition [{}] in case [{}] (attempt [{}])", taskId, transitionId, caseId, attempts + 1);
