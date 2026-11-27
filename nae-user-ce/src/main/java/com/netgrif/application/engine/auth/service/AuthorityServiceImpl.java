@@ -5,7 +5,7 @@ import com.netgrif.application.engine.auth.config.AuthCacheProperties;
 import com.netgrif.application.engine.auth.repository.AuthorityRepository;
 import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.objects.auth.dto.AuthoritySearchDto;
-import com.netgrif.application.engine.objects.utils.TtlCache;
+import com.netgrif.application.engine.objects.utils.InvalidationSafeCache;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,14 +30,14 @@ public class AuthorityServiceImpl implements AuthorityService {
      * so they are cached briefly. They are only ever created by this service, so entries cannot go stale except by
      * deletion outside of it, which the TTL bounds. Configured by {@link AuthCacheProperties}.
      */
-    private TtlCache<String, Authority> authorityByIdCache;
+    private InvalidationSafeCache<String, Authority> authorityByIdCache;
 
     private AuthorityRepository authorityRepository;
     private MongoTemplate mongoTemplate;
 
     @Autowired
     public void setAuthCacheProperties(AuthCacheProperties authCacheProperties) {
-        this.authorityByIdCache = new TtlCache<>(authCacheProperties.getAuthority().getTtl(), authCacheProperties.getAuthority().getMaxSize());
+        this.authorityByIdCache = new InvalidationSafeCache<>(authCacheProperties.getAuthority().getTtl(), authCacheProperties.getAuthority().getMaxSize());
     }
 
     @Autowired

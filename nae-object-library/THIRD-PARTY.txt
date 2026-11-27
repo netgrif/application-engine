@@ -1,7 +1,9 @@
 
-Lists of 28 third-party dependencies.
+Lists of 30 third-party dependencies.
      (The Apache Software License, Version 2.0) Jackson-annotations (com.fasterxml.jackson.core:jackson-annotations:2.21 - https://github.com/FasterXML/jackson)
      (The Apache License, Version 2.0) Woodstox (com.fasterxml.woodstox:woodstox-core:7.1.1 - https://github.com/FasterXML/woodstox)
+     (Apache License, Version 2.0) Caffeine cache (com.github.ben-manes.caffeine:caffeine:3.2.4 - https://github.com/ben-manes/caffeine)
+     (Apache 2.0) error-prone annotations (com.google.errorprone:error_prone_annotations:2.49.0 - https://errorprone.info/error_prone_annotations)
      (The Apache Software License, Version 2.0) ZXing Core (com.google.zxing:core:3.1.0 - http://github.com/zxing/zxing/core)
      (The Apache Software License, Version 2.0) lang (com.mysema.commons:mysema-commons-lang:0.2.4 - http://www.github.com/mysema/mysema-commons-lang)
      (Apache License, Version 2.0) Querydsl - Core module (com.querydsl:querydsl-core:5.1.0 - http://www.querydsl.com)

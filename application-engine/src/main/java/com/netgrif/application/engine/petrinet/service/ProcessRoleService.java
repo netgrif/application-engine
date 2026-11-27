@@ -19,7 +19,7 @@ import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepos
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.objects.utils.TtlCache;
+import com.netgrif.application.engine.objects.utils.InvalidationSafeCache;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -66,7 +66,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
      * cached briefly. Writes done through this service clear the cache; the TTL bounds staleness for writes done elsewhere.
      * Configured by {@link AuthCacheProperties}.
      */
-    private final TtlCache<String, ProcessRole> roleByIdCache;
+    private final InvalidationSafeCache<String, ProcessRole> roleByIdCache;
 
     public ProcessRoleService(ProcessRoleRepository processRoleRepository,
                               PetriNetRepository netRepository,
@@ -74,7 +74,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
                               @Lazy IPetriNetService petriNetService, @Lazy UserService userService, ISecurityContextService securityContextService, @Lazy GroupService groupService,
                               @Lazy RealmService realmService, @Lazy PaginationProperties paginationProperties, @Lazy IWorkflowService workflowService, @Lazy ITaskService taskService,
                               AuthCacheProperties authCacheProperties) {
-        this.roleByIdCache = new TtlCache<>(authCacheProperties.getProcessRole().getTtl(), authCacheProperties.getProcessRole().getMaxSize());
+        this.roleByIdCache = new InvalidationSafeCache<>(authCacheProperties.getProcessRole().getTtl(), authCacheProperties.getProcessRole().getMaxSize());
         this.processRoleRepository = processRoleRepository;
         this.netRepository = netRepository;
         this.publisher = publisher;
